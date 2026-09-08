@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="10" fill="#111827"/>
+  <rect width="48" height="48" rx="10" stroke="#334155" stroke-width="1.5"/>
+  <!-- Radar / Radio waves -->
+  <path d="M14 18C16.8 15.2 20.8 13.5 25 13.5C29.2 13.5 33.2 15.2 36 18" stroke="#0EA5E9" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M18 22C19.9 20.1 22.4 19 25 19C27.6 19 30.1 20.1 32 22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M21.5 25.5C22.4 24.6 23.6 24 25 24C26.4 24 27.6 24.6 28.5 25.5" stroke="#7DD3FC" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Center Emitter Tower -->
+  <circle cx="25" cy="28" r="2.5" fill="#0EA5E9"/>
+  <path d="M25 29V40" stroke="#0EA5E9" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M20 40L25 31L30 40" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22 36H28" stroke="#94A3B8" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,773 @@
+/**
+ * RF TOOLS Component Design System
+ * Version: 1.0.0
+ * Theme: Obsidian Slate Engineering Dark Theme
+ */
+
+@import './tokens.css';
+
+/* ==========================================================================
+   Base Layout & Workspace Shell
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.rf-tabular-nums {
+  font-family: 'JetBrains Mono', 'Geist Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Buttons & Actions
+   ========================================================================== */
+
+.rf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--rounded-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  line-height: 1.25;
+  user-select: none;
+}
+
+.rf-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.rf-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse); /* WCAG AAA: 6.92:1 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.rf-btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.4);
+}
+
+.rf-btn-primary:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+  color: var(--color-text-white);
+}
+
+.rf-btn-secondary {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-default);
+}
+
+.rf-btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-bg-overlay);
+  border-color: var(--color-border-strong);
+}
+
+.rf-btn-ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+}
+
+.rf-btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.rf-btn-destructive {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-status-danger);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.rf-btn-destructive:hover:not(:disabled) {
+  background-color: var(--color-status-danger);
+  color: var(--color-text-inverse);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+}
+
+.rf-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(40%);
+}
+
+/* ==========================================================================
+   Zone 1: Ingestion Dropzone
+   ========================================================================== */
+
+.rf-dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background-color: var(--color-bg-surface);
+  border: 2px dashed var(--color-border-default);
+  border-radius: var(--rounded-lg);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.rf-dropzone:hover {
+  border-color: var(--color-border-strong);
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+.rf-dropzone--dragover {
+  border-color: var(--color-border-accent) !important;
+  border-style: solid !important;
+  background-color: rgba(14, 165, 233, 0.08) !important;
+  box-shadow: 0 0 24px -2px rgba(14, 165, 233, 0.35);
+}
+
+.rf-dropzone__icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-primary);
+  transition: transform 0.2s ease;
+}
+
+.rf-dropzone--dragover .rf-dropzone__icon {
+  transform: translateY(-4px) scale(1.1);
+}
+
+.rf-dropzone__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.rf-dropzone__desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.rf-dropzone__formats {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.rf-dropzone__format-pill {
+  padding: 2px 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-muted);
+  border-radius: var(--rounded-xs);
+  border: 1px solid var(--color-border-subtle);
+}
+
+/* Loaded Collapsed Metadata Chip */
+.rf-dropzone-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-md);
+  box-sizing: border-box;
+}
+
+.rf-dropzone-chip__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.rf-dropzone-chip__format {
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background-color: rgba(14, 165, 233, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  border-radius: var(--rounded-xs);
+}
+
+.rf-dropzone-chip__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.rf-dropzone-chip__stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.rf-dropzone-chip__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Dual Dropzone (ISD Tool) */
+.rf-dropzone-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .rf-dropzone-dual {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Zone 2: Column Mapping Engine
+   ========================================================================== */
+
+.rf-mapping-panel {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+}
+
+.rf-mapping-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.rf-mapping-group-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.rf-mapping-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 130px;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.rf-mapping-row:last-child {
+  border-bottom: none;
+}
+
+.rf-mapping-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.rf-mapping-label__required {
+  color: var(--color-status-danger);
+  font-weight: bold;
+}
+
+.rf-mapping-control-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rf-mapping-select {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm);
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.rf-mapping-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+}
+
+.rf-mapping-select--error {
+  border-color: var(--color-status-danger);
+}
+
+.rf-sample-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-sunken);
+  padding: 2px 6px;
+  border-radius: var(--rounded-xs);
+  border: 1px solid var(--color-border-subtle);
+  max-width: fit-content;
+}
+
+.rf-confidence-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: var(--rounded-full);
+  white-space: nowrap;
+}
+
+.rf-confidence-pill--high {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--color-status-success);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.rf-confidence-pill--medium {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: var(--color-status-warning);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+.rf-confidence-pill--unmapped {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-status-danger);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* ==========================================================================
+   Zone 3: Parameter Tuning & Physics Panel
+   ========================================================================== */
+
+.rf-param-panel {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+}
+
+.rf-param-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.rf-param-group:last-child {
+  margin-bottom: 0;
+}
+
+.rf-param-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.rf-param-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.rf-param-desc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Sliders with Synchronized Numeric Stepper */
+.rf-slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.rf-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--color-border-subtle);
+  border-radius: var(--rounded-full);
+  outline: none;
+}
+
+.rf-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-text-white);
+  border: 2px solid var(--color-primary);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.rf-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.rf-stepper-input {
+  width: 70px;
+  padding: 6px 8px;
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  text-align: right;
+  outline: none;
+}
+
+.rf-stepper-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* Segmented Toggles */
+.rf-segmented-switch {
+  display: inline-flex;
+  padding: 3px;
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm);
+  gap: 2px;
+}
+
+.rf-segmented-item {
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--rounded-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rf-segmented-item:hover {
+  color: var(--color-text-primary);
+}
+
+.rf-segmented-item--active {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse); /* WCAG AAA */
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Color Picker Input */
+.rf-color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.rf-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-sm);
+  border: 1px solid var(--color-border-strong);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.rf-hex-input {
+  width: 100px;
+  padding: 6px 8px;
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+}
+
+/* LTE Band Stacking Matrix */
+.rf-band-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.rf-band-table th {
+  padding: 6px 8px;
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.rf-band-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ==========================================================================
+   KPI Threshold Chips (PRB & RRC Load)
+   ========================================================================== */
+
+.rf-kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--rounded-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+.rf-kpi-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.rf-kpi-chip--gray {
+  background-color: rgba(191, 191, 191, 0.12);
+  border: 1px solid rgba(191, 191, 191, 0.35);
+  color: var(--color-kpi-gray);
+}
+.rf-kpi-chip--gray .rf-kpi-chip__dot { background-color: var(--color-kpi-gray); }
+
+.rf-kpi-chip--blue {
+  background-color: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  color: #60A5FA;
+}
+.rf-kpi-chip--blue .rf-kpi-chip__dot { background-color: #3B82F6; }
+
+.rf-kpi-chip--green {
+  background-color: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  color: #4ADE80;
+}
+.rf-kpi-chip--green .rf-kpi-chip__dot { background-color: #22C55E; }
+
+.rf-kpi-chip--yellow {
+  background-color: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.45);
+  color: #FACC15;
+}
+.rf-kpi-chip--yellow .rf-kpi-chip__dot { background-color: #EAB308; }
+
+.rf-kpi-chip--amber {
+  background-color: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #FBBF24;
+}
+.rf-kpi-chip--amber .rf-kpi-chip__dot { background-color: #F59E0B; }
+
+.rf-kpi-chip--red {
+  background-color: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.50);
+  color: #F87171;
+}
+.rf-kpi-chip--red .rf-kpi-chip__dot { background-color: #EF4444; }
+
+/* ==========================================================================
+   Zone 4: Virtualized Data Preview Table
+   ========================================================================== */
+
+.rf-table-container {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-lg);
+  overflow: hidden;
+}
+
+.rf-table-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.rf-table-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.rf-table-wrap {
+  overflow-x: auto;
+  max-height: 450px;
+}
+
+.rf-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.rf-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 10px 14px;
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border-default);
+  white-space: nowrap;
+}
+
+.rf-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.rf-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.rf-table tbody tr:hover {
+  background-color: var(--color-bg-overlay);
+}
+
+.rf-table td.rf-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Tool Cards (Dashboard View)
+   ========================================================================== */
+
+.rf-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.rf-card-tool {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-lg);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rf-card-tool:hover {
+  border-color: var(--color-border-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(14, 165, 233, 0.2);
+}
+
+.rf-card-tool__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.rf-card-tool__icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-sm);
+  background-color: var(--color-bg-elevated);
+}
+
+.rf-card-tool__category {
+  padding: 3px 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+  border-radius: var(--rounded-xs);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.rf-card-tool__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 6px 0;
+}
+
+.rf-card-tool__desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-lg);
+  flex-grow: 1;
+}
+
+.rf-card-tool__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: 0.8125rem;
+}

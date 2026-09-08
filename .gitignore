@@ -1,0 +1,16 @@
+venv/
+.env
+__pycache__/
+*.py[cod]
+*.class
+*.swp
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+output/
+temp/
+*.log
+.remember_me.json

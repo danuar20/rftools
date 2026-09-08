@@ -1,0 +1,130 @@
+{
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#0ea5e9",
+        "primary-hover": "#0284c7",
+        "primary-active": "#0369a1",
+        "bg-base": "#0b0f17",
+        "bg-surface": "#111827",
+        "bg-elevated": "#1e293b",
+        "bg-overlay": "#253349",
+        "bg-sunken": "#070a10",
+        "border-subtle": "#1e293b",
+        "border-default": "#334155",
+        "border-strong": "#475569",
+        "border-accent": "#0ea5e9",
+        "text-primary": "#f8fafc",
+        "text-secondary": "#94a3b8",
+        "text-muted": "#7c8b9e",
+        "text-inverse": "#0b0f17",
+        "text-white": "#ffffff",
+        "accent-indigo": "#4f46e5",
+        "accent-emerald": "#10b981",
+        "status-success": "#10b981",
+        "status-warning": "#f59e0b",
+        "status-danger": "#ef4444",
+        "status-info": "#0ea5e9",
+        "kpi-gray": "#bfbfbf",
+        "kpi-blue": "#3b82f6",
+        "kpi-green": "#22c55e",
+        "kpi-yellow": "#eab308",
+        "kpi-amber": "#f59e0b",
+        "kpi-red": "#ef4444"
+      },
+      "fontFamily": {
+        "h1": [
+          "Inter"
+        ],
+        "h2": [
+          "Inter"
+        ],
+        "h3": [
+          "Inter"
+        ],
+        "body-lg": [
+          "Inter"
+        ],
+        "body-md": [
+          "Inter"
+        ],
+        "body-sm": [
+          "Inter"
+        ],
+        "mono-sm": [
+          "JetBrains Mono"
+        ],
+        "badge": [
+          "Inter"
+        ]
+      },
+      "fontSize": {
+        "h1": [
+          "1.875rem",
+          {
+            "letterSpacing": "-0.02em",
+            "fontWeight": "700"
+          }
+        ],
+        "h2": [
+          "1.5rem",
+          {
+            "letterSpacing": "-0.015em",
+            "fontWeight": "600"
+          }
+        ],
+        "h3": [
+          "1.25rem",
+          {
+            "fontWeight": "600"
+          }
+        ],
+        "body-lg": [
+          "1.125rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "body-md": [
+          "1rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "body-sm": [
+          "0.875rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "mono-sm": [
+          "0.8125rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "badge": [
+          "0.75rem",
+          {
+            "fontWeight": "600"
+          }
+        ]
+      },
+      "borderRadius": {
+        "xs": "2px",
+        "sm": "4px",
+        "md": "6px",
+        "lg": "8px",
+        "full": "9999px"
+      },
+      "spacing": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "16px",
+        "lg": "24px",
+        "xl": "32px",
+        "xxl": "48px"
+      }
+    }
+  }
+}

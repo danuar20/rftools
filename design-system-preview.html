@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RF TOOLS — Visual Design System & Component Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./tokens.css">
+  <link rel="stylesheet" href="./components.css">
+  <style>
+    /* Custom Showcase Layout Styles */
+    .showcase-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+    .showcase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border-default);
+      margin-bottom: 40px;
+    }
+    .showcase-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .showcase-brand__logo {
+      width: 48px;
+      height: 48px;
+    }
+    .showcase-brand__title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+    }
+    .showcase-brand__subtitle {
+      margin: 4px 0 0 0;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    .showcase-section {
+      margin-bottom: 56px;
+    }
+    .showcase-section__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .showcase-section__desc {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin: 0 0 24px 0;
+    }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .palette-card {
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--rounded-md);
+      overflow: hidden;
+    }
+    .palette-swatch {
+      height: 64px;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px;
+      box-sizing: border-box;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .palette-info {
+      padding: 12px;
+    }
+    .palette-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .palette-token {
+      font-size: 0.6875rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--color-text-muted);
+    }
+    .component-box {
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--rounded-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .component-box__title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .dual-workspace-preview {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      gap: 24px;
+      background-color: var(--color-bg-base);
+      padding: 20px;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--rounded-lg);
+    }
+    @media (max-width: 1024px) {
+      .dual-workspace-preview {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase-container">
+    <!-- Header -->
+    <header class="showcase-header">
+      <div class="showcase-brand">
+        <img src="./assets/icons/rf-logo.svg" alt="RF TOOLS" class="showcase-brand__logo">
+        <div>
+          <h1 class="showcase-brand__title">RF TOOLS Design System</h1>
+          <p class="showcase-brand__subtitle">High-Precision Telecommunications & Engineering Design System (v1.0.0)</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="rf-confidence-pill rf-confidence-pill--high">WCAG AAA / AA Validated</span>
+        <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(14,165,233,0.15); color: #0EA5E9; border-color: rgba(14,165,233,0.35);">Phase 3: Visual &amp; System Design</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: DESIGN TOKENS & OBSIDIAN SLATE PALETTE -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>🎨</span> Section 1: Design Tokens &amp; Obsidian Slate Palette
+      </h2>
+      <p class="showcase-section__desc">
+        Engineered dark surfaces calibrated for zero eye strain in Network Operations Centers (NOC), high-contrast text, and primary interaction cyan.
+      </p>
+
+      <div class="palette-grid">
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #0B0F17; color: #F8FAFC; border-bottom: 1px solid #334155;">#0B0F17</div>
+          <div class="palette-info">
+            <div class="palette-name">Canvas Base</div>
+            <div class="palette-token">--color-bg-base</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #111827; color: #F8FAFC; border-bottom: 1px solid #334155;">#111827</div>
+          <div class="palette-info">
+            <div class="palette-name">Surface Card</div>
+            <div class="palette-token">--color-bg-surface</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #1E293B; color: #F8FAFC;">#1E293B</div>
+          <div class="palette-info">
+            <div class="palette-name">Elevated Panel</div>
+            <div class="palette-token">--color-bg-elevated</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #253349; color: #F8FAFC;">#253349</div>
+          <div class="palette-info">
+            <div class="palette-name">Hover Overlay</div>
+            <div class="palette-token">--color-bg-overlay</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #070A10; color: #94A3B8; border-bottom: 1px solid #334155;">#070A10</div>
+          <div class="palette-info">
+            <div class="palette-name">Sunken Well</div>
+            <div class="palette-token">--color-bg-sunken</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #0EA5E9; color: #0B0F17;">#0EA5E9</div>
+          <div class="palette-info">
+            <div class="palette-name">Technical Cyan</div>
+            <div class="palette-token">--color-primary</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #4F46E5; color: #FFFFFF;">#4F46E5</div>
+          <div class="palette-info">
+            <div class="palette-name">GIS Indigo</div>
+            <div class="palette-token">--color-accent-indigo</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: #10B981; color: #0B0F17;">#10B981</div>
+          <div class="palette-info">
+            <div class="palette-name">Success / Topology</div>
+            <div class="palette-token">--color-accent-emerald</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: TELECOM KPI LOAD THRESHOLD MATRIX -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>📊</span> Section 2: Telecom PRB &amp; RRC Load Threshold Chips
+      </h2>
+      <p class="showcase-section__desc">
+        Exact color tokens and chip styling adhering to 3GPP LTE/NR PRB congestion benchmarks and active RRC connected user states.
+      </p>
+
+      <div class="component-box">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Inactive (0%)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--gray">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 0.0% · Inactive
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Low Load (&le; 35% / RRC &le; 40)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--blue">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 24.8% · Low Load
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Normal (35-60% / RRC 40-60)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--green">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 48.2% · Normal
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Medium (60-75% / RRC 60-90)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--yellow">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 68.5% · Medium
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">High (75-90% / RRC 90-120)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--amber">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 84.1% · High Load
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Congested (&gt; 90% / RRC &gt; 120)</span>
+            <span class="rf-kpi-chip rf-kpi-chip--red">
+              <span class="rf-kpi-chip__dot"></span>
+              PRB 94.7% · Congested
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: ZONE 1 - INGESTION DROPZONE -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>📥</span> Section 3: Zone 1 — File Ingestion Dropzones
+      </h2>
+      <p class="showcase-section__desc">
+        Empty drag-and-drop state, active drag-over wash with cyan border, and collapsed high-density metadata chip.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- Idle Dropzone -->
+        <div class="component-box" style="margin-bottom: 0;">
+          <div class="component-box__title">Idle State</div>
+          <div class="rf-dropzone" id="demo-dropzone-idle">
+            <svg class="rf-dropzone__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <div class="rf-dropzone__title">Drag and drop calculation workbook here</div>
+            <div class="rf-dropzone__desc">Supports standard engineering spreadsheets up to 100 MB</div>
+            <div class="rf-dropzone__formats">
+              <span class="rf-dropzone__format-pill">.XLSX</span>
+              <span class="rf-dropzone__format-pill">.XLS</span>
+              <span class="rf-dropzone__format-pill">.CSV</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drag-over Simulated State -->
+        <div class="component-box" style="margin-bottom: 0;">
+          <div class="component-box__title">Active Drag-Over State (Simulated)</div>
+          <div class="rf-dropzone rf-dropzone--dragover">
+            <svg class="rf-dropzone__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            <div class="rf-dropzone__title" style="color: var(--color-primary);">Drop spreadsheet to inspect columns</div>
+            <div class="rf-dropzone__desc">Automatic header extraction &amp; alias mapping will initiate immediately</div>
+            <div class="rf-dropzone__formats">
+              <span class="rf-dropzone__format-pill" style="border-color: var(--color-primary); color: var(--color-primary);">READY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loaded Collapsed State -->
+      <div class="component-box">
+        <div class="component-box__title">Loaded State (Collapsed Metadata Chip)</div>
+        <div class="rf-dropzone-chip">
+          <div class="rf-dropzone-chip__meta">
+            <span class="rf-dropzone-chip__format">XLSX</span>
+            <div>
+              <div class="rf-dropzone-chip__name">Carrier_PRB_Sector_Dump_2026_Q3.xlsx</div>
+              <div class="rf-dropzone-chip__stats">
+                <span>1.42 MB</span>
+                <span>&bull;</span>
+                <span class="rf-tabular-nums">1,450 rows &times; 18 cols</span>
+                <span>&bull;</span>
+                <select class="rf-mapping-select" style="width: auto; padding: 3px 24px 3px 8px; font-size: 0.75rem;">
+                  <option>Sheet1: LTE_Carrier_Data (Active)</option>
+                  <option>Sheet2: Tower_Coordinates</option>
+                  <option>Sheet3: Metadata</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="rf-dropzone-chip__actions">
+            <button class="rf-btn rf-btn-secondary" style="padding: 6px 12px; font-size: 0.8125rem;">
+              <span>🔄</span> Replace File
+            </button>
+            <button class="rf-btn rf-btn-destructive" style="padding: 6px 12px; font-size: 0.8125rem;">
+              <span>✕</span> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ISD Dual Dropzone -->
+      <div class="component-box">
+        <div class="component-box__title">Dual Dropzone Variant (Tool 3: Inter-Site Distance Calculator)</div>
+        <div class="rf-dropzone-dual">
+          <div class="rf-dropzone-chip" style="border-left: 3px solid var(--color-primary);">
+            <div class="rf-dropzone-chip__meta">
+              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(14,165,233,0.2); color: #0EA5E9; border-color: rgba(14,165,233,0.4);">FILE A: SOURCE</span>
+              <div>
+                <div class="rf-dropzone-chip__name">Source_Sites_Cluster_North.xlsx</div>
+                <div class="rf-dropzone-chip__stats">
+                  <span>340 Sites</span>
+                  <span>&bull;</span>
+                  <span>520 KB</span>
+                </div>
+              </div>
+            </div>
+            <button class="rf-btn rf-btn-ghost" style="padding: 4px 8px; font-size: 0.75rem;">Replace</button>
+          </div>
+
+          <div class="rf-dropzone-chip" style="border-left: 3px solid var(--color-accent-indigo);">
+            <div class="rf-dropzone-chip__meta">
+              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(99,102,241,0.2); color: #818CF8; border-color: rgba(99,102,241,0.4);">FILE B: TARGET</span>
+              <div>
+                <div class="rf-dropzone-chip__name">Competitor_Sites_Master.xlsx</div>
+                <div class="rf-dropzone-chip__stats">
+                  <span>1,280 Sites</span>
+                  <span>&bull;</span>
+                  <span>1.85 MB</span>
+                </div>
+              </div>
+            </div>
+            <button class="rf-btn rf-btn-ghost" style="padding: 4px 8px; font-size: 0.75rem;">Replace</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: SPLIT WORKSPACE - ZONE 2 (MAPPING) & ZONE 3 (PARAMETERS) -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>⚡</span> Section 4: Zones 2 &amp; 3 — Column Mapping &amp; Physics Parameters (PRB KML Workspace)
+      </h2>
+      <p class="showcase-section__desc">
+        Dual-column 55%/45% layout providing rapid column inspection, auto-selected dropdowns, and interactive antenna parameter tuning.
+      </p>
+
+      <div class="dual-workspace-preview">
+        <!-- ZONE 2: MAPPING (55%) -->
+        <div class="rf-mapping-panel">
+          <div class="rf-mapping-section-header">
+            <span style="font-size: 0.9375rem; font-weight: 600; color: var(--color-text-primary);">Zone 2: Column Mapping Engine</span>
+            <span class="rf-confidence-pill rf-confidence-pill--high">8/8 Mapped</span>
+          </div>
+
+          <div class="rf-mapping-group-title">Mandatory Requirements</div>
+
+          <!-- Latitude -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>📍 Latitude</span>
+              <span class="rf-mapping-label__required">*</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>LAT (Detected Column)</option>
+                <option>LATITUDE</option>
+                <option>Y_COORD</option>
+              </select>
+              <div class="rf-sample-chip">Sample: -6.175392</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--high">100% Match</span>
+            </div>
+          </div>
+
+          <!-- Longitude -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>📍 Longitude</span>
+              <span class="rf-mapping-label__required">*</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>LONG (Detected Column)</option>
+                <option>LONGITUDE</option>
+                <option>LON</option>
+              </select>
+              <div class="rf-sample-chip">Sample: 106.827153</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--high">100% Match</span>
+            </div>
+          </div>
+
+          <!-- Azimuth Direction -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>🧭 Azimuth (Direction)</span>
+              <span class="rf-mapping-label__required">*</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>DIRECTION (Detected Column)</option>
+                <option>AZIMUTH</option>
+                <option>BEARING</option>
+              </select>
+              <div class="rf-sample-chip">Sample: 120&deg;</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--high">100% Match</span>
+            </div>
+          </div>
+
+          <!-- Beamwidth -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>📡 Beamwidth (Horizontal)</span>
+              <span class="rf-mapping-label__required">*</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>BEAM (Detected Column)</option>
+                <option>H_BW</option>
+              </select>
+              <div class="rf-sample-chip">Sample: 65&deg;</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--medium">Fuzzy Match</span>
+            </div>
+          </div>
+
+          <!-- PRB Traffic Metric -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>📶 DL PRB Utilization</span>
+              <span class="rf-mapping-label__required">*</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>DL PRB BDBH</option>
+                <option>DL_PRB_AVG</option>
+              </select>
+              <div class="rf-sample-chip">Sample: 78.4%</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--high">100% Match</span>
+            </div>
+          </div>
+
+          <div class="rf-mapping-group-title">Optional Antenna Attributes</div>
+
+          <!-- Tower Height -->
+          <div class="rf-mapping-row">
+            <div class="rf-mapping-label">
+              <span>🗼 Tower Height (m)</span>
+            </div>
+            <div class="rf-mapping-control-wrap">
+              <select class="rf-mapping-select">
+                <option selected>TOWER_HEIGHT</option>
+                <option>HEIGHT_M</option>
+              </select>
+              <div class="rf-sample-chip">Sample: 45m</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="rf-confidence-pill rf-confidence-pill--medium">Fuzzy Match</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ZONE 3: PARAMETER TUNING (45%) -->
+        <div class="rf-param-panel">
+          <div class="rf-mapping-section-header">
+            <span style="font-size: 0.9375rem; font-weight: 600; color: var(--color-text-primary);">Zone 3: Parameter Controls &amp; Physics</span>
+            <span class="rf-confidence-pill rf-confidence-pill--high" style="background-color: rgba(14,165,233,0.15); color: #0EA5E9; border-color: rgba(14,165,233,0.35);">PRB Sector Engine</span>
+          </div>
+
+          <!-- Metric Selector Segmented Toggle -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">Color Thematic Metric</span>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Active Driver</span>
+            </div>
+            <div class="rf-param-desc">Select primary metric to drive 3D sector color thresholds</div>
+            <div class="rf-segmented-switch" style="width: 100%;">
+              <button class="rf-segmented-item rf-segmented-item--active" style="flex: 1;">DL PRB (%)</button>
+              <button class="rf-segmented-item" style="flex: 1;">UL PRB (%)</button>
+              <button class="rf-segmented-item" style="flex: 1;">RRC Users</button>
+            </div>
+          </div>
+
+          <!-- Sector Fill Opacity Slider -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">Polygon Fill Opacity</span>
+              <span class="rf-tabular-nums" style="font-size: 0.8125rem; color: var(--color-primary);">40%</span>
+            </div>
+            <div class="rf-param-desc">Alpha transparency in Google Earth polygon rendering</div>
+            <div class="rf-slider-row">
+              <input type="range" class="rf-slider" min="10" max="100" value="40" id="demo-opacity-slider">
+              <input type="number" class="rf-stepper-input" value="40" min="10" max="100">
+            </div>
+          </div>
+
+          <!-- Extrude to Ground Toggle -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">3D Extrude to Ground</span>
+              <label style="position: relative; display: inline-block; width: 38px; height: 20px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-primary); border-radius: 20px; transition: .2s;">
+                  <span style="position: absolute; content: ''; height: 14px; width: 14px; left: 20px; bottom: 3px; background-color: #0B0F17; border-radius: 50%; transition: .2s;"></span>
+                </span>
+              </label>
+            </div>
+            <div class="rf-param-desc">Draws vertical curtain walls from sector polygon down to terrain surface</div>
+          </div>
+
+          <!-- LTE Band Altitude Stacking Matrix -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">3GPP Band Stacking Layer Altitudes</span>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Override Config</span>
+            </div>
+            <div class="rf-param-desc">Multi-carrier altitude stacking prevents overlapping 3D KML polygons</div>
+            <table class="rf-band-table">
+              <thead>
+                <tr>
+                  <th>Carrier Band</th>
+                  <th>Altitude (m)</th>
+                  <th>Sector Radius (m)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="color: var(--color-text-primary); font-weight: 600;">LTE 700</td>
+                  <td style="color: var(--color-primary);">30 m</td>
+                  <td>180 m</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--color-text-primary); font-weight: 600;">LTE 900</td>
+                  <td style="color: var(--color-primary);">34 m</td>
+                  <td>160 m</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--color-text-primary); font-weight: 600;">LTE 1800</td>
+                  <td style="color: var(--color-primary);">38 m</td>
+                  <td>140 m</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--color-text-primary); font-weight: 600;">LTE 2100</td>
+                  <td style="color: var(--color-primary);">42 m</td>
+                  <td>120 m</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--color-text-primary); font-weight: 600;">LTE 2300</td>
+                  <td style="color: var(--color-primary);">54 m</td>
+                  <td>100 m</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Primary Execution Action -->
+          <div style="margin-top: 24px;">
+            <button class="rf-btn rf-btn-primary" style="width: 100%; padding: 12px; font-size: 0.9375rem;">
+              <span>⚡</span> Process &amp; Generate 3D PRB KML (1,450 Records)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ZONE 4 - DATA PREVIEW TABLE -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>📋</span> Section 5: Zone 4 — High-Density Data Preview Table
+      </h2>
+      <p class="showcase-section__desc">
+        10-row virtualized preview grid with monospace coordinate alignment, tabular numerical figures, status chips, and download CTA.
+      </p>
+
+      <div class="rf-table-container">
+        <!-- Summary Bar -->
+        <div class="rf-table-summary-bar">
+          <div class="rf-table-stats">
+            <span style="font-weight: 600; color: var(--color-text-primary);">Generated Output: PRB_Sectors_3D.kml</span>
+            <span>&bull;</span>
+            <span class="rf-tabular-nums">1,450 Polygons Created</span>
+            <span>&bull;</span>
+            <span class="rf-tabular-nums" style="color: var(--color-status-success);">Computed in 312ms</span>
+          </div>
+          <div>
+            <button class="rf-btn rf-btn-primary" style="padding: 6px 14px; font-size: 0.8125rem;">
+              <span>📥</span> Download KML Deliverable (3.8 MB)
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Grid -->
+        <div class="rf-table-wrap">
+          <table class="rf-table">
+            <thead>
+              <tr>
+                <th>Site ID</th>
+                <th>Sector Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Azimuth</th>
+                <th>Beam</th>
+                <th>Band</th>
+                <th>Altitude</th>
+                <th>DL PRB (%)</th>
+                <th>Traffic State</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT001</td>
+                <td>JKT001_L18_1</td>
+                <td class="rf-mono">-6.175392</td>
+                <td class="rf-mono">106.827153</td>
+                <td class="rf-mono">0&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE1800</td>
+                <td class="rf-mono">38m</td>
+                <td class="rf-mono">92.4%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--red"><span class="rf-kpi-chip__dot"></span>Congested</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT001</td>
+                <td>JKT001_L18_2</td>
+                <td class="rf-mono">-6.175392</td>
+                <td class="rf-mono">106.827153</td>
+                <td class="rf-mono">120&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE1800</td>
+                <td class="rf-mono">38m</td>
+                <td class="rf-mono">48.1%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--green"><span class="rf-kpi-chip__dot"></span>Normal</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT001</td>
+                <td>JKT001_L18_3</td>
+                <td class="rf-mono">-6.175392</td>
+                <td class="rf-mono">106.827153</td>
+                <td class="rf-mono">240&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE1800</td>
+                <td class="rf-mono">38m</td>
+                <td class="rf-mono">76.8%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--amber"><span class="rf-kpi-chip__dot"></span>High Load</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT002</td>
+                <td>JKT002_L21_1</td>
+                <td class="rf-mono">-6.182410</td>
+                <td class="rf-mono">106.834920</td>
+                <td class="rf-mono">30&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE2100</td>
+                <td class="rf-mono">42m</td>
+                <td class="rf-mono">64.5%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--yellow"><span class="rf-kpi-chip__dot"></span>Medium</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT002</td>
+                <td>JKT002_L21_2</td>
+                <td class="rf-mono">-6.182410</td>
+                <td class="rf-mono">106.834920</td>
+                <td class="rf-mono">150&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE2100</td>
+                <td class="rf-mono">42m</td>
+                <td class="rf-mono">22.0%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--blue"><span class="rf-kpi-chip__dot"></span>Low Load</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT002</td>
+                <td>JKT002_L21_3</td>
+                <td class="rf-mono">-6.182410</td>
+                <td class="rf-mono">106.834920</td>
+                <td class="rf-mono">270&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE2100</td>
+                <td class="rf-mono">42m</td>
+                <td class="rf-mono">0.0%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--gray"><span class="rf-kpi-chip__dot"></span>Inactive</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
+                <td>JKT003_L09_1</td>
+                <td class="rf-mono">-6.190125</td>
+                <td class="rf-mono">106.815678</td>
+                <td class="rf-mono">60&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE900</td>
+                <td class="rf-mono">34m</td>
+                <td class="rf-mono">88.5%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--amber"><span class="rf-kpi-chip__dot"></span>High Load</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
+                <td>JKT003_L09_2</td>
+                <td class="rf-mono">-6.190125</td>
+                <td class="rf-mono">106.815678</td>
+                <td class="rf-mono">180&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE900</td>
+                <td class="rf-mono">34m</td>
+                <td class="rf-mono">55.2%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--green"><span class="rf-kpi-chip__dot"></span>Normal</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
+                <td>JKT003_L09_3</td>
+                <td class="rf-mono">-6.190125</td>
+                <td class="rf-mono">106.815678</td>
+                <td class="rf-mono">300&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE900</td>
+                <td class="rf-mono">34m</td>
+                <td class="rf-mono">96.3%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--red"><span class="rf-kpi-chip__dot"></span>Congested</span></td>
+              </tr>
+              <tr>
+                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT004</td>
+                <td>JKT004_L23_1</td>
+                <td class="rf-mono">-6.201450</td>
+                <td class="rf-mono">106.841200</td>
+                <td class="rf-mono">45&deg;</td>
+                <td class="rf-mono">65&deg;</td>
+                <td class="rf-mono">LTE2300</td>
+                <td class="rf-mono">54m</td>
+                <td class="rf-mono">31.8%</td>
+                <td><span class="rf-kpi-chip rf-kpi-chip--blue"><span class="rf-kpi-chip__dot"></span>Low Load</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: SUITE TOOL CARDS (DASHBOARD VIEW) -->
+    <section class="showcase-section">
+      <h2 class="showcase-section__title">
+        <span>🧰</span> Section 6: RF TOOLS Suite Cards (Dashboard Grid)
+      </h2>
+      <p class="showcase-section__desc">
+        Responsive grid of all 6 telecommunications calculation engines with domain icons, badges, and CTAs.
+      </p>
+
+      <div class="rf-card-grid">
+        <!-- Tool 1 -->
+        <a href="#tool-excel-to-kml" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-excel-to-kml.svg" alt="Excel to KML" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">KML &amp; Site</span>
+          </div>
+          <h3 class="rf-card-tool__title">Excel &rarr; Point KML</h3>
+          <p class="rf-card-tool__desc">Converts site lists with coordinates into customizable Google Earth placemarks with custom icon scales and colors.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.kml output</span>
+          </div>
+        </a>
+
+        <!-- Tool 2 -->
+        <a href="#tool-prb-kml" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-prb-kml.svg" alt="PRB KML" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">KML &amp; Site</span>
+          </div>
+          <h3 class="rf-card-tool__title">Excel &rarr; PRB 3D Sector</h3>
+          <p class="rf-card-tool__desc">Models 3D antenna sector polygons extruded relative to ground with 3GPP LTE band altitudes and PRB congestion colors.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.kml 3D layer</span>
+          </div>
+        </a>
+
+        <!-- Tool 3 -->
+        <a href="#tool-isd" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-isd-calculator.svg" alt="ISD Calculator" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">ISD &amp; Topology</span>
+          </div>
+          <h3 class="rf-card-tool__title">ISD Calculator</h3>
+          <p class="rf-card-tool__desc">High-speed geodesic Haversine distance engine computing N-nearest site neighbor relationships and topological metrics.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.xlsx dual sheet</span>
+          </div>
+        </a>
+
+        <!-- Tool 4 -->
+        <a href="#tool-geohash-shp" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-geohash-to-shp.svg" alt="Geohash to Shapefile" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">Geohash &amp; GIS</span>
+          </div>
+          <h3 class="rf-card-tool__title">Geohash &rarr; Shapefile</h3>
+          <p class="rf-card-tool__desc">Transforms geohash datasets into ESRI Shapefile polygon archives (.shp, .shx, .dbf, .prj) with exact bbox or metric squares.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.zip archive</span>
+          </div>
+        </a>
+
+        <!-- Tool 5 -->
+        <a href="#tool-geohash-latlon" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-geohash-to-latlon.svg" alt="Geohash Decoder" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">Geohash &amp; GIS</span>
+          </div>
+          <h3 class="rf-card-tool__title">Geohash &rarr; Lat / Long</h3>
+          <p class="rf-card-tool__desc">Decodes geohash string columns into high-precision WGS84 centroid latitude and longitude coordinate columns.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.xlsx / .csv</span>
+          </div>
+        </a>
+
+        <!-- Tool 6 -->
+        <a href="#tool-latlon-geohash" class="rf-card-tool">
+          <div class="rf-card-tool__header">
+            <div class="rf-card-tool__icon">
+              <img src="./assets/icons/tool-latlon-to-geohash.svg" alt="Coordinate Encoder" style="width: 24px; height: 24px;">
+            </div>
+            <span class="rf-card-tool__category">Geohash &amp; GIS</span>
+          </div>
+          <h3 class="rf-card-tool__title">Lat / Long &rarr; Geohash</h3>
+          <p class="rf-card-tool__desc">Encodes coordinate pairs into geohash grid strings with configurable precision levels from regional down to sub-meter.</p>
+          <div class="rf-card-tool__footer">
+            <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
+            <span style="color: var(--color-text-muted);">.xlsx / .csv</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Live slider value sync
+    const slider = document.getElementById('demo-opacity-slider');
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        const numInput = slider.nextElementSibling;
+        const display = slider.parentElement.previousElementSibling.querySelector('.rf-tabular-nums');
+        if (numInput) numInput.value = e.target.value;
+        if (display) display.textContent = e.target.value + '%';
+      });
+    }
+  </script>
+</body>
+</html>

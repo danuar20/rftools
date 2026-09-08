@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RF TOOLS — Telecommunications &amp; Geospatial Engineering Suite</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/rf-logo.svg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Design System & Components CSS -->
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Collapsible Sidebar -->
+    <aside id="sidebar-container"></aside>
+
+    <!-- Main Content Container -->
+    <div class="main-wrapper">
+      <!-- Top Action Header Navbar -->
+      <div id="navbar-container"></div>
+
+      <!-- Scrollable Main Viewport -->
+      <main class="content-viewport" id="content-viewport">
+        <!-- Dynamic View Rendered Here by Router -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Application Bundle -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
