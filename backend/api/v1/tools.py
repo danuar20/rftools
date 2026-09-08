@@ -164,9 +164,14 @@ async def process_prb_kml(
     opacity_percent: int = Form(40),
     include_legend: bool = Form(True),
     sheet_name: Optional[str] = Form("Sheet1"),
+    custom_bands: Optional[str] = Form(None),
+    custom_ranges: Optional[str] = Form(None),
+    left_logo_url: Optional[str] = Form(None),
+    right_logo_url: Optional[str] = Form(None),
+    legend_url: Optional[str] = Form(None),
     preview: bool = Query(False)
 ):
-    """Converts cell metrics into a 3D PRB KML sector file."""
+    """Converts cell metrics into a 3D PRB KML sector file with custom bands, ranges, and logos."""
     try:
         content = await file.read()
         kml_bytes, summary = convert_excel_to_prb_kml(
@@ -174,7 +179,12 @@ async def process_prb_kml(
             color_by_metric=color_by_metric,
             opacity_percent=opacity_percent,
             include_legend=include_legend,
-            sheet_name=sheet_name
+            sheet_name=sheet_name,
+            custom_bands=custom_bands,
+            custom_ranges=custom_ranges,
+            left_logo_url=left_logo_url,
+            right_logo_url=right_logo_url,
+            legend_url=legend_url
         )
         if preview:
             return {"success": True, "summary": summary}
@@ -192,6 +202,7 @@ async def process_isd_calculator(
     file_a: UploadFile = File(...),
     file_b: UploadFile = File(...),
     n_nearest: int = Form(1),
+    distance_unit: str = Form("km"),
     lat_col_a: Optional[str] = Form(None),
     lon_col_a: Optional[str] = Form(None),
     name_col_a: Optional[str] = Form(None),
@@ -200,7 +211,7 @@ async def process_isd_calculator(
     name_col_b: Optional[str] = Form(None),
     preview: bool = Query(False)
 ):
-    """Calculates nearest neighbor distances between File A and File B."""
+    """Calculates nearest neighbor distances between File A and File B (supports km and m units)."""
     try:
         content_a = await file_a.read()
         content_b = await file_b.read()
@@ -208,6 +219,7 @@ async def process_isd_calculator(
             content_a,
             content_b,
             n_nearest=n_nearest,
+            distance_unit=distance_unit,
             lat_col_a=lat_col_a,
             lon_col_a=lon_col_a,
             name_col_a=name_col_a,

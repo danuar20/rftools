@@ -137,19 +137,14 @@ def convert_excel_to_kml(
 
             name = None
             if name_idx is not None and name_idx < len(r) and r[name_idx] not in (None, ""):
-                name = str(r[name_idx]).strip()
-            else:
-                for cand in ['sitename', 'site_name', 'site_id', 'siteid', 'name', 'site']:
-                    if cand in header_map:
-                        idx_cand = header_map[cand]
-                        if idx_cand not in (lat_idx, lon_idx) and idx_cand < len(r) and r[idx_cand] not in (None, ""):
-                            name = str(r[idx_cand]).strip()
-                            break
-                if not name:
-                    for try_idx in range(len(r)):
-                        if try_idx not in (lat_idx, lon_idx) and r[try_idx] not in (None, ""):
-                            name = str(r[try_idx]).strip()
-                            break
+                val = str(r[name_idx]).strip()
+                if not val.startswith("="):
+                    name = val
+            if not name:
+                for try_idx in (1, 0):
+                    if try_idx < len(r) and r[try_idx] not in (None, "") and try_idx not in (lat_idx, lon_idx):
+                        name = str(r[try_idx]).strip()
+                        break
             final_name = name or f"Site_{valid_points + 1}"
 
             p = fol.newpoint(name=final_name, coords=[(lon_f, lat_f)])

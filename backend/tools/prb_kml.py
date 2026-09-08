@@ -1,10 +1,12 @@
 """
 Tool 2: Excel to PRB KML 3D Sector Polygon Visualizer
 Builds 3D extruded sector polygons color-coded by PRB/RRC utilization.
+Matches 24-row HTML balloon popup table and supports custom bands, ranges, and logos.
 """
 
 import io
 import math
+import json
 from typing import Optional, Dict, Any, Tuple, List
 import pandas as pd
 import simplekml
@@ -12,10 +14,14 @@ from simplekml import ListItemType, OverlayXY, ScreenXY, Units
 from backend.tools.constants import (
     EARTH_RADIUS_GEODESIC_KM,
     get_band_params,
+    get_kpi_color,
     get_dl_prb_color,
     get_ul_prb_color,
     get_rrc_color,
     DEFAULT_PRB_OPACITY,
+    DEFAULT_LEFT_LOGO,
+    DEFAULT_RIGHT_LOGO,
+    DEFAULT_LEGEND_URL,
 )
 
 def calculate_new_coords(rad_lat: float, rad_lon: float, azimuth_rad: float, d_r: float) -> Tuple[float, float]:
@@ -65,20 +71,138 @@ def generate_sector_polygon_coords(
     pts.append((lon, lat, altitude))
     return pts
 
+def format_cell_value(val: Any) -> str:
+    """Formats attribute value, displaying '-' for empty or NaN values."""
+    if val is None or pd.isna(val):
+        return "-"
+    s = str(val).strip()
+    if s == "" or s.lower() == "nan":
+        return "-"
+    return s
+
+def build_balloon_description(
+    row_data: Dict[str, Any],
+    left_logo: str,
+    right_logo: str,
+    color_dl: str,
+    color_ul: str,
+    color_rrc: str,
+    dl_prb: float,
+    ul_prb: float,
+    rrc: float,
+    payload_gb: float
+) -> str:
+    """
+    Generates exact 24-row HTML balloon popup table matching attachment 01a0815f-1e68-77f0-a9d4-1e6945320dd5
+    with dual header logos and copyright footer.
+    """
+    # Extract values with '-' fallback
+    week = format_cell_value(row_data.get('WEEK'))
+    sitename = format_cell_value(row_data.get('SITENAME'))
+    cellname = format_cell_value(row_data.get('CELLNAME'))
+    band = format_cell_value(row_data.get('BEAM'))
+    bw = format_cell_value(row_data.get('BW (MHz)') or row_data.get('BW (MHZ)'))
+    lon = format_cell_value(row_data.get('LONG'))
+    lat = format_cell_value(row_data.get('LAT'))
+    class_rev = format_cell_value(row_data.get('CLASS REV'))
+    nop = format_cell_value(row_data.get('NOP'))
+    rtpo = format_cell_value(row_data.get('RTPO'))
+    propinsi = format_cell_value(row_data.get('PROPINSI'))
+    kabupaten = format_cell_value(row_data.get('KABUPATEN'))
+    kecamatan = format_cell_value(row_data.get('KECAMATAN'))
+    desa = format_cell_value(row_data.get('DESA'))
+    sdr = format_cell_value(row_data.get('SDR'))
+    antenna_type = format_cell_value(row_data.get('ANTENNA_TYPE'))
+    tower_height = format_cell_value(row_data.get('TOWER_HEIGHT'))
+    antenna_height = format_cell_value(row_data.get('ANTENNA_HEIGHT'))
+    azimuth = format_cell_value(row_data.get('DIRECTION'))
+    m_tilt = format_cell_value(row_data.get('M-Tilt'))
+    e_tilt = format_cell_value(row_data.get('E-Tilt'))
+    pci = format_cell_value(row_data.get('PCI'))
+
+    # Append MHz if numeric bandwidth
+    if bw != "-" and not bw.lower().endswith("mhz"):
+        bw_display = f"{bw} Mhz"
+    else:
+        bw_display = bw
+
+    html = (
+        '<STYLE TYPE="text/css">'
+        'TD{font-family: Calibri, sans-serif; font-size: 8pt; color: Black;}'
+        '.small-text{font-size: 6pt; color: #333;}'
+        '</STYLE>'
+        '<table border="1" cellspacing="0" cellpadding="2" style="border-collapse: collapse; width: 100%;">'
+        '<tr>'
+        f'<td style="text-align: center; vertical-align: middle; padding: 4px;"><b><img src="{left_logo}" width="184" height="56"></b></td>'
+        f'<td style="text-align: center; vertical-align: middle; padding: 4px;"><center><img src="{right_logo}" width="184" height="56"></center></td>'
+        '</tr>'
+        f'<tr><td><b>WEEK.</b></td><td>{week}</td></tr>'
+        f'<tr><td><b>SITENAME.</b></td><td>{sitename}</td></tr>'
+        f'<tr><td><b>CELLNAME.</b></td><td>{cellname}</td></tr>'
+        f'<tr><td><b>BAND.</b></td><td>{band}</td></tr>'
+        f'<tr><td><b>DL PRB BDBH (%).</b></td><td bgcolor="#{color_dl}"><b><center>{dl_prb}</center></b></td></tr>'
+        f'<tr><td><b>UL PRB BDBH (%).</b></td><td bgcolor="#{color_ul}"><b><center>{ul_prb}</center></b></td></tr>'
+        f'<tr><td><b>RRC User BDBH.</b></td><td bgcolor="#{color_rrc}"><b><center>{rrc}</center></b></td></tr>'
+        f'<tr><td><b>PAYLOAD (GB).</b></td><td><b><center>{payload_gb}</center></b></td></tr>'
+        f'<tr><td><b>BANDWIDTH (MHz).</b></td><td>{bw_display}</td></tr>'
+        f'<tr><td><b>LONGITUDE.</b></td><td>{lon}</td></tr>'
+        f'<tr><td><b>LATITUDE.</b></td><td>{lat}</td></tr>'
+        f'<tr><td><b>CLASS REV.</b></td><td>{class_rev}</td></tr>'
+        f'<tr><td><b>NOP.</b></td><td>{nop}</td></tr>'
+        f'<tr><td><b>RTPO.</b></td><td>{rtpo}</td></tr>'
+        f'<tr><td><b>PROPINSI.</b></td><td>{propinsi}</td></tr>'
+        f'<tr><td><b>KABUPATEN.</b></td><td>{kabupaten}</td></tr>'
+        f'<tr><td><b>KECAMATAN.</b></td><td>{kecamatan}</td></tr>'
+        f'<tr><td><b>DESA.</b></td><td>{desa}</td></tr>'
+        f'<tr><td><b>SDR.</b></td><td>{sdr}</td></tr>'
+        f'<tr><td><b>ANTENNA_TYPE.</b></td><td>{antenna_type}</td></tr>'
+        f'<tr><td><b>TOWER_HEIGHT.</b></td><td>{tower_height}</td></tr>'
+        f'<tr><td><b>ANTENNA_HEIGHT.</b></td><td>{antenna_height}</td></tr>'
+        f'<tr><td><b>AZIMUTH.</b></td><td>{azimuth}</td></tr>'
+        f'<tr><td><b>M-Tilt.</b></td><td>{m_tilt}</td></tr>'
+        f'<tr><td><b>E-Tilt.</b></td><td>{e_tilt}</td></tr>'
+        f'<tr><td><b>PCI.</b></td><td>{pci}</td></tr>'
+        '</table>'
+        '<table border="0" padding="0" style="margin-top: 4px;">'
+        '<tr><td><span class="small-text"><b>©2026-Telkominfra- </b>danuartrianurrohman@telkominfra.com</span></td></tr>'
+        '</table>'
+    )
+    return html
+
 def convert_excel_to_prb_kml(
     file_bytes_or_path,
     color_by_metric: str = "DL_PRB",
     opacity_percent: int = DEFAULT_PRB_OPACITY,
     include_legend: bool = True,
-    sheet_name: Optional[str] = "Sheet1"
+    sheet_name: Optional[str] = "Sheet1",
+    custom_bands: Optional[Dict[str, Dict[str, Any]]] = None,
+    custom_ranges: Optional[Any] = None,
+    left_logo_url: Optional[str] = None,
+    right_logo_url: Optional[str] = None,
+    legend_url: Optional[str] = None
 ) -> Tuple[bytes, Dict[str, Any]]:
     """
     Processes PRB Excel file and returns (kml_bytes, summary_dict).
+    Supports custom bands, custom KPI ranges, selectable/custom header logos, and reliable fractional ScreenOverlay.
     """
     if isinstance(file_bytes_or_path, (bytes, bytearray)):
         file_obj = io.BytesIO(file_bytes_or_path)
     else:
         file_obj = file_bytes_or_path
+
+    # Parse custom_bands if passed as JSON string
+    if isinstance(custom_bands, str):
+        try:
+            custom_bands = json.loads(custom_bands)
+        except Exception:
+            custom_bands = None
+
+    # Parse custom_ranges if passed as JSON string
+    if isinstance(custom_ranges, str):
+        try:
+            custom_ranges = json.loads(custom_ranges)
+        except Exception:
+            custom_ranges = None
 
     # Try reading requested sheet, fallback to first sheet
     try:
@@ -106,17 +230,23 @@ def convert_excel_to_prb_kml(
     if missing:
         raise ValueError(f"Missing required columns in PRB sheet: {', '.join(missing)}")
 
+    # Setup Logos
+    effective_left_logo = left_logo_url.strip() if (left_logo_url and left_logo_url.strip()) else DEFAULT_LEFT_LOGO
+    effective_right_logo = right_logo_url.strip() if (right_logo_url and right_logo_url.strip()) else DEFAULT_RIGHT_LOGO
+
     kml = simplekml.Kml()
     kml.document.liststyle.listitemtype = ListItemType.checkhidechildren
 
+    # ScreenOverlay for Legend with reliable fractional coordinates
     if include_legend:
         screen = kml.newscreenoverlay(name='Legend')
-        YOUR_FILE_ID = "1FUMTnOF6rluHJ4WbFSqwmOdERQALn6rV"
-        screen.icon.href = f"https://drive.google.com/uc?export=view&id={YOUR_FILE_ID}"
-        screen.overlayxy = OverlayXY(x=0, y=1, xunits=Units.fraction, yunits=Units.fraction)
-        screen.screenxy = ScreenXY(x=1728, y=270, xunits=Units.pixels, yunits=Units.pixels)
-        screen.size.x = 0.075
-        screen.size.y = 0.15
+        effective_legend_url = legend_url.strip() if (legend_url and legend_url.strip()) else DEFAULT_LEGEND_URL
+        screen.icon.href = effective_legend_url
+        # Position at top-left with fractional screen coordinates (standard across all display sizes)
+        screen.overlayxy = OverlayXY(x=0.02, y=0.98, xunits=Units.fraction, yunits=Units.fraction)
+        screen.screenxy = ScreenXY(x=0.02, y=0.98, xunits=Units.fraction, yunits=Units.fraction)
+        screen.size.x = 0.14
+        screen.size.y = 0.24
         screen.size.xunits = Units.fraction
         screen.size.yunits = Units.fraction
 
@@ -146,22 +276,22 @@ def convert_excel_to_prb_kml(
 
             cellname = str(get_val(row, 'CELLNAME', f'Cell_{idx+1}')).strip()
             sitename = str(get_val(row, 'SITENAME', f'Site_{idx+1}')).strip()
-            week = str(get_val(row, 'WEEK', 'N/A')).strip()
-            bw = str(get_val(row, 'BW (MHZ)', get_val(row, 'BW (MHz)', 'N/A'))).strip()
 
-            band_info = get_band_params(beam)
+            # Carrier band parameters (with custom_bands lookup)
+            band_info = get_band_params(beam, custom_bands=custom_bands)
             altitude = band_info['altitude']
             beamwidth = band_info['beamwidth']
             radius_km = band_info['radius_km']
 
-            # Determine colors
-            color_dl = get_dl_prb_color(dl_prb)
-            color_ul = get_ul_prb_color(ul_prb)
-            color_rrc = get_rrc_color(rrc)
+            # Determine colors (with custom_ranges support)
+            color_dl = get_kpi_color(dl_prb, metric_type="DL_PRB", custom_ranges=custom_ranges)
+            color_ul = get_kpi_color(ul_prb, metric_type="UL_PRB", custom_ranges=custom_ranges)
+            color_rrc = get_kpi_color(rrc, metric_type="RRC", custom_ranges=custom_ranges)
 
-            if color_by_metric.upper() in ("UL_PRB", "UL"):
+            m_key = color_by_metric.upper()
+            if "UL" in m_key:
                 active_color = color_ul
-            elif color_by_metric.upper() in ("RRC", "RRC_USER"):
+            elif "RRC" in m_key:
                 active_color = color_rrc
             else:
                 active_color = color_dl
@@ -178,32 +308,20 @@ def convert_excel_to_prb_kml(
             poligon.style.polystyle.color = simplekml.Color.changealphaint(opacity_a, simplekml.Color.hex(active_color))
             poligon.style.linestyle.color = simplekml.Color.changealphaint(255, simplekml.Color.hex(active_color))
 
-            # HTML Description Table
-            description = (
-                f"<STYLE TYPE='text/css'>"
-                f"TD{{font-family: Calibri, sans-serif; font-size: 8pt; color: #111;}}"
-                f".small-text{{font-size: 6pt; color: #555;}}"
-                f"</STYLE>"
-                f"<table border='1' cellspacing='0' cellpadding='4' style='border-collapse: collapse;'>"
-                f"<tr bgcolor='#0B0F17' style='color: #F8FAFC; text-align: center;'>"
-                f"<td colspan='2'><b>RF TOOLS — Sector Attributes</b></td></tr>"
-                f"<tr><td><b>WEEK</b></td><td>{week}</td></tr>"
-                f"<tr><td><b>SITENAME</b></td><td>{sitename}</td></tr>"
-                f"<tr><td><b>CELLNAME</b></td><td>{cellname}</td></tr>"
-                f"<tr><td><b>BAND</b></td><td>{beam}</td></tr>"
-                f"<tr><td><b>DL PRB BDBH (%)</b></td><td bgcolor='#{color_dl}'><b><center>{dl_prb}</center></b></td></tr>"
-                f"<tr><td><b>UL PRB BDBH (%)</b></td><td bgcolor='#{color_ul}'><b><center>{ul_prb}</center></b></td></tr>"
-                f"<tr><td><b>RRC User BDBH</b></td><td bgcolor='#{color_rrc}'><b><center>{rrc}</center></b></td></tr>"
-                f"<tr><td><b>PAYLOAD (GB)</b></td><td><b><center>{payload_gb}</center></b></td></tr>"
-                f"<tr><td><b>BANDWIDTH (MHz)</b></td><td>{bw}</td></tr>"
-                f"<tr><td><b>LONGITUDE</b></td><td>{lon}</td></tr>"
-                f"<tr><td><b>LATITUDE</b></td><td>{lat}</td></tr>"
-                f"<tr><td><b>AZIMUTH</b></td><td>{azimuth}&deg;</td></tr>"
-                f"<tr><td><b>ALTITUDE / RADIUS</b></td><td>{altitude}m / {int(radius_km*1000)}m</td></tr>"
-                f"</table>"
-                f"<div class='small-text' style='margin-top: 4px;'>Generated by RF TOOLS &bull; 3GPP LTE Modeling</div>"
+            # Exact 24-row HTML Description Table
+            row_dict = {str(k).strip(): v for k, v in row.items()}
+            poligon.description = build_balloon_description(
+                row_dict,
+                left_logo=effective_left_logo,
+                right_logo=effective_right_logo,
+                color_dl=color_dl,
+                color_ul=color_ul,
+                color_rrc=color_rrc,
+                dl_prb=dl_prb,
+                ul_prb=ul_prb,
+                rrc=rrc,
+                payload_gb=payload_gb
             )
-            poligon.description = description
             valid_sectors += 1
 
             if len(preview_rows) < 10:
@@ -234,6 +352,8 @@ def convert_excel_to_prb_kml(
         "valid_sectors": valid_sectors,
         "skipped_rows": skipped_rows,
         "color_by_metric": color_by_metric,
+        "custom_bands_applied": bool(custom_bands),
+        "custom_ranges_applied": bool(custom_ranges),
         "preview_rows": preview_rows,
     }
     return kml_str.encode('utf-8'), summary

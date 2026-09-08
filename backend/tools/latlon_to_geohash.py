@@ -74,9 +74,6 @@ def convert_latlon_to_geohash(
             geohashes.append("")
             skipped_count += 1
 
-    if valid_count == 0:
-        raise ValueError(f"No valid coordinate records could be encoded from columns '{col_lat_found}' and '{col_lon_found}'.")
-
     df_out = df.copy()
     # Remove existing conflicting 'geohash' column if present
     if 'geohash' in [str(c).lower().strip() for c in df_out.columns]:

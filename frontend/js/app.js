@@ -24,6 +24,7 @@ class App {
     this.navbar = new NavbarComponent(this.navbarContainer);
     this.sidebar = new SidebarComponent(this.sidebarContainer);
     this.commandPalette = new CommandPaletteComponent();
+    this.aboutModal = new AboutComponent();
 
     this.activeComponent = null;
 
@@ -31,10 +32,26 @@ class App {
   }
 
   async init() {
-    // Bind route change
-    state.subscribe((event, route) => {
+    // Initial health check
+    await this.checkHealth();
+    // Periodic health check every 15s
+    setInterval(() => this.checkHealth(), 15000);
+
+    // Fetch tool catalog
+    try {
+      const tools = await ApiService.getTools();
+      state.tools = tools;
+      state.emit('tools-loaded', tools);
+    } catch (err) {
+      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
+    }
+
+    // Bind route and language changes
+    state.subscribe((event, data) => {
       if (event === 'route-change') {
-        this.renderRoute(route);
+        this.renderRoute(data);
+      } else if (event === 'language-change') {
+        this.renderRoute(state.route);
       }
     });
 
@@ -46,23 +63,8 @@ class App {
       }
     });
 
-    // Immediate initial render
+    // Initial render
     this.renderRoute(state.route);
-
-    // Non-blocking health check
-    this.checkHealth();
-    setInterval(() => this.checkHealth(), 15000);
-
-    // Non-blocking tool catalog fetch
-    try {
-      const tools = await ApiService.getTools();
-      if (tools && Array.isArray(tools)) {
-        state.tools = tools;
-        state.emit('tools-loaded', tools);
-      }
-    } catch (err) {
-      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
-    }
   }
 
   async checkHealth() {
@@ -73,13 +75,25 @@ class App {
 
   renderRoute(route) {
     if (!this.viewport) return;
+
+    // Clean up previous active component listeners
+    if (this.activeComponent && typeof this.activeComponent.destroy === 'function') {
+      try {
+        this.activeComponent.destroy();
+      } catch (err) {
+        console.warn('Component destroy error:', err);
+      }
+      this.activeComponent = null;
+    }
+
     this.viewport.innerHTML = '';
     window.scrollTo(0, 0);
 
     if (!route || route === 'dashboard') {
       this.activeComponent = new DashboardComponent(this.viewport);
     } else if (route === 'tools') {
-      this.activeComponent = new DirectoryComponent(this.viewport);
+      window.location.hash = '#dashboard';
+      return;
     } else if (route.startsWith('tool-')) {
       const toolId = route.replace('tool-', '');
       this.activeComponent = new WorkspaceComponent(this.viewport, toolId);
@@ -88,7 +102,10 @@ class App {
     } else if (route === 'templates') {
       this.activeComponent = new TemplatesComponent(this.viewport);
     } else if (route === 'about') {
-      this.activeComponent = new AboutComponent(this.viewport);
+      this.activeComponent = new DashboardComponent(this.viewport);
+      if (this.aboutModal) {
+        this.aboutModal.open();
+      }
     } else {
       this.activeComponent = new DashboardComponent(this.viewport);
     }
@@ -98,11 +115,9 @@ class App {
 // Boot application
 function boot() {
   if (!window.rfApp) {
-    console.log('Booting RF TOOLS App...');
     window.rfApp = new App();
   }
 }
-
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
 } else {

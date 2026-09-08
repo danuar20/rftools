@@ -14,65 +14,79 @@ export class WorkspaceComponent {
     this.ws = state.workspaces[toolId];
     this.activeSheetTab = 'result'; // For ISD dual sheet preview
     this.render();
+
+    this.unsubscribe = state.subscribe((event) => {
+      if (state.route !== `tool-${this.toolId}`) return;
+      if (event === 'language-change' || event === 'theme-change') {
+        this.render();
+      }
+    });
+  }
+
+  destroy() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
   }
 
   getToolMeta() {
-    const defaultMeta = {
+    const metaMap = {
       'excel-to-kml': {
-        title: 'Excel to Point KML Placemark Converter',
-        category: 'KML & Site Visualization',
+        title: state.t('tool_excel_to_kml_title'),
+        category: state.t('nav_kml'),
         icon: 'tool-excel-to-kml.svg',
-        description: 'Transforms spreadsheet site coordinates into Google Earth placemark KML files with custom icon scales, colors, and hierarchical folders.',
+        description: state.t('tool_excel_to_kml_desc'),
         sample_template_id: 'point_kml',
         outputExt: 'kml'
       },
       'prb-kml': {
-        title: 'Excel to PRB KML 3D Sector Polygon Visualizer',
-        category: 'KML & Site Visualization',
+        title: state.t('tool_prb_kml_title'),
+        category: state.t('nav_kml'),
         icon: 'tool-prb-kml.svg',
-        description: 'Generates extruded 3D antenna sector polygons color-coded by busy-hour DL/UL PRB utilization, RRC connected users, and 3GPP band altitudes.',
+        description: state.t('tool_prb_kml_desc'),
         sample_template_id: 'prb_kml',
         outputExt: 'kml'
       },
       'isd-calculator': {
-        title: 'Inter-Site Distance (ISD) Calculator',
-        category: 'Network Topology & ISD',
+        title: state.t('tool_isd_calculator_title'),
+        category: state.t('nav_topology'),
         icon: 'tool-isd-calculator.svg',
-        description: 'Calculates high-speed geodesic Haversine distance matrix between two site datasets finding N-nearest neighbor relationships.',
+        description: state.t('tool_isd_calculator_desc'),
         sample_template_id: 'isd_a',
         outputExt: 'xlsx'
       },
       'geohash-to-shp': {
-        title: 'Geohash to ESRI Shapefile Generator',
-        category: 'Geospatial & Geohash Utilities',
+        title: state.t('tool_geohash_to_shp_title'),
+        category: state.t('nav_gis'),
         icon: 'tool-geohash-to-shp.svg',
-        description: 'Transforms geohash records into GIS vector polygon shapefile packages (.zip containing .shp, .shx, .dbf, .prj) with exact bbox or metric squares.',
+        description: state.t('tool_geohash_to_shp_desc'),
         sample_template_id: 'geohash',
         outputExt: 'zip'
       },
       'geohash-to-latlon': {
-        title: 'Geohash to Centroid Lat/Long Decoder',
-        category: 'Geospatial & Geohash Utilities',
+        title: state.t('tool_geohash_to_latlon_title'),
+        category: state.t('nav_gis'),
         icon: 'tool-geohash-to-latlon.svg',
-        description: 'Decodes geohash string tokens into WGS84 decimal degree centroid coordinates (latitude and longitude).',
+        description: state.t('tool_geohash_to_latlon_desc'),
         sample_template_id: 'geohash',
         outputExt: 'xlsx'
       },
       'latlon-to-geohash': {
-        title: 'Lat/Long to Geohash Encoder',
-        category: 'Geospatial & Geohash Utilities',
+        title: state.t('tool_latlon_to_geohash_title'),
+        category: state.t('nav_gis'),
         icon: 'tool-latlon-to-geohash.svg',
-        description: 'Encodes paired geographic latitude/longitude coordinates into standardized geohash string tokens with user-defined precision (1 to 12).',
+        description: state.t('tool_latlon_to_geohash_desc'),
         sample_template_id: 'latlon',
         outputExt: 'xlsx'
       }
     };
 
-    const found = state.tools.find(t => t.id === this.toolId);
-    return found || defaultMeta[this.toolId] || { title: this.toolId, category: 'Tool', icon: 'rf-logo.svg', sample_template_id: 'point_kml' };
+    return metaMap[this.toolId] || { title: this.toolId, category: 'Tool', icon: 'rf-logo.svg', sample_template_id: 'point_kml', outputExt: 'xlsx' };
   }
 
   render() {
+    if (state.route !== `tool-${this.toolId}`) return;
     const meta = this.getToolMeta();
     const isISD = this.toolId === 'isd-calculator';
 
@@ -95,13 +109,13 @@ export class WorkspaceComponent {
 
           <div class="workspace-header-actions">
             <button class="rf-btn rf-btn-secondary" id="ws-download-template-btn" title="Download official sample template">
-              <span>📥 Download Template (.xlsx)</span>
+              <span>📥 ${state.t('btn_download_template')}</span>
             </button>
             <button class="rf-btn rf-btn-ghost" id="ws-formula-guide-btn" title="View math formulae &amp; specifications">
               <span>📖 Guide</span>
             </button>
             <button class="rf-btn rf-btn-ghost" id="ws-reset-btn" title="Reset workspace form">
-              <span>🔄 Reset</span>
+              <span>🔄 ${state.t('btn_reset')}</span>
             </button>
           </div>
         </header>
@@ -110,10 +124,10 @@ export class WorkspaceComponent {
         <section class="zone-card">
           <div class="zone-header">
             <span class="zone-title">
-              <span>📥</span> Zone 1: File Ingestion Dropzone
+              <span>📥</span> ${state.t('zone1_title')}
             </span>
             <span class="zone-badge" id="zone1-status-badge">
-              ${isISD ? (this.ws.fileA && this.ws.fileB ? '2 Files Loaded' : 'Awaiting 2 Files') : (this.ws.file ? 'File Loaded' : 'Awaiting File')}
+              ${isISD ? (this.ws.fileA && this.ws.fileB ? state.t('zone1_file_loaded') : 'Awaiting 2 Files') : (this.ws.file ? state.t('zone1_file_loaded') : 'Awaiting File')}
             </span>
           </div>
           <div class="zone-body" id="zone1-dropzone-container">
@@ -127,11 +141,11 @@ export class WorkspaceComponent {
           <section class="zone-card">
             <div class="zone-header">
               <span class="zone-title">
-                <span>🎛️</span> Zone 2: Column Mapping Engine
+                <span>🎛️</span> ${state.t('zone2_title')}
               </span>
               <div style="display: flex; gap: 8px; align-items: center;">
                 <button class="rf-btn rf-btn-ghost" id="reset-mappings-btn" style="padding: 2px 8px; font-size: 0.75rem;" title="Restore initial detected matches">
-                  ↺ Reset Auto-Detect
+                  ↺ ${state.t('btn_reset')}
                 </button>
                 <span class="rf-confidence-pill rf-confidence-pill--high" id="mapping-count-pill">
                   ${this.getMappingStatusPill()}
@@ -147,7 +161,7 @@ export class WorkspaceComponent {
           <section class="zone-card">
             <div class="zone-header">
               <span class="zone-title">
-                <span>⚡</span> Zone 3: Parameter Controls &amp; Physics
+                <span>⚡</span> ${state.t('zone3_title')}
               </span>
               <span class="zone-badge">Config</span>
             </div>
@@ -166,11 +180,11 @@ export class WorkspaceComponent {
           </div>
           <div class="action-bar-buttons">
             <button class="rf-btn rf-btn-secondary" id="action-preview-btn" ${this.canCalculate() ? '' : 'disabled'}>
-              <span>👁 Live Data Preview</span>
+              <span>👁 ${state.t('zone4_preview_tab')}</span>
             </button>
             <button class="rf-btn rf-btn-primary" id="action-execute-btn" ${this.canCalculate() ? '' : 'disabled'}>
               <span id="action-execute-spinner" class="spinner" style="display: none;"></span>
-              <span id="action-execute-text">⚡ Process &amp; Generate Deliverable</span>
+              <span id="action-execute-text">⚡ ${state.t('btn_execute')}</span>
             </button>
           </div>
         </div>
@@ -179,11 +193,11 @@ export class WorkspaceComponent {
         <section class="zone-card" id="zone4-results-card" style="${this.ws.previewData || this.ws.resultSummary ? '' : 'display: none;'}">
           <div class="zone-header">
             <span class="zone-title">
-              <span>📋</span> Zone 4: Results &amp; Data Preview Panel
+              <span>📋</span> ${state.t('zone4_title')}
             </span>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="rf-btn rf-btn-ghost" id="results-copy-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                📋 Copy Data
+                📋 ${state.t('btn_copy')}
               </button>
               <button class="rf-btn rf-btn-ghost" id="results-fullscreen-btn" style="padding: 3px 10px; font-size: 0.75rem;">
                 🔍 Fullscreen
@@ -222,7 +236,7 @@ export class WorkspaceComponent {
           <!-- File A Dropzone -->
           <div>
             <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-primary); margin-bottom: 8px; text-transform: uppercase;">
-              File A: Source Sites Workbook (.xlsx)
+              ${state.t('zone1_file_a')}
             </div>
             ${this.ws.fileA ? this.renderLoadedChip('A', this.ws.fileA, this.ws.inspectionA) : this.renderEmptyDropzone('A')}
           </div>
@@ -230,14 +244,14 @@ export class WorkspaceComponent {
           <!-- File B Dropzone -->
           <div>
             <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-accent-indigo); margin-bottom: 8px; text-transform: uppercase;">
-              File B: Target Candidates Workbook (.xlsx)
+              ${state.t('zone1_file_b')}
             </div>
             ${this.ws.fileB ? this.renderLoadedChip('B', this.ws.fileB, this.ws.inspectionB) : this.renderEmptyDropzone('B')}
           </div>
         </div>
         <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px;">
           <button class="rf-btn rf-btn-secondary" id="load-sample-isd-btn" style="padding: 6px 14px; font-size: 0.8125rem;">
-            <span>📄 Load Sample Data for Both Files</span>
+            <span>📄 ${state.t('btn_load_sample')}</span>
           </button>
         </div>
       `;
@@ -253,7 +267,7 @@ export class WorkspaceComponent {
       ${this.renderEmptyDropzone('single')}
       <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px;">
         <button class="rf-btn rf-btn-secondary" id="load-sample-data-btn" style="padding: 6px 14px; font-size: 0.8125rem;">
-          <span>📄 Load Verified Sample Data into Workspace</span>
+          <span>📄 ${state.t('btn_load_sample')}</span>
         </button>
       </div>
     `;
@@ -266,8 +280,8 @@ export class WorkspaceComponent {
         <svg class="rf-dropzone__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
-        <div class="rf-dropzone__title">Drag and drop spreadsheet here, or click to browse</div>
-        <div class="rf-dropzone__desc">Instant header inspection and automatic column matching</div>
+        <div class="rf-dropzone__title">${state.t('zone1_drop_title')}</div>
+        <div class="rf-dropzone__desc">${state.t('zone1_drop_subtitle')}</div>
         <div class="rf-dropzone__formats">
           <span class="rf-dropzone__format-pill">.XLSX</span>
           <span class="rf-dropzone__format-pill">.XLS</span>
@@ -529,6 +543,26 @@ export class WorkspaceComponent {
     return `${satisfied}/${mandCount} Mapped`;
   }
 
+  getEffectiveLeftLogo(p) {
+    if (p && p.logoPreset === 'rf_tools') {
+      return '/assets/logos/rf_tools_logo_left.png';
+    }
+    if (p && p.logoPreset === 'custom' && p.leftLogoUrl && p.leftLogoUrl.trim()) {
+      return p.leftLogoUrl.trim();
+    }
+    return 'https://raw.githubusercontent.com/danuar20/image/main/Infra.png';
+  }
+
+  getEffectiveRightLogo(p) {
+    if (p && p.logoPreset === 'rf_tools') {
+      return '/assets/logos/rf_tools_logo_right.png';
+    }
+    if (p && p.logoPreset === 'custom' && p.rightLogoUrl && p.rightLogoUrl.trim()) {
+      return p.rightLogoUrl.trim();
+    }
+    return 'https://raw.githubusercontent.com/danuar20/image/main/PUMA.png';
+  }
+
   renderParamsContent() {
     const p = this.ws.params;
 
@@ -607,6 +641,119 @@ export class WorkspaceComponent {
             </div>
           </div>
 
+          <!-- Dual Header Logos Selection -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">Balloon Popup Dual Logos</span>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Header Logos</span>
+            </div>
+            <div class="rf-param-desc">Select logo preset or specify custom image URLs for the 24-row balloon popup header</div>
+            <div class="rf-segmented-switch" style="width: 100%; margin-bottom: 12px;">
+              <button class="rf-segmented-item ${(!p.logoPreset || p.logoPreset === 'telkominfra_puma') ? 'rf-segmented-item--active' : ''}" data-logo-preset="telkominfra_puma" style="flex: 1;">TelkomInfra &amp; PUMA</button>
+              <button class="rf-segmented-item ${p.logoPreset === 'rf_tools' ? 'rf-segmented-item--active' : ''}" data-logo-preset="rf_tools" style="flex: 1;">RF Tools Default</button>
+              <button class="rf-segmented-item ${p.logoPreset === 'custom' ? 'rf-segmented-item--active' : ''}" data-logo-preset="custom" style="flex: 1;">Custom Logos</button>
+            </div>
+            <div id="custom-logo-inputs" style="${p.logoPreset === 'custom' ? '' : 'display: none;'} margin-bottom: 12px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Left Logo URL</label>
+                  <input type="text" class="rf-stepper-input" id="param-left-logo-url" value="${p.leftLogoUrl || ''}" placeholder="https://.../left_logo.png" style="width: 100%; text-align: left;">
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Right Logo URL</label>
+                  <input type="text" class="rf-stepper-input" id="param-right-logo-url" value="${p.rightLogoUrl || ''}" placeholder="https://.../right_logo.png" style="width: 100%; text-align: left;">
+                </div>
+              </div>
+            </div>
+            <!-- Logo Preview -->
+            <div style="display: flex; gap: 12px; align-items: center; justify-content: center; padding: 8px; background: var(--color-bg-sunken); border: 1px solid var(--color-border-subtle); border-radius: var(--rounded-sm);">
+              <div style="display: flex; align-items: center; justify-content: center; width: 140px; height: 38px; background: #ffffff; border-radius: 3px; padding: 2px;">
+                <img id="preview-logo-left" src="${this.getEffectiveLeftLogo(p)}" alt="Left Logo" style="max-width: 130px; max-height: 34px; object-fit: contain;">
+              </div>
+              <span style="color: var(--color-text-muted); font-size: 0.75rem;">&amp;</span>
+              <div style="display: flex; align-items: center; justify-content: center; width: 140px; height: 38px; background: #000000; border-radius: 3px; padding: 2px;">
+                <img id="preview-logo-right" src="${this.getEffectiveRightLogo(p)}" alt="Right Logo" style="max-width: 130px; max-height: 34px; object-fit: contain;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom PRB Range Inputs -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">Custom PRB &amp; KPI Color Ranges</span>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Thresholds</span>
+            </div>
+            <div class="rf-param-desc">Customize threshold scales for Red (High load), Yellow (Mid load), and Green (Normal)</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+              <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 6px;">DL PRB (%)</div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">Red (&ge; %):</label>
+                  <input type="number" class="rf-stepper-input" id="range-dl-high" value="${p.ranges?.dl_high ?? 90}" style="width: 100%;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Yellow (&ge; %):</label>
+                  <input type="number" class="rf-stepper-input" id="range-dl-mid" value="${p.ranges?.dl_mid ?? 80}" style="width: 100%;">
+                </div>
+              </div>
+
+              <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #3B82F6; margin-bottom: 6px;">UL PRB (%)</div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">High (&ge; %):</label>
+                  <input type="number" class="rf-stepper-input" id="range-ul-high" value="${p.ranges?.ul_high ?? 70}" style="width: 100%;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Mid (&ge; %):</label>
+                  <input type="number" class="rf-stepper-input" id="range-ul-mid" value="${p.ranges?.ul_mid ?? 50}" style="width: 100%;">
+                </div>
+              </div>
+
+              <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 6px;">RRC Users</div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">High (&ge;):</label>
+                  <input type="number" class="rf-stepper-input" id="range-rrc-high" value="${p.ranges?.rrc_high ?? 100}" style="width: 100%;">
+                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Mid (&ge;):</label>
+                  <input type="number" class="rf-stepper-input" id="range-rrc-mid" value="${p.ranges?.rrc_mid ?? 50}" style="width: 100%;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editable Band Stacking Table with Add-Band -->
+          <div class="rf-param-group">
+            <div class="rf-param-header">
+              <span class="rf-param-title">3GPP Carrier Band Altitude &amp; Radius Stacking</span>
+              <button type="button" class="rf-btn rf-btn-secondary" id="btn-add-band" style="padding: 3px 10px; font-size: 0.75rem;">
+                + Add Band
+              </button>
+            </div>
+            <div class="rf-param-desc">Custom altitude, beam radius, and horizontal beamwidth for 3D polygon sector layers</div>
+            <div style="overflow-x: auto;">
+              <table class="rf-band-table" id="table-custom-bands">
+                <thead>
+                  <tr>
+                    <th>Band Tier</th>
+                    <th>Altitude (m)</th>
+                    <th>Radius (m)</th>
+                    <th>Beamwidth (°)</th>
+                    <th style="width: 36px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${(p.bands || []).map((b, idx) => `
+                    <tr data-band-row="${idx}">
+                      <td><input type="text" class="rf-stepper-input band-input-name" data-idx="${idx}" value="${b.name || ''}" style="width: 90px; text-align: left;"></td>
+                      <td><input type="number" class="rf-stepper-input band-input-alt" data-idx="${idx}" value="${b.altitude || 30}" style="width: 65px;"></td>
+                      <td><input type="number" class="rf-stepper-input band-input-radius" data-idx="${idx}" value="${b.radius_m || Math.round((b.radius_km || 0.05) * 1000)}" style="width: 65px;"></td>
+                      <td><input type="number" class="rf-stepper-input band-input-bw" data-idx="${idx}" value="${b.beamwidth || 65}" style="width: 60px;"></td>
+                      <td>
+                        <button type="button" class="rf-btn rf-btn-ghost btn-remove-band" data-idx="${idx}" title="Delete band" style="padding: 2px 6px; color: var(--color-status-danger); font-size: 0.8125rem;">&times;</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="rf-param-group">
             <div class="rf-param-header">
               <span class="rf-param-title">Google Earth Legend &amp; Extrusion</span>
@@ -621,30 +768,6 @@ export class WorkspaceComponent {
                 <span>Extrude Polygons to Ground</span>
               </label>
             </div>
-          </div>
-
-          <div class="rf-param-group">
-            <div class="rf-param-header">
-              <span class="rf-param-title">3GPP Carrier Band Altitude Stacking</span>
-              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Specs</span>
-            </div>
-            <div class="rf-param-desc">Pre-configured antenna layer altitudes preventing polygon collision</div>
-            <table class="rf-band-table">
-              <thead>
-                <tr>
-                  <th>Band Tier</th>
-                  <th>Altitude</th>
-                  <th>Beam Radius</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>LTE 700</td><td style="color: var(--color-primary);">42 m</td><td>38 m</td></tr>
-                <tr><td>LTE 900</td><td style="color: var(--color-primary);">38 m</td><td>45 m</td></tr>
-                <tr><td>LTE 1800</td><td style="color: var(--color-primary);">34 m</td><td>60 m</td></tr>
-                <tr><td>LTE 2100</td><td style="color: var(--color-primary);">32 m</td><td>75 m</td></tr>
-                <tr><td>LTE 2300</td><td style="color: var(--color-primary);">30 m</td><td>100 m</td></tr>
-              </tbody>
-            </table>
           </div>
         `;
 
@@ -665,10 +788,12 @@ export class WorkspaceComponent {
           <div class="rf-param-group">
             <div class="rf-param-header">
               <span class="rf-param-title">Distance Computation Units</span>
+              <span class="rf-confidence-pill rf-confidence-pill--high" id="isd-unit-pill">${p.distanceUnit === 'm' ? 'Meters (m)' : 'Kilometers (km)'}</span>
             </div>
+            <div class="rf-param-desc">Select output distance calculation metric (Kilometers vs Meters)</div>
             <div class="rf-segmented-switch" style="width: 100%;">
-              <button class="rf-segmented-item rf-segmented-item--active" style="flex: 1;">Kilometers (km)</button>
-              <button class="rf-segmented-item" style="flex: 1;">Meters (m)</button>
+              <button class="rf-segmented-item ${p.distanceUnit !== 'm' ? 'rf-segmented-item--active' : ''}" data-isd-unit="km" style="flex: 1;">Kilometers (km)</button>
+              <button class="rf-segmented-item ${p.distanceUnit === 'm' ? 'rf-segmented-item--active' : ''}" data-isd-unit="m" style="flex: 1;">Meters (m)</button>
             </div>
           </div>
 
@@ -678,8 +803,8 @@ export class WorkspaceComponent {
             </div>
             <div class="rf-param-desc">
               Generated workbook includes:
-              <br>&bull; <b>Sheet 1: ISD_Result</b> (Ranked Site ID pairs with exact Haversine km)
-              <br>&bull; <b>Sheet 2: Summary</b> (Distance distribution: count, min, mean, max)
+              <br>&bull; <b>Sheet 1: ISD_Result</b> (Ranked Site ID pairs with exact Haversine ${p.distanceUnit === 'm' ? 'meters' : 'km'})
+              <br>&bull; <b>Sheet 2: Summary</b> (Distance distribution: count, min, mean, max in ${p.distanceUnit === 'm' ? 'meters' : 'km'})
             </div>
           </div>
         `;
@@ -870,7 +995,7 @@ export class WorkspaceComponent {
       </div>
 
       <!-- ISD KPI Stat Cards -->
-      ${isISD && summary.min_km !== undefined ? `
+      ${isISD && (summary.min_km !== undefined || summary.min_m !== undefined) ? `
         <div class="kpi-summary-grid" style="margin-top: 12px;">
           <div class="kpi-summary-card">
             <span class="kpi-summary-label">Total Pairs</span>
@@ -878,15 +1003,21 @@ export class WorkspaceComponent {
           </div>
           <div class="kpi-summary-card">
             <span class="kpi-summary-label">Min Distance</span>
-            <span class="kpi-summary-value" style="color: var(--color-status-success);">${summary.min_km} km</span>
+            <span class="kpi-summary-value" style="color: var(--color-status-success);">
+              ${(summary.distance_unit === 'm' || summary.unit === 'm') && summary.min_m !== undefined ? `${summary.min_m} m` : `${summary.min_km ?? summary.min_m} ${(summary.distance_unit === 'm' || summary.unit === 'm') ? 'm' : 'km'}`}
+            </span>
           </div>
           <div class="kpi-summary-card">
             <span class="kpi-summary-label">Mean Distance</span>
-            <span class="kpi-summary-value" style="color: var(--color-primary);">${summary.mean_km} km</span>
+            <span class="kpi-summary-value" style="color: var(--color-primary);">
+              ${(summary.distance_unit === 'm' || summary.unit === 'm') && summary.mean_m !== undefined ? `${summary.mean_m} m` : `${summary.mean_km ?? summary.mean_m} ${(summary.distance_unit === 'm' || summary.unit === 'm') ? 'm' : 'km'}`}
+            </span>
           </div>
           <div class="kpi-summary-card">
             <span class="kpi-summary-label">Max Distance</span>
-            <span class="kpi-summary-value" style="color: var(--color-status-warning);">${summary.max_km} km</span>
+            <span class="kpi-summary-value" style="color: var(--color-status-warning);">
+              ${(summary.distance_unit === 'm' || summary.unit === 'm') && summary.max_m !== undefined ? `${summary.max_m} m` : `${summary.max_km ?? summary.max_m} ${(summary.distance_unit === 'm' || summary.unit === 'm') ? 'm' : 'km'}`}
+            </span>
           </div>
         </div>
       ` : ''}
@@ -912,6 +1043,12 @@ export class WorkspaceComponent {
 
   renderPreviewTableGrid(summary, previewRows) {
     if (this.toolId === 'isd-calculator' && this.activeSheetTab === 'summary') {
+      const isMeters = summary.distance_unit === 'm' || summary.unit === 'm' || this.ws.params.distanceUnit === 'm';
+      const u = isMeters ? 'm' : 'km';
+      const minVal = isMeters && summary.min_m !== undefined ? summary.min_m : (summary.min_km ?? summary.min_m);
+      const meanVal = isMeters && summary.mean_m !== undefined ? summary.mean_m : (summary.mean_km ?? summary.mean_m);
+      const maxVal = isMeters && summary.max_m !== undefined ? summary.max_m : (summary.max_km ?? summary.max_m);
+
       return `
         <table class="rf-table">
           <thead>
@@ -923,9 +1060,9 @@ export class WorkspaceComponent {
           </thead>
           <tbody>
             <tr><td>Total Evaluated Neighbor Pairs</td><td class="rf-mono">${summary.total_pairs}</td><td>pairs</td></tr>
-            <tr><td>Minimum Distance (Min)</td><td class="rf-mono" style="color: var(--color-status-success); font-weight: 600;">${summary.min_km}</td><td>km</td></tr>
-            <tr><td>Mean Distance (Average)</td><td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">${summary.mean_km}</td><td>km</td></tr>
-            <tr><td>Maximum Distance (Max)</td><td class="rf-mono" style="color: var(--color-status-warning); font-weight: 600;">${summary.max_km}</td><td>km</td></tr>
+            <tr><td>Minimum Distance (Min)</td><td class="rf-mono" style="color: var(--color-status-success); font-weight: 600;">${minVal}</td><td>${u}</td></tr>
+            <tr><td>Mean Distance (Average)</td><td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">${meanVal}</td><td>${u}</td></tr>
+            <tr><td>Maximum Distance (Max)</td><td class="rf-mono" style="color: var(--color-status-warning); font-weight: 600;">${maxVal}</td><td>${u}</td></tr>
           </tbody>
         </table>
       `;
@@ -1342,6 +1479,14 @@ export class WorkspaceComponent {
     this.bindMappingSelectors();
   }
 
+  refreshParamsZone() {
+    const zone3 = this.container.querySelector('#zone3-params-container');
+    if (zone3) {
+      zone3.innerHTML = this.renderParamsContent();
+      this.bindParams();
+    }
+  }
+
   bindParams() {
     const p = this.ws.params;
 
@@ -1425,6 +1570,132 @@ export class WorkspaceComponent {
       extrudeToggle.addEventListener('change', (e) => { p.extrude = e.target.checked; });
     }
 
+    // PRB Dual Logo Presets & Custom URLs
+    const logoPresetBtns = this.container.querySelectorAll('[data-logo-preset]');
+    const customLogoInputs = this.container.querySelector('#custom-logo-inputs');
+    const previewLeft = this.container.querySelector('#preview-logo-left');
+    const previewRight = this.container.querySelector('#preview-logo-right');
+
+    const updateLogoPreviews = () => {
+      if (previewLeft) previewLeft.src = this.getEffectiveLeftLogo(p);
+      if (previewRight) previewRight.src = this.getEffectiveRightLogo(p);
+    };
+
+    logoPresetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        logoPresetBtns.forEach(b => b.classList.remove('rf-segmented-item--active'));
+        btn.classList.add('rf-segmented-item--active');
+        p.logoPreset = btn.dataset.logoPreset;
+        if (customLogoInputs) {
+          customLogoInputs.style.display = p.logoPreset === 'custom' ? 'block' : 'none';
+        }
+        updateLogoPreviews();
+      });
+    });
+
+    const leftLogoInput = this.container.querySelector('#param-left-logo-url');
+    if (leftLogoInput) {
+      leftLogoInput.addEventListener('input', (e) => {
+        p.leftLogoUrl = e.target.value.trim();
+        updateLogoPreviews();
+      });
+    }
+
+    const rightLogoInput = this.container.querySelector('#param-right-logo-url');
+    if (rightLogoInput) {
+      rightLogoInput.addEventListener('input', (e) => {
+        p.rightLogoUrl = e.target.value.trim();
+        updateLogoPreviews();
+      });
+    }
+
+    // PRB Custom KPI Range Inputs
+    if (!p.ranges) {
+      p.ranges = { dl_high: 90, dl_mid: 80, ul_high: 70, ul_mid: 50, rrc_high: 100, rrc_mid: 50 };
+    }
+    const bindRangeInput = (id, key) => {
+      const el = this.container.querySelector(id);
+      if (el) {
+        el.addEventListener('input', (e) => {
+          const v = parseFloat(e.target.value);
+          if (!isNaN(v)) p.ranges[key] = v;
+        });
+      }
+    };
+    bindRangeInput('#range-dl-high', 'dl_high');
+    bindRangeInput('#range-dl-mid', 'dl_mid');
+    bindRangeInput('#range-ul-high', 'ul_high');
+    bindRangeInput('#range-ul-mid', 'ul_mid');
+    bindRangeInput('#range-rrc-high', 'rrc_high');
+    bindRangeInput('#range-rrc-mid', 'rrc_mid');
+
+    // PRB Custom Bands Table
+    if (!p.bands || !Array.isArray(p.bands)) {
+      p.bands = [
+        { name: 'LTE 700', altitude: 42, radius_m: 38, radius_km: 0.038, beamwidth: 65 },
+        { name: 'LTE 900', altitude: 38, radius_m: 45, radius_km: 0.045, beamwidth: 65 },
+        { name: 'LTE 1800', altitude: 34, radius_m: 60, radius_km: 0.060, beamwidth: 65 },
+        { name: 'LTE 2100', altitude: 32, radius_m: 75, radius_km: 0.075, beamwidth: 65 },
+        { name: 'LTE 2300', altitude: 30, radius_m: 100, radius_km: 0.100, beamwidth: 65 }
+      ];
+    }
+
+    this.container.querySelectorAll('.band-input-name').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        if (p.bands[idx]) p.bands[idx].name = e.target.value;
+      });
+    });
+
+    this.container.querySelectorAll('.band-input-alt').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        if (p.bands[idx]) p.bands[idx].altitude = parseFloat(e.target.value) || 30;
+      });
+    });
+
+    this.container.querySelectorAll('.band-input-radius').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        if (p.bands[idx]) {
+          p.bands[idx].radius_m = parseFloat(e.target.value) || 50;
+          p.bands[idx].radius_km = p.bands[idx].radius_m / 1000.0;
+        }
+      });
+    });
+
+    this.container.querySelectorAll('.band-input-bw').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        if (p.bands[idx]) p.bands[idx].beamwidth = parseFloat(e.target.value) || 65;
+      });
+    });
+
+    this.container.querySelectorAll('.btn-remove-band').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        if (!isNaN(idx) && p.bands.length > 1) {
+          p.bands.splice(idx, 1);
+          this.refreshParamsZone();
+        }
+      });
+    });
+
+    const addBandBtn = this.container.querySelector('#btn-add-band');
+    if (addBandBtn) {
+      addBandBtn.addEventListener('click', () => {
+        const num = p.bands.length + 1;
+        p.bands.push({
+          name: `LTE ${2500 + num * 100}`,
+          altitude: 28,
+          radius_m: 60,
+          radius_km: 0.06,
+          beamwidth: 65
+        });
+        this.refreshParamsZone();
+      });
+    }
+
     // ISD Calculator params
     const nSlider = this.container.querySelector('#param-n-slider');
     const nNum = this.container.querySelector('#param-n-num');
@@ -1439,6 +1710,18 @@ export class WorkspaceComponent {
       nSlider.addEventListener('input', (e) => syncN(e.target.value));
       nNum.addEventListener('input', (e) => syncN(e.target.value));
     }
+
+    // ISD Distance Computation Units (km vs m)
+    const isdUnitBtns = this.container.querySelectorAll('[data-isd-unit]');
+    isdUnitBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        isdUnitBtns.forEach(b => b.classList.remove('rf-segmented-item--active'));
+        btn.classList.add('rf-segmented-item--active');
+        p.distanceUnit = btn.dataset.isdUnit;
+        const pill = this.container.querySelector('#isd-unit-pill');
+        if (pill) pill.textContent = p.distanceUnit === 'm' ? 'Meters (m)' : 'Kilometers (km)';
+      });
+    });
 
     // Geohash to Shapefile params
     const modeButtons = this.container.querySelectorAll('[data-mode]');
@@ -1510,6 +1793,7 @@ export class WorkspaceComponent {
       fd.append('file_a', this.ws.fileA);
       fd.append('file_b', this.ws.fileB);
       fd.append('n_nearest', String(p.nNearest || 1));
+      fd.append('distance_unit', String(p.distanceUnit || 'km'));
       if (this.ws.mappingsA['lat_col_a']) fd.append('lat_col_a', this.ws.mappingsA['lat_col_a']);
       if (this.ws.mappingsA['lon_col_a']) fd.append('lon_col_a', this.ws.mappingsA['lon_col_a']);
       if (this.ws.mappingsA['name_col_a']) fd.append('name_col_a', this.ws.mappingsA['name_col_a']);
@@ -1537,6 +1821,45 @@ export class WorkspaceComponent {
         fd.append('opacity_percent', String(p.opacityPercent || 40));
         fd.append('include_legend', String(p.includeLegend !== false));
         fd.append('sheet_name', p.sheetName || 'Sheet1');
+        if (p.bands && Array.isArray(p.bands)) {
+          const bandsDict = {};
+          p.bands.forEach(b => {
+            if (b.name) {
+              bandsDict[b.name] = {
+                altitude: parseFloat(b.altitude) || 30,
+                beamwidth: parseFloat(b.beamwidth) || 65,
+                radius_km: parseFloat(b.radius_km || (b.radius_m ? b.radius_m / 1000 : 0.05))
+              };
+            }
+          });
+          fd.append('custom_bands', JSON.stringify(bandsDict));
+        }
+        if (p.ranges) {
+          const customRanges = {
+            dl_prb: [
+              { min: 0, max: p.ranges.dl_mid || 80, color: '00FF00' },
+              { min: p.ranges.dl_mid || 80, max: p.ranges.dl_high || 90, color: 'FFFF00' },
+              { min: p.ranges.dl_high || 90, max: 100, color: 'FF0000' }
+            ],
+            ul_prb: [
+              { min: 0, max: p.ranges.ul_mid || 50, color: '00FF00' },
+              { min: p.ranges.ul_mid || 50, max: p.ranges.ul_high || 70, color: 'FFFF00' },
+              { min: p.ranges.ul_high || 70, max: 100, color: 'FF0000' }
+            ],
+            rrc: [
+              { min: 0, max: p.ranges.rrc_mid || 50, color: '00FF00' },
+              { min: p.ranges.rrc_mid || 50, max: p.ranges.rrc_high || 100, color: 'FFFF00' },
+              { min: p.ranges.rrc_high || 100, max: 999999, color: 'FF0000' }
+            ]
+          };
+          fd.append('custom_ranges', JSON.stringify(customRanges));
+        }
+        {
+          const leftLogo = this.getEffectiveLeftLogo(p);
+          const rightLogo = this.getEffectiveRightLogo(p);
+          if (leftLogo) fd.append('left_logo_url', leftLogo);
+          if (rightLogo) fd.append('right_logo_url', rightLogo);
+        }
         break;
 
       case 'geohash-to-shp':

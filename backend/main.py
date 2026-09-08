@@ -4,16 +4,7 @@ Target port: 5005
 """
 
 import os
-import tempfile
 import time
-
-# Ensure tempfile uses a stable system temp directory regardless of task-scoped TMPDIR
-if not os.path.exists(tempfile.gettempdir()) or "multica-task" in os.environ.get("TMPDIR", ""):
-    os.environ["TMPDIR"] = "/tmp"
-    os.environ["TEMP"] = "/tmp"
-    os.environ["TMP"] = "/tmp"
-    tempfile.tempdir = "/tmp"
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -45,8 +36,6 @@ app.add_middleware(
 # Global Request Timing & Error Sanitizer
 @app.middleware("http")
 async def add_process_time_and_security(request: Request, call_next):
-    if not tempfile.tempdir or not os.path.isdir(tempfile.tempdir):
-        tempfile.tempdir = "/tmp"
     start_time = time.time()
     try:
         response = await call_next(request)

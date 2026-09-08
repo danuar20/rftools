@@ -2,6 +2,7 @@
 Tool 3: ISD (Inter-Site Distance) Calculator
 Computes Haversine great-circle distances between source sites (File A)
 and candidate sites (File B) finding N-nearest neighbors.
+Supports both kilometers (km) and meters (m) units.
 """
 
 import io
@@ -95,6 +96,7 @@ def calculate_isd(
     file_a_bytes_or_path,
     file_b_bytes_or_path,
     n_nearest: int = 1,
+    distance_unit: str = "km",
     lat_col_a: Optional[str] = None,
     lon_col_a: Optional[str] = None,
     name_col_a: Optional[str] = None,
@@ -104,9 +106,14 @@ def calculate_isd(
 ) -> Tuple[bytes, Dict[str, Any]]:
     """
     Computes nearest neighbor distances between File A and File B.
+    Supports distance_unit='km' (default) or 'm' (meters).
     Returns (excel_bytes, summary_dict).
     """
     n_nearest = max(1, min(5, int(n_nearest)))
+    is_meters = str(distance_unit).strip().lower() in ("m", "meter", "meters")
+    dist_col_name = "distance_m" if is_meters else "distance_km"
+    multiplier = 1000.0 if is_meters else 1.0
+    decimals = 2 if is_meters else 6
 
     sites_a = _load_sites_from_excel(file_a_bytes_or_path, lat_col_a, lon_col_a, name_col_a)
     if not sites_a:
@@ -119,51 +126,62 @@ def calculate_isd(
     out_wb = openpyxl.Workbook()
     out_sh = out_wb.active
     out_sh.title = "ISD_Result"
-    out_sh.append(["siteA", "latA", "lonA", "nearestSiteB", "latB", "lonB", "distance_km"])
+    out_sh.append(["siteA", "latA", "lonA", "nearestSiteB", "latB", "lonB", dist_col_name])
 
-    distances = []
+    distances_km = []
+    distances_output = []
     preview_rows = []
 
     for name_a, lat_a, lon_a in sites_a:
         dist_list = []
         for name_b, lat_b, lon_b in sites_b:
-            d = haversine_km(lat_a, lon_a, lat_b, lon_b)
-            dist_list.append(((name_b, lat_b, lon_b), d))
+            d_km = haversine_km(lat_a, lon_a, lat_b, lon_b)
+            dist_list.append(((name_b, lat_b, lon_b), d_km))
 
         dist_list.sort(key=lambda x: x[1])
 
         k = min(n_nearest, len(dist_list))
         for i in range(k):
             (name_b, lat_b, lon_b), dist_km = dist_list[i]
-            dist_rounded = round(dist_km, 6)
+            d_out = round(dist_km * multiplier, decimals)
             out_sh.append([
                 name_a, lat_a, lon_a,
                 name_b, lat_b, lon_b,
-                dist_rounded
+                d_out
             ])
-            distances.append(dist_km)
+            distances_km.append(dist_km)
+            distances_output.append(d_out)
 
             if len(preview_rows) < 10:
-                preview_rows.append({
+                preview_row = {
                     "siteA": name_a,
                     "latA": lat_a,
                     "lonA": lon_a,
                     "nearestSiteB": name_b,
                     "latB": lat_b,
                     "lonB": lon_b,
-                    "distance_km": dist_rounded
-                })
+                    "distance": d_out,
+                    "unit": "m" if is_meters else "km",
+                }
+                preview_row[dist_col_name] = d_out
+                preview_rows.append(preview_row)
 
     summary_sh = out_wb.create_sheet(title="Summary")
-    if distances:
-        min_km = round(min(distances), 6)
-        max_km = round(max(distances), 6)
-        mean_km = round(sum(distances) / len(distances), 6)
-        summary_sh.append(["count", len(distances)])
-        summary_sh.append(["min_km", min_km])
-        summary_sh.append(["mean_km", mean_km])
-        summary_sh.append(["max_km", max_km])
+    if distances_output:
+        min_val = round(min(distances_output), decimals)
+        max_val = round(max(distances_output), decimals)
+        mean_val = round(sum(distances_output) / len(distances_output), decimals)
+
+        min_km = round(min(distances_km), 6)
+        max_km = round(max(distances_km), 6)
+        mean_km = round(sum(distances_km) / len(distances_km), 6)
+
+        summary_sh.append(["count", len(distances_output)])
+        summary_sh.append([f"min_{'m' if is_meters else 'km'}", min_val])
+        summary_sh.append([f"mean_{'m' if is_meters else 'km'}", mean_val])
+        summary_sh.append([f"max_{'m' if is_meters else 'km'}", max_val])
     else:
+        min_val = max_val = mean_val = 0.0
         min_km = max_km = mean_km = 0.0
         summary_sh.append(["No valid distances computed"])
 
@@ -176,7 +194,11 @@ def calculate_isd(
         "sites_a_count": len(sites_a),
         "sites_b_count": len(sites_b),
         "n_nearest": n_nearest,
-        "total_pairs": len(distances),
+        "distance_unit": "m" if is_meters else "km",
+        "total_pairs": len(distances_output),
+        "min_distance": min_val,
+        "mean_distance": mean_val,
+        "max_distance": max_val,
         "min_km": min_km,
         "mean_km": mean_km,
         "max_km": max_km,

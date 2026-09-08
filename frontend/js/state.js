@@ -3,6 +3,8 @@
  * Central store for workspace data, column mappings, and user preferences
  */
 
+import { translate } from './i18n.js';
+
 const STORAGE_PREFIX = 'rf_tools_mapping_';
 
 export class AppState {
@@ -11,6 +13,15 @@ export class AppState {
     this.tools = [];
     this.health = { ok: false, latency: 0, engines: {}, port: 5005 };
     this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
+
+    // Theme & Language
+    this.theme = localStorage.getItem('rf_tools_theme') || 'dark';
+    this.lang = localStorage.getItem('rf_tools_lang') || 'en';
+
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.theme);
+      document.documentElement.setAttribute('lang', this.lang);
+    }
 
     // Tool workspaces storage
     this.workspaces = {
@@ -26,7 +37,25 @@ export class AppState {
         opacityPercent: 40,
         includeLegend: true,
         extrude: true,
-        sheetName: 'Sheet1'
+        sheetName: 'Sheet1',
+        bands: [
+          { name: 'LTE 700', altitude: 42, radius_m: 38, radius_km: 0.038, beamwidth: 65 },
+          { name: 'LTE 900', altitude: 38, radius_m: 45, radius_km: 0.045, beamwidth: 65 },
+          { name: 'LTE 1800', altitude: 34, radius_m: 60, radius_km: 0.060, beamwidth: 65 },
+          { name: 'LTE 2100', altitude: 32, radius_m: 75, radius_km: 0.075, beamwidth: 65 },
+          { name: 'LTE 2300', altitude: 30, radius_m: 100, radius_km: 0.100, beamwidth: 65 }
+        ],
+        ranges: {
+          dl_high: 90,
+          dl_mid: 80,
+          ul_high: 70,
+          ul_mid: 50,
+          rrc_high: 100,
+          rrc_mid: 50
+        },
+        logoPreset: 'telkominfra_puma',
+        leftLogoUrl: '',
+        rightLogoUrl: ''
       }),
       'isd-calculator': this.initWorkspace('isd-calculator', {
         nNearest: 1,
@@ -118,6 +147,34 @@ export class AppState {
     localStorage.setItem('rf_sidebar_collapsed', String(this.sidebarCollapsed));
     this.emit('sidebar-toggle', this.sidebarCollapsed);
   }
+
+  setTheme(theme) {
+    this.theme = theme;
+    localStorage.setItem('rf_tools_theme', theme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    this.emit('theme-change', theme);
+  }
+
+  toggleTheme() {
+    const nextTheme = this.theme === 'dark' ? 'light' : 'dark';
+    this.setTheme(nextTheme);
+  }
+
+  setLanguage(lang) {
+    this.lang = lang;
+    localStorage.setItem('rf_tools_lang', lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('lang', lang);
+    }
+    this.emit('language-change', lang);
+  }
+
+  t(key, fallback = '') {
+    return translate(this.lang, key, fallback);
+  }
 }
+
 
 export const state = new AppState();

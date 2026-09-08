@@ -59,8 +59,7 @@ def convert_geohash_to_latlon(
         except Exception:
             lats.append(None)
             lons.append(None)
-    if valid_count == 0:
-        raise ValueError(f"No valid geohash records could be decoded from column '{col_found}'.")
+            skipped_count += 1
 
     df_out = df.copy()
     # Remove existing conflicting latitude/longitude if any

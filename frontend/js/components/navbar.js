@@ -1,5 +1,6 @@
 /**
  * Top Action Header & Navbar Component
+ * Features: Clean single-title breadcrumbs, Dark/Light theme toggle, EN/ID language switcher, About link
  */
 
 import { state } from '../state.js';
@@ -9,115 +10,92 @@ export class NavbarComponent {
     this.container = container;
     this.render();
 
-    state.subscribe((event, data) => {
-      if (event === 'route-change' || event === 'tools-loaded' || event === 'health-update') {
-        this.update();
+    state.subscribe((event) => {
+      if (event === 'route-change' || event === 'tools-loaded' || event === 'theme-change' || event === 'language-change') {
+        this.render();
       }
     });
   }
 
   render() {
+    const isDark = state.theme !== 'light';
+    const currentLang = state.lang || 'en';
+    const currentRoute = state.route;
+
     this.container.innerHTML = `
       <header class="top-header">
         <div class="top-header__left">
           <nav class="breadcrumbs" id="navbar-breadcrumbs">
-            <a href="#dashboard">Dashboard</a>
+            ${this.buildBreadcrumbs(currentRoute)}
           </nav>
         </div>
         <div class="top-header__right">
-          <button class="search-trigger" id="navbar-search-btn" title="Quick search (Ctrl+K)">
-            <span>🔍 Search or jump to tool...</span>
-            <span class="kbd-shortcut">Ctrl+K</span>
+          <!-- Theme Toggle -->
+          <button class="header-control-btn" id="navbar-theme-btn" title="${state.t('toggle_theme')}">
+            <span>${isDark ? '☀️' : '🌙'}</span>
+            <span style="font-size: 0.75rem;">${isDark ? state.t('theme_light') : state.t('theme_dark')}</span>
           </button>
 
-          <div class="status-pill" id="navbar-health-pill">
-            <span class="pulse-dot" id="navbar-health-dot"></span>
-            <span id="navbar-health-text">Checking...</span>
+          <!-- Language Selector -->
+          <div class="lang-toggle-group" id="navbar-lang-group" title="${state.t('toggle_lang')}">
+            <button class="lang-btn ${currentLang === 'en' ? 'lang-btn--active' : ''}" data-lang="en">EN</button>
+            <button class="lang-btn ${currentLang === 'id' ? 'lang-btn--active' : ''}" data-lang="id">ID</button>
           </div>
 
-          <a href="#docs" class="rf-btn rf-btn-ghost" style="padding: 6px 12px; font-size: 0.8125rem;" title="Engineering Documentation">
-            <span>📖 Docs</span>
-          </a>
-
-          <a href="#templates" class="rf-btn rf-btn-ghost" style="padding: 6px 12px; font-size: 0.8125rem;" title="Sample Reference Spreadsheets">
-            <span>📥 Templates</span>
-          </a>
+          <!-- About Button (Modal Trigger) -->
+          <button type="button" class="header-control-btn" id="navbar-about-btn" title="${state.t('nav_about')}">
+            <span>⚙️</span>
+            <span style="font-size: 0.75rem;">${state.t('nav_about')}</span>
+          </button>
         </div>
       </header>
     `;
 
-    const searchBtn = this.container.querySelector('#navbar-search-btn');
-    if (searchBtn) {
-      searchBtn.addEventListener('click', () => {
-        document.dispatchEvent(new CustomEvent('open-command-palette'));
+    // Theme toggle event
+    const themeBtn = this.container.querySelector('#navbar-theme-btn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        state.toggleTheme();
       });
     }
 
-    this.update();
-  }
+    // Language toggle event
+    const langBtns = this.container.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const lang = e.currentTarget.dataset.lang;
+        if (lang && lang !== state.lang) {
+          state.setLanguage(lang);
+        }
+      });
+    });
 
-  update() {
-    const breadcrumbs = this.container.querySelector('#navbar-breadcrumbs');
-    if (breadcrumbs) {
-      breadcrumbs.innerHTML = this.buildBreadcrumbs(state.route);
-    }
-
-    const healthDot = this.container.querySelector('#navbar-health-dot');
-    const healthText = this.container.querySelector('#navbar-health-text');
-    if (healthDot && healthText) {
-      if (state.health.ok) {
-        healthDot.className = 'pulse-dot';
-        healthText.textContent = `Live: Port 5005 (${state.health.latency}ms)`;
-      } else {
-        healthDot.className = 'pulse-dot pulse-dot--danger';
-        healthText.textContent = 'Backend Offline';
-      }
+    // About modal event
+    const aboutBtn = this.container.querySelector('#navbar-about-btn');
+    if (aboutBtn) {
+      aboutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        document.dispatchEvent(new CustomEvent('open-about-modal'));
+      });
     }
   }
 
   buildBreadcrumbs(route) {
     if (!route || route === 'dashboard') {
-      return '<span class="breadcrumbs__current">Dashboard</span>';
+      return `<span class="breadcrumbs__current">${state.t('nav_dashboard')}</span>`;
     }
     if (route === 'tools') {
-      return `
-        <a href="#dashboard">Dashboard</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <span class="breadcrumbs__current">Tools Directory</span>
-      `;
+      return `<span class="breadcrumbs__current">${state.t('nav_tools')}</span>`;
     }
     if (route.startsWith('tool-')) {
       const toolId = route.replace('tool-', '');
       const tool = state.tools.find(t => t.id === toolId);
-      const toolTitle = tool ? tool.title : toolId;
-      return `
-        <a href="#dashboard">Dashboard</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <a href="#tools">Tools</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <span class="breadcrumbs__current">${toolTitle}</span>
-      `;
-    }
-    if (route === 'docs') {
-      return `
-        <a href="#dashboard">Dashboard</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <span class="breadcrumbs__current">Engineering Documentation</span>
-      `;
-    }
-    if (route === 'templates') {
-      return `
-        <a href="#dashboard">Dashboard</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <span class="breadcrumbs__current">Sample Template Hub</span>
-      `;
+      const toolTitle = tool ? (state.t(`tool_${toolId.replace(/-/g, '_')}_title`, tool.title)) : toolId;
+      return `<span class="breadcrumbs__current">${toolTitle}</span>`;
     }
     if (route === 'about') {
-      return `
-        <a href="#dashboard">Dashboard</a>
-        <span class="breadcrumbs__sep">&gt;</span>
-        <span class="breadcrumbs__current">System Architecture &amp; Verification</span>
-      `;
+      return `<span class="breadcrumbs__current">${state.t('nav_about')}</span>`;
     }
     return `<span class="breadcrumbs__current">${route}</span>`;
   }

@@ -1,184 +1,274 @@
 /**
- * System Architecture & Verification Component
+ * About Pop-up Modal Component
+ * Displays dynamic application version, tool functions, developer contact, and copyright.
  */
 
 import { state } from '../state.js';
 import { ApiService } from '../api.js';
-import { toast } from './toast.js';
 
 export class AboutComponent {
-  constructor(container) {
+  constructor(container = null) {
     this.container = container;
-    this.render();
+    this.isOpen = false;
+    this.version = 'v1.0.0';
+    this.status = 'online';
 
-    state.subscribe((event) => {
-      if (event === 'health-update') {
-        this.render();
+    this.initModal();
+    this.fetchDynamicInfo();
+
+    // Listen for global open event
+    this.handleOpenEvent = () => this.open();
+    document.addEventListener('open-about-modal', this.handleOpenEvent);
+
+    // If instantiated with container or route is about, open immediately
+    if (state.route === 'about') {
+      this.open();
+    }
+
+    this.unsubscribe = state.subscribe((event) => {
+      if (state.route !== 'about' && !this.isOpen) return;
+      if (event === 'language-change' || event === 'health-update' || event === 'theme-change') {
+        this.updateContent();
       }
     });
   }
 
-  render() {
-    const h = state.health;
-    const engines = h.data && h.data.engines ? h.data.engines : {
-      excel_to_kml: 'active',
-      prb_kml: 'active',
-      isd_calculator: 'active',
-      geohash_to_shp: 'active',
-      geohash_to_latlon: 'active',
-      latlon_to_geohash: 'active'
-    };
+  async fetchDynamicInfo() {
+    try {
+      const health = await ApiService.getHealth();
+      if (health && health.version) {
+        this.version = `v${health.version}`;
+      }
+      this.status = health && health.status === 'online' ? 'online' : 'ready';
+      this.updateContent();
+    } catch (e) {
+      // Keep defaults
+    }
+  }
 
-    this.container.innerHTML = `
-      <div style="max-width: 1200px; margin: 0 auto;">
-        <!-- Header -->
-        <div style="margin-bottom: 32px;">
-          <h1 style="font-size: 1.875rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 8px 0;">
-            System Architecture &amp; Verification
-          </h1>
-          <p style="font-size: 0.9375rem; color: var(--color-text-secondary); margin: 0;">
-            Technical runtime architecture, live engine status checks, and port 5005 health verification.
-          </p>
-        </div>
-
-        <!-- Live Server Status Grid -->
-        <div class="kpi-summary-grid" style="margin-bottom: 32px;">
-          <div class="kpi-summary-card">
-            <span class="kpi-summary-label">Backend Status</span>
-            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              <span class="pulse-dot ${h.ok ? '' : 'pulse-dot--danger'}"></span>
-              <span style="font-size: 1.2rem; font-weight: 700; color: ${h.ok ? 'var(--color-status-success)' : 'var(--color-status-danger)'};">
-                ${h.ok ? 'Online (Healthy)' : 'Disconnected'}
-              </span>
+  initModal() {
+    let overlay = document.getElementById('about-modal-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'about-modal-overlay';
+      overlay.innerHTML = `
+        <div class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+          <div class="about-modal__header">
+            <div class="about-modal__title-group">
+              <span class="about-modal__logo">📡</span>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <h2 class="about-modal__title" id="about-modal-title">RF Tools-Telco</h2>
+                  <span class="about-modal__version-badge" id="about-modal-version">${this.version}</span>
+                  <span class="about-modal__status-badge" id="about-modal-status">● ${this.status}</span>
+                </div>
+                <p class="about-modal__subtitle">RF Tools-Telco</p>
+              </div>
             </div>
+            <button class="about-modal__close-btn" id="about-modal-close-x" title="Close modal" aria-label="Close">&times;</button>
           </div>
 
-          <div class="kpi-summary-card">
-            <span class="kpi-summary-label">Port &amp; Endpoint</span>
-            <span class="kpi-summary-value" style="color: var(--color-primary);">Port 5005</span>
+          <div class="about-modal__body" id="about-modal-body">
+            <!-- Dynamic body rendered in updateContent -->
           </div>
 
-          <div class="kpi-summary-card">
-            <span class="kpi-summary-label">Round-Trip Latency</span>
-            <span class="kpi-summary-value">${h.latency || 0} ms</span>
-          </div>
-
-          <div class="kpi-summary-card">
-            <span class="kpi-summary-label">Automated Unit Tests</span>
-            <span class="kpi-summary-value" style="color: var(--color-status-success);">33 / 33 Passing</span>
-          </div>
-        </div>
-
-        <!-- Engine Status Matrix -->
-        <div class="component-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0; color: var(--color-text-primary);">
-              Pure Calculation Engines Health Check
-            </h3>
-            <button class="rf-btn rf-btn-secondary" id="recheck-health-btn" style="padding: 4px 12px; font-size: 0.75rem;">
-              🔄 Re-Check Health
+          <div class="about-modal__footer">
+            <div class="about-modal__copyright">
+              © 2025 - 2026 RF Tools. All rights reserved.
+            </div>
+            <button class="rf-btn rf-btn-secondary" id="about-modal-close-btn" style="padding: 6px 16px; font-size: 0.8125rem;">
+              Close
             </button>
           </div>
-
-          <table class="rf-band-table">
-            <thead>
-              <tr>
-                <th>Engine ID</th>
-                <th>Target Utility</th>
-                <th>Underlying Algorithms</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">excel_to_kml</td>
-                <td>Point KML Placemark Converter</td>
-                <td>OpenPyXL, SimpleKML coordinate styling</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.excel_to_kml || 'Active'}</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">prb_kml</td>
-                <td>PRB KML 3D Sector Polygon Visualizer</td>
-                <td>Forward Spherical Geodesic Projection, 3GPP Band Stacking</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.prb_kml || 'Active'}</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">isd_calculator</td>
-                <td>Inter-Site Distance (ISD) Calculator</td>
-                <td>Haversine Great-Circle Matrix, N-Nearest Neighbors</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.isd_calculator || 'Active'}</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">geohash_to_shp</td>
-                <td>Geohash to Shapefile Generator</td>
-                <td>WGS84 Bounding Box, Local UTM Metric Square, GeoPandas</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.geohash_to_shp || 'Active'}</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">geohash_to_latlon</td>
-                <td>Geohash to Centroid Lat/Long Decoder</td>
-                <td>Base-32 Binary Inversion, Centroid Calculation</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.geohash_to_latlon || 'Active'}</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="color: var(--color-primary); font-weight: 600;">latlon_to_geohash</td>
-                <td>Lat/Long to Geohash Encoder</td>
-                <td>Morton Z-Order Interleaving, Multi-Precision Clamping</td>
-                <td><span class="rf-confidence-pill rf-confidence-pill--high">${engines.latlon_to_geohash || 'Active'}</span></td>
-              </tr>
-            </tbody>
-          </table>
         </div>
+      `;
+      document.body.appendChild(overlay);
 
-        <!-- Architectural Diagram -->
-        <div class="component-box">
-          <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 12px 0; color: var(--color-text-primary);">
-            Decoupled 4-Tier Architectural Model
-          </h3>
-          <div class="formula-box" style="font-size: 0.8125rem; line-height: 1.4;">
-            ┌────────────────────────────────────────────────────────────────────────┐<br>
-            │                    Web Frontend UI (Port 5005)                         │<br>
-            │  - Collapsible Sidebar      - 4-Zone Workspaces     - Command Palette  │<br>
-            │  - Reactive Column Mapping  - Live Data Previews    - Template Manager │<br>
-            └───────────────────────────────────┬────────────────────────────────────┘<br>
-                                                │ RESTful HTTP / Multipart / JSON<br>
-            ┌───────────────────────────────────▼────────────────────────────────────┐<br>
-            │                     FastAPI Application Layer                          │<br>
-            │  - Port 5005 Uvicorn ASGI   - Heuristic Column Inspector               │<br>
-            │  - Dynamic Excel Templates  - RFC 7807 Error Sanitizer                 │<br>
-            └───────────────────────────────────┬────────────────────────────────────┘<br>
-                                                │ Clean Python Function Calls<br>
-            ┌───────────────────────────────────▼────────────────────────────────────┐<br>
-            │                   Modular Calculation Engines                          │<br>
-            │  ├── tools/excel_to_kml.py        ├── tools/geohash_to_shp.py          │<br>
-            │  ├── tools/prb_kml.py             ├── tools/geohash_to_latlon.py       │<br>
-            │  └── tools/isd_calculator.py      └── tools/latlon_to_geohash.py       │<br>
-            └───────────────────────────────────┬────────────────────────────────────┘<br>
-                                                │ Mathematical Equations<br>
-            ┌───────────────────────────────────▼────────────────────────────────────┐<br>
-            │          Pure Geospatial &amp; Telecom Scientific Stack                 │<br>
-            │      Haversine (6371km) &bull; Spherical Geodesics &bull; WGS84 EPSG:4326     │<br>
-            └────────────────────────────────────────────────────────────────────────┘
-          </div>
-        </div>
-      </div>
-    `;
+      // Event listeners for close
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) this.close();
+      });
 
-    const recheckBtn = this.container.querySelector('#recheck-health-btn');
-    if (recheckBtn) {
-      recheckBtn.addEventListener('click', async () => {
-        try {
-          recheckBtn.disabled = true;
-          const res = await ApiService.getHealth();
-          state.health = res;
-          state.emit('health-update', res);
-          toast.success(`Health check complete (${res.latency}ms)`);
-        } catch (err) {
-          toast.error(`Health check failed: ${err.message}`);
-        } finally {
-          recheckBtn.disabled = false;
+      const closeX = overlay.querySelector('#about-modal-close-x');
+      if (closeX) closeX.addEventListener('click', () => this.close());
+
+      const closeBtn = overlay.querySelector('#about-modal-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
         }
       });
     }
+    this.overlay = overlay;
+    this.updateContent();
+  }
+
+  updateContent() {
+    if (!this.overlay) return;
+
+    const versionEl = this.overlay.querySelector('#about-modal-version');
+    if (versionEl) versionEl.textContent = this.version;
+
+    const statusEl = this.overlay.querySelector('#about-modal-status');
+    if (statusEl) statusEl.textContent = `● ${this.status}`;
+
+    const bodyEl = this.overlay.querySelector('#about-modal-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = `
+        <!-- Description -->
+        <div class="about-section">
+          <p class="about-desc">
+            ${state.lang === 'id' 
+              ? 'RF Tools adalah aplikasi rekayasa telekomunikasi dan analisis spasial tingkat lanjut. Dibangun untuk menyajikan komputasi geodesi WGS84 murni, pemodelan sektor antena 3D, analisis topologi jaringan, serta interoperabilitas format SIG standar.'
+              : 'RF Tools is an advanced telecommunications engineering and spatial analysis suite. Designed to provide pure WGS84 geodetic computations, 3D antenna sector visualization, network topology analysis, and standard GIS format interoperability.'}
+          </p>
+        </div>
+
+        <!-- Tool Functions (6 Tools) -->
+        <div class="about-section">
+          <h3 class="about-section__title">
+            <span>⚙️</span> ${state.lang === 'id' ? 'Fungsi & Modul Perhitungan' : 'Engine Functions & Modules'}
+          </h3>
+          <div class="about-tools-grid">
+            <div class="about-tool-card" data-tool-id="excel-to-kml">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">📍</span>
+                <span class="about-tool-card__name">Excel &rarr; Point KML</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Konversi koordinat sel/site ke placemark Google Earth dengan kustomisasi ikon, skala, dan label warna RGB.'
+                  : 'Converts site coordinates into styled Google Earth placemarks with customizable icons, scale factors, and RGB label colors.'}
+              </p>
+            </div>
+
+            <div class="about-tool-card" data-tool-id="prb-kml">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">📡</span>
+                <span class="about-tool-card__name">Excel &rarr; PRB 3D Sector</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Visualisasi poligon sektor 3D bertingkat berdasarkan frekuensi carrier, ambang batas warna KPI PRB, logo ganda, dan tabel balon 24 baris.'
+                  : 'Visualizes 3D extruded antenna radiation sectors stacked by band altitude, PRB KPI heatmaps, dual logos, and 24-row telemetry balloon popup.'}
+              </p>
+            </div>
+
+            <div class="about-tool-card" data-tool-id="isd-calculator">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">📐</span>
+                <span class="about-tool-card__name">ISD Calculator</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Perhitungan jarak antar-site (Inter-Site Distance) rumus Haversine untuk N-tetangga terdekat dengan pilihan satuan Kilometer atau Meter.'
+                  : 'Computes great-circle inter-site distance topology matrix for N-nearest neighbors with selectable Kilometers (km) or Meters (m) units.'}
+              </p>
+            </div>
+
+            <div class="about-tool-card" data-tool-id="geohash-to-shp">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">🗺️</span>
+                <span class="about-tool-card__name">Geohash &rarr; Shapefile</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Pembuatan paket arsip ESRI Shapefile (.shp, .shx, .dbf, .prj) dari kode geohash dengan bounding box atau grid metrik UTM.'
+                  : 'Generates standard ESRI polygon shapefile packages (.shp, .shx, .dbf, .prj) from geohash spatial buckets with EPSG:4326 geodetic datum.'}
+              </p>
+            </div>
+
+            <div class="about-tool-card" data-tool-id="geohash-to-latlon">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">🔍</span>
+                <span class="about-tool-card__name">Geohash &rarr; Lat / Long</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Dekoder token string geohash base-32 menjadi koordinat titik pusat lintang/bujur desimal dan batas bounding box.'
+                  : 'Decodes base-32 geohash strings into high-precision latitude/longitude centroid coordinates and bounding box extents.'}
+              </p>
+            </div>
+
+            <div class="about-tool-card" data-tool-id="latlon-to-geohash">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">🌐</span>
+                <span class="about-tool-card__name">Lat / Long &rarr; Geohash</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Enkoder pasangan koordinat lintang/bujur menjadi kode geohash spasial dengan presisi tingkat 1 hingga 12.'
+                  : 'Encodes latitude/longitude coordinate pairs into standardized hierarchical geohash codes with precision tuning from 1 to 12.'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Developer Contact Card -->
+        <div class="about-section">
+          <h3 class="about-section__title">
+            <span>👤</span> ${state.lang === 'id' ? 'Informasi Pengembang' : 'Developer & Engineering Contact'}
+          </h3>
+          <div class="about-contact-card">
+            <div class="about-contact-row">
+              <span class="about-contact-label">${state.lang === 'id' ? 'Pengembang' : 'Developer'}</span>
+              <span class="about-contact-val"><b>Danuar Trianur Rohman</b></span>
+            </div>
+            <div class="about-contact-row">
+              <span class="about-contact-label">Email</span>
+              <span class="about-contact-val">
+                <a href="mailto:danuartrianurrohman@gmail.com" class="about-contact-link">danuartrianurrohman@gmail.com</a>
+              </span>
+            </div>
+            <div class="about-contact-row">
+              <span class="about-contact-label">${state.lang === 'id' ? 'Telepon / WhatsApp' : 'Phone / WhatsApp'}</span>
+              <span class="about-contact-val">
+                <a href="tel:+6282116513070" class="about-contact-link">+6282116513070</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  open() {
+    this.isOpen = true;
+    if (this.overlay) {
+      this.overlay.classList.add('modal-overlay--open');
+      this.updateContent();
+    }
+  }
+
+  close() {
+    this.isOpen = false;
+    if (this.overlay) {
+      this.overlay.classList.remove('modal-overlay--open');
+    }
+    // If URL hash was #about, revert hash to previous or #dashboard
+    if (window.location.hash === '#about') {
+      window.location.hash = '#dashboard';
+    }
+  }
+
+  render() {
+    // Guard for backwards compatibility
+    if (state.route !== 'about') return;
+    this.open();
+  }
+
+  destroy() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
+    if (this.handleOpenEvent) {
+      document.removeEventListener('open-about-modal', this.handleOpenEvent);
+      this.handleOpenEvent = null;
+    }
+    this.close();
   }
 }

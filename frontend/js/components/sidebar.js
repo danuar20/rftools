@@ -1,5 +1,6 @@
 /**
  * Collapsible Left Navigation Sidebar Component
+ * Streamlined hierarchy with refined bottom toggle and localized navigation
  */
 
 import { state } from '../state.js';
@@ -9,8 +10,8 @@ export class SidebarComponent {
     this.container = container;
     this.render();
 
-    state.subscribe((event, data) => {
-      if (event === 'route-change' || event === 'tools-loaded' || event === 'sidebar-toggle' || event === 'health-update') {
+    state.subscribe((event) => {
+      if (event === 'route-change' || event === 'tools-loaded' || event === 'sidebar-toggle' || event === 'language-change') {
         this.render();
       }
     });
@@ -24,45 +25,36 @@ export class SidebarComponent {
     this.container.innerHTML = `
       <!-- Brand Header -->
       <div class="sidebar__header">
-        <a href="#dashboard" class="sidebar__brand">
-          <img src="/assets/icons/rf-logo.svg" alt="RF TOOLS" class="sidebar__logo">
+        <a href="#dashboard" class="sidebar__brand" title="RF Tools-Telco version v1.0.0">
+          <img src="/assets/icons/rf-logo.svg" alt="RF Tools-Telco" class="sidebar__logo">
           <div class="sidebar__brand-text">
-            <span class="sidebar__brand-title">RF TOOLS</span>
-            <span class="sidebar__brand-subtitle">Engineering Suite</span>
+            <span class="sidebar__brand-title">RF Tools-Telco</span>
+            <span class="sidebar__brand-version">version v1.0.0</span>
           </div>
         </a>
-        <button class="sidebar__toggle" id="sidebar-toggle-btn" title="Toggle Sidebar (Ctrl+B)">
-          <span>${isCollapsed ? '▶' : '◀'}</span>
-        </button>
       </div>
 
       <!-- Navigation Tree -->
       <nav class="sidebar__nav">
-        <!-- Overview -->
+        <!-- Section: Overview -->
         <div>
-          <div class="sidebar__section-title">Overview</div>
+          <div class="sidebar__section-title">${state.t('nav_overview')}</div>
           <ul class="sidebar__menu">
             <li>
-              <a href="#dashboard" class="sidebar__link ${currentRoute === 'dashboard' ? 'sidebar__link--active' : ''}" title="Dashboard">
+              <a href="#dashboard" class="sidebar__link ${currentRoute === 'dashboard' ? 'sidebar__link--active' : ''}" title="${state.t('nav_dashboard')}">
                 <span class="sidebar__link-icon">📊</span>
-                <span class="sidebar__link-text">Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#tools" class="sidebar__link ${currentRoute === 'tools' ? 'sidebar__link--active' : ''}" title="Tools Directory">
-                <span class="sidebar__link-icon">🧰</span>
-                <span class="sidebar__link-text">Tools Directory</span>
+                <span class="sidebar__link-text">${state.t('nav_dashboard')}</span>
               </a>
             </li>
           </ul>
         </div>
 
-        <!-- Domain A: KML & Site Visualization -->
+        <!-- Section: KML & Visualization -->
         <div>
-          <div class="sidebar__section-title">KML &amp; Visualization</div>
+          <div class="sidebar__section-title">${state.t('nav_kml')}</div>
           <ul class="sidebar__menu">
             <li>
-              <a href="#tool-excel-to-kml" class="sidebar__link ${currentRoute === 'tool-excel-to-kml' ? 'sidebar__link--active' : ''}" title="Point KML Converter">
+              <a href="#tool-excel-to-kml" class="sidebar__link ${currentRoute === 'tool-excel-to-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_excel_to_kml_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-excel-to-kml.svg" alt="Point KML">
                 </span>
@@ -70,7 +62,7 @@ export class SidebarComponent {
               </a>
             </li>
             <li>
-              <a href="#tool-prb-kml" class="sidebar__link ${currentRoute === 'tool-prb-kml' ? 'sidebar__link--active' : ''}" title="PRB 3D Sector Visualizer">
+              <a href="#tool-prb-kml" class="sidebar__link ${currentRoute === 'tool-prb-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_prb_kml_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-prb-kml.svg" alt="PRB KML">
                 </span>
@@ -80,27 +72,27 @@ export class SidebarComponent {
           </ul>
         </div>
 
-        <!-- Domain B: Network Topology & ISD -->
+        <!-- Section: Network Topology & ISD -->
         <div>
-          <div class="sidebar__section-title">Topology &amp; Distance</div>
+          <div class="sidebar__section-title">${state.t('nav_topology')}</div>
           <ul class="sidebar__menu">
             <li>
-              <a href="#tool-isd-calculator" class="sidebar__link ${currentRoute === 'tool-isd-calculator' ? 'sidebar__link--active' : ''}" title="Inter-Site Distance Calculator">
+              <a href="#tool-isd-calculator" class="sidebar__link ${currentRoute === 'tool-isd-calculator' ? 'sidebar__link--active' : ''}" title="${state.t('tool_isd_calculator_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-isd-calculator.svg" alt="ISD">
                 </span>
-                <span class="sidebar__link-text">ISD Calculator (Dual)</span>
+                <span class="sidebar__link-text">ISD Calculator</span>
               </a>
             </li>
           </ul>
         </div>
 
-        <!-- Domain C: Geospatial & Geohash Utilities -->
+        <!-- Section: Geospatial & Geohash Utilities -->
         <div>
-          <div class="sidebar__section-title">Geospatial &amp; Geohash</div>
+          <div class="sidebar__section-title">${state.t('nav_gis')}</div>
           <ul class="sidebar__menu">
             <li>
-              <a href="#tool-geohash-to-shp" class="sidebar__link ${currentRoute === 'tool-geohash-to-shp' ? 'sidebar__link--active' : ''}" title="Geohash to Shapefile">
+              <a href="#tool-geohash-to-shp" class="sidebar__link ${currentRoute === 'tool-geohash-to-shp' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_shp_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-geohash-to-shp.svg" alt="Geohash to SHP">
                 </span>
@@ -108,7 +100,7 @@ export class SidebarComponent {
               </a>
             </li>
             <li>
-              <a href="#tool-geohash-to-latlon" class="sidebar__link ${currentRoute === 'tool-geohash-to-latlon' ? 'sidebar__link--active' : ''}" title="Geohash to Lat/Long">
+              <a href="#tool-geohash-to-latlon" class="sidebar__link ${currentRoute === 'tool-geohash-to-latlon' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_latlon_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-geohash-to-latlon.svg" alt="Decoder">
                 </span>
@@ -116,7 +108,7 @@ export class SidebarComponent {
               </a>
             </li>
             <li>
-              <a href="#tool-latlon-to-geohash" class="sidebar__link ${currentRoute === 'tool-latlon-to-geohash' ? 'sidebar__link--active' : ''}" title="Lat/Long to Geohash">
+              <a href="#tool-latlon-to-geohash" class="sidebar__link ${currentRoute === 'tool-latlon-to-geohash' ? 'sidebar__link--active' : ''}" title="${state.t('tool_latlon_to_geohash_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-latlon-to-geohash.svg" alt="Encoder">
                 </span>
@@ -125,44 +117,14 @@ export class SidebarComponent {
             </li>
           </ul>
         </div>
-
-        <!-- Documentation & Specs -->
-        <div>
-          <div class="sidebar__section-title">Reference &amp; Specs</div>
-          <ul class="sidebar__menu">
-            <li>
-              <a href="#docs" class="sidebar__link ${currentRoute === 'docs' ? 'sidebar__link--active' : ''}" title="Documentation">
-                <span class="sidebar__link-icon">📖</span>
-                <span class="sidebar__link-text">Documentation</span>
-              </a>
-            </li>
-            <li>
-              <a href="#templates" class="sidebar__link ${currentRoute === 'templates' ? 'sidebar__link--active' : ''}" title="Sample Templates">
-                <span class="sidebar__link-icon">📥</span>
-                <span class="sidebar__link-text">Sample Templates</span>
-              </a>
-            </li>
-            <li>
-              <a href="#about" class="sidebar__link ${currentRoute === 'about' ? 'sidebar__link--active' : ''}" title="Architecture &amp; System Health">
-                <span class="sidebar__link-icon">⚙️</span>
-                <span class="sidebar__link-text">About &amp; Architecture</span>
-              </a>
-            </li>
-          </ul>
-        </div>
       </nav>
 
-      <!-- Sidebar Footer -->
+      <!-- Sidebar Footer (Refined User-Friendly Toggle Button) -->
       <div class="sidebar__footer">
-        <div class="sidebar__status-box">
-          <span class="pulse-dot ${state.health.ok ? '' : 'pulse-dot--danger'}"></span>
-          <span class="sidebar__status-text">
-            ${state.health.ok ? 'Port 5005 Live' : 'Port 5005 Disconnected'}
-          </span>
-          <span class="rf-tabular-nums sidebar__status-text" style="font-size: 0.6875rem; color: var(--color-text-muted);">
-            v1.0.0
-          </span>
-        </div>
+        <button class="sidebar__toggle" id="sidebar-toggle-btn" title="${state.t('toggle_sidebar')}" aria-label="${state.t('toggle_sidebar')}">
+          <span class="sidebar__toggle-icon">${isCollapsed ? '▶' : '◀'}</span>
+          ${isCollapsed ? '' : `<span class="sidebar__toggle-label">${state.lang === 'id' ? 'Ciutkan Menu' : 'Collapse Sidebar'}</span>`}
+        </button>
       </div>
     `;
 
