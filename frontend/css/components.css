@@ -572,6 +572,7 @@ body {
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.02em;
+  color: var(--color-text-primary);
 }
 
 .rf-kpi-chip__dot {
@@ -806,4 +807,351 @@ body {
   border-top: 1px solid var(--color-border-subtle);
   font-size: 0.8125rem;
   margin-top: auto;
+}
+
+/* ==========================================================================
+   Geohash Converter Interactive Component (geohash.co style UX)
+   ========================================================================== */
+
+.gh-converter-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+}
+
+.gh-converter-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(340px, 1fr);
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .gh-converter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gh-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gh-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.gh-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: var(--spacing-sm);
+}
+
+.gh-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.gh-card__badge {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: var(--rounded-full);
+  background: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.gh-big-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gh-big-input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 11px 14px;
+  border-radius: var(--rounded-sm);
+  border: 1.5px solid var(--color-border-subtle);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gh-big-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.gh-char-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.gh-char-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 4px 6px;
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-xs);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.gh-char-chip span.bits {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.gh-coords-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+  .gh-coords-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gh-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gh-field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gh-input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  padding: 9px 12px;
+  border-radius: var(--rounded-sm);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gh-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.gh-precision-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.gh-slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.gh-slider {
+  flex: 1;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.gh-quick-prec-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gh-quick-pill {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: var(--rounded-full);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gh-quick-pill:hover,
+.gh-quick-pill--active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+/* 3x3 Neighbor Grid Pad */
+.gh-neighbor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background-color: var(--color-bg-sunken);
+  padding: 12px;
+  border-radius: var(--rounded-md);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.gh-neighbor-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border-radius: var(--rounded-sm);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 52px;
+}
+
+.gh-neighbor-btn:hover {
+  background-color: var(--color-bg-elevated);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.gh-neighbor-btn--center {
+  background-color: rgba(56, 189, 248, 0.1);
+  border: 1.5px solid var(--color-primary);
+  cursor: default;
+}
+
+.gh-neighbor-btn--center:hover {
+  transform: none;
+  background-color: rgba(56, 189, 248, 0.15);
+}
+
+.gh-neighbor-dir {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.gh-neighbor-btn--center .gh-neighbor-dir {
+  color: var(--color-primary);
+}
+
+.gh-neighbor-val {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+/* Compass Bounding Box Display */
+.gh-bbox-diagram {
+  background-color: var(--color-bg-sunken);
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: var(--rounded-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gh-bbox-compass {
+  display: grid;
+  grid-template-areas:
+    ". north ."
+    "west center east"
+    ". south .";
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.gh-bbox-node {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-xs);
+  text-align: center;
+}
+
+.gh-bbox-node.north { grid-area: north; justify-self: center; }
+.gh-bbox-node.south { grid-area: south; justify-self: center; }
+.gh-bbox-node.west { grid-area: west; justify-self: end; }
+.gh-bbox-node.east { grid-area: east; justify-self: start; }
+.gh-bbox-node.center {
+  grid-area: center;
+  background-color: rgba(56, 189, 248, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.gh-dim-table {
+  width: 100%;
+  font-size: 0.75rem;
+  border-collapse: collapse;
+}
+
+.gh-dim-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.gh-dim-table td.label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.gh-dim-table td.val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-align: right;
 }

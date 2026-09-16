@@ -13,6 +13,12 @@ def test_frontend_html_root():
     assert "text/html" in res.headers["content-type"]
     assert "RF Tools-Telco" in res.text
     assert "app-shell" in res.text
+    assert "tokens.css?v=1.1.1" in res.text
+    assert "components.css?v=1.1.1" in res.text
+    assert "app.css?v=1.1.1" in res.text
+    assert "app.js?v=1.1.1" in res.text
+    assert "Cache-Control" in res.headers
+    assert "no-cache, no-store, must-revalidate" in res.headers["Cache-Control"]
 
 def test_frontend_json_root():
     res = client.get("/", headers={"Accept": "application/json"})
@@ -224,6 +230,153 @@ def test_workspace_isd_and_prb_controls():
     assert 'btn-remove-band' in res_ws.text
     assert 'custom_bands' in res_ws.text
     assert 'custom_ranges' in res_ws.text
+
+def test_prb_six_tier_ranges_and_logo_enhancements():
+    # 1. Workspace has 6-tier inputs (T1 to T4 for DL, UL, RRC)
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    assert "range-dl-t1" in res_ws.text
+    assert "range-dl-t2" in res_ws.text
+    assert "range-dl-t3" in res_ws.text
+    assert "range-dl-t4" in res_ws.text
+    assert "range-ul-t1" in res_ws.text
+    assert "range-rrc-t1" in res_ws.text
+    assert "6 Tiers" in res_ws.text
+
+    # 2. Right logo preview box has white background (#ffffff)
+    assert 'preview-logo-right' in res_ws.text
+    # Ensure Right Logo preview box container has #ffffff
+    assert 'background: #ffffff; border-radius: 3px; padding: 2px;' in res_ws.text
+    assert 'background: #000000; border-radius: 3px; padding: 2px;' not in res_ws.text
+
+    # 3. COLOR_HEX cell text is responsive (uses var(--color-text-primary) for dark/light contrast)
+    assert 'color: var(--color-text-primary);' in res_ws.text
+
+    # 4. State prb-kml ranges defaults match the 6 tiers (35, 60, 75, 90 for PRB; 40, 60, 90, 120 for RRC)
+    res_state = client.get("/static/js/state.js")
+    assert res_state.status_code == 200
+    assert "dl_t1: 35" in res_state.text
+    assert "dl_t2: 60" in res_state.text
+    assert "dl_t3: 75" in res_state.text
+    assert "dl_t4: 90" in res_state.text
+    assert "rrc_t1: 40" in res_state.text
+    assert "rrc_t2: 60" in res_state.text
+    assert "rrc_t3: 90" in res_state.text
+    assert "rrc_t4: 120" in res_state.text
+
+    # 5. Default RF Tools logos exist and have RGBA mode
+    res_left = client.get("/assets/logos/rf_tools_logo_left.png")
+    assert res_left.status_code == 200
+    assert len(res_left.content) > 500
+
+    res_right = client.get("/assets/logos/rf_tools_logo_right.png")
+    assert res_right.status_code == 200
+    assert len(res_right.content) > 500
+
+def test_dashboard_slide_retention():
+    # 1. State contains dashboardSlide property
+    res_state = client.get("/static/js/state.js")
+    assert res_state.status_code == 200
+    assert "this.dashboardSlide = 0" in res_state.text
+
+    # 2. DashboardComponent initializes from and persists to state.dashboardSlide
+    res_dash = client.get("/static/js/components/dashboard.js")
+    assert res_dash.status_code == 200
+    assert "this.currentSlide = typeof state.dashboardSlide === 'number' ? state.dashboardSlide : 0" in res_dash.text
+    assert "state.dashboardSlide = this.currentSlide" in res_dash.text
+
+def test_geohash_converter_frontend_integration():
+    # 1. Sidebar menu contains Geohash Converter with explicit fallback
+    res_side = client.get("/static/js/components/sidebar.js")
+    assert res_side.status_code == 200
+    assert "#tool-geohash-converter" in res_side.text
+    assert "tool-geohash-converter.svg" in res_side.text
+    assert "state.t('tool_geohash_converter_title', 'Geohash Converter')" in res_side.text
+
+    # 2. Dashboard directory includes Geohash Converter with interactive launch badge
+    res_dash = client.get("/static/js/components/dashboard.js")
+    assert res_dash.status_code == 200
+    assert "geohash-converter" in res_dash.text
+    assert "Interactive ⇄" in res_dash.text
+
+    # 3. Dedicated workspace route rendering and interactive controls
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    assert "renderGeohashConverter" in res_ws.text
+    assert "bindGeohashConverter" in res_ws.text
+    assert "gh-input-hash" in res_ws.text
+    assert "gh-input-lat" in res_ws.text
+    assert "gh-input-lon" in res_ws.text
+    assert "gh-input-combined" in res_ws.text
+    assert "gh-slider-precision" in res_ws.text
+    assert "gh-copy-hash-btn" in res_ws.text
+    assert "gh-copy-coords-btn" in res_ws.text
+    assert "gh-copy-bbox-btn" in res_ws.text
+    assert "gh-neighbor-grid" in res_ws.text
+    assert "gh-bbox-diagram" in res_ws.text
+
+    # 4. Command palette and About modal integration
+    res_cp = client.get("/static/js/components/command_palette.js")
+    assert res_cp.status_code == 200
+    assert "geohash-converter" in res_cp.text
+
+    res_about = client.get("/static/js/components/about.js")
+    assert res_about.status_code == 200
+    assert 'data-tool-id="geohash-converter"' in res_about.text
+
+    # 5. Client-side geohash utility module and icon asset
+    res_gh = client.get("/static/js/utils/geohash.js")
+    assert res_gh.status_code == 200
+    assert "export function decode" in res_gh.text
+    assert "export function encode" in res_gh.text
+    assert "export function getNeighbors" in res_gh.text
+
+    res_icon = client.get("/assets/icons/tool-geohash-converter.svg")
+    assert res_icon.status_code == 200
+    assert "<svg" in res_icon.text
+
+def test_geohash_converter_api_integration():
+    # Test POST endpoint with geohash string
+    res_post = client.post("/api/v1/geohash/convert", json={"geohash": "qqguygv"})
+    assert res_post.status_code == 200
+    data = res_post.json()
+    assert data["geohash"] == "qqguygv"
+    assert data["precision"] == 7
+    assert -6.20 < data["latitude"] < -6.15
+    assert 106.80 < data["longitude"] < 106.85
+    assert "bounding_box" in data
+    assert "neighbors" in data
+    assert data["neighbors"]["n"] is not None
+
+    # Test POST endpoint with lat/lon coordinates and precision
+    res_coords = client.post("/api/v1/geohash/convert", json={
+        "latitude": -6.175392,
+        "longitude": 106.827153,
+        "precision": 7
+    })
+    assert res_coords.status_code == 200
+    assert res_coords.json()["geohash"] == "qqguygv"
+
+    # Test GET endpoint with query parameter
+    res_get = client.get("/api/v1/geohash/convert?geohash=qqguygv")
+    assert res_get.status_code == 200
+    assert res_get.json()["geohash"] == "qqguygv"
+
+def test_navbar_breadcrumbs_tool_definition_and_state_emit_guard():
+    # 1. Verify navbar.js defines tool before using it in buildBreadcrumbs
+    res_nav = client.get("/static/js/components/navbar.js")
+    assert res_nav.status_code == 200
+    assert "const tool = (state.tools || []).find(t => t.id === toolId);" in res_nav.text
+    assert "const fallback = state.t(`tool_${toolId.replace(/-/g, '_')}_title`, toolId);" in res_nav.text
+
+    # 2. Verify state.js emit wraps each listener execution in a try...catch block
+    res_state = client.get("/static/js/state.js")
+    assert res_state.status_code == 200
+    assert "try {" in res_state.text
+    assert "fn(event, data);" in res_state.text
+    assert "console.error(`Error in state listener for event" in res_state.text
+
+
 
 
 

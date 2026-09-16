@@ -92,6 +92,14 @@ export class SidebarComponent {
           <div class="sidebar__section-title">${state.t('nav_gis')}</div>
           <ul class="sidebar__menu">
             <li>
+              <a href="#tool-geohash-converter" class="sidebar__link ${currentRoute === 'tool-geohash-converter' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_converter_title', 'Geohash Converter')}">
+                <span class="sidebar__link-icon">
+                  <img src="/assets/icons/tool-geohash-converter.svg" alt="Geohash Converter">
+                </span>
+                <span class="sidebar__link-text">${state.t('tool_geohash_converter_title', 'Geohash Converter')}</span>
+              </a>
+            </li>
+            <li>
               <a href="#tool-geohash-to-shp" class="sidebar__link ${currentRoute === 'tool-geohash-to-shp' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_shp_title')}">
                 <span class="sidebar__link-icon">
                   <img src="/assets/icons/tool-geohash-to-shp.svg" alt="Geohash to SHP">

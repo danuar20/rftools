@@ -17,6 +17,7 @@ export class AppState {
     // Theme & Language
     this.theme = localStorage.getItem('rf_tools_theme') || 'dark';
     this.lang = localStorage.getItem('rf_tools_lang') || 'en';
+    this.dashboardSlide = 0;
 
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', this.theme);
@@ -46,12 +47,24 @@ export class AppState {
           { name: 'LTE 2300', altitude: 30, radius_m: 100, radius_km: 0.100, beamwidth: 65 }
         ],
         ranges: {
+          dl_t1: 35,
+          dl_t2: 60,
+          dl_t3: 75,
+          dl_t4: 90,
+          ul_t1: 35,
+          ul_t2: 60,
+          ul_t3: 75,
+          ul_t4: 90,
+          rrc_t1: 40,
+          rrc_t2: 60,
+          rrc_t3: 90,
+          rrc_t4: 120,
           dl_high: 90,
-          dl_mid: 80,
-          ul_high: 70,
-          ul_mid: 50,
-          rrc_high: 100,
-          rrc_mid: 50
+          dl_mid: 75,
+          ul_high: 90,
+          ul_mid: 75,
+          rrc_high: 120,
+          rrc_mid: 90
         },
         logoPreset: 'telkominfra_puma',
         leftLogoUrl: '',
@@ -73,6 +86,12 @@ export class AppState {
       'latlon-to-geohash': this.initWorkspace('latlon-to-geohash', {
         precision: 7,
         outputFormat: 'xlsx'
+      }),
+      'geohash-converter': this.initWorkspace('geohash-converter', {
+        geohash: 'qqguygv',
+        latitude: -6.175392,
+        longitude: 106.827153,
+        precision: 7
       })
     };
 
@@ -139,7 +158,13 @@ export class AppState {
   }
 
   emit(event, data) {
-    this.listeners.forEach(fn => fn(event, data));
+    this.listeners.forEach(fn => {
+      try {
+        fn(event, data);
+      } catch (err) {
+        console.error(`Error in state listener for event "${event}":`, err);
+      }
+    });
   }
 
   toggleSidebar() {

@@ -14,6 +14,7 @@ from backend.config import HOST, PORT, CORS_ORIGINS, APP_ENV
 from backend.api.v1.tools import router as tools_router
 from backend.api.v1.templates import router as templates_router
 from backend.api.v1.inspect import router as inspect_router
+from backend.api.v1.geohash import router as geohash_router
 
 app = FastAPI(
     title="RF TOOLS API",
@@ -31,6 +32,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Global Request Timing & Error Sanitizer
@@ -41,6 +43,12 @@ async def add_process_time_and_security(request: Request, call_next):
         response = await call_next(request)
         process_time = time.time() - start_time
         response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+        # Prevent browser caching of HTML and static assets
+        path = request.url.path
+        if path == "/" or path == "/app" or path == "/index.html" or path.startswith("/app/") or path.startswith("/static/") or path.startswith("/assets/"):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
         return response
     except Exception as exc:
         process_time = time.time() - start_time
@@ -61,6 +69,7 @@ async def add_process_time_and_security(request: Request, call_next):
 app.include_router(tools_router, prefix="/api/v1")
 app.include_router(templates_router, prefix="/api/v1")
 app.include_router(inspect_router, prefix="/api/v1")
+app.include_router(geohash_router, prefix="/api/v1")
 
 # Mount static assets if directory exists
 if os.path.isdir("assets"):
@@ -86,7 +95,8 @@ async def health_check():
             "isd_calculator": "active",
             "geohash_to_shp": "active",
             "geohash_to_latlon": "active",
-            "latlon_to_geohash": "active"
+            "latlon_to_geohash": "active",
+            "geohash_converter": "active"
         }
     }
 

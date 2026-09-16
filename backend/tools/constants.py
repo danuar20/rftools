@@ -3,6 +3,7 @@ RF TOOLS Constants & Engineering Parameters
 Defines standard telecom parameters, 3GPP thresholds, and GIS projections.
 """
 
+import re
 from typing import Optional, Dict, Any, List
 
 # Earth Radius Constants
@@ -22,17 +23,45 @@ BAND_PARAMETERS = {
 
 DEFAULT_BAND_PARAM = {"altitude": 28, "beamwidth": 27, "radius_km": 0.080}
 
+def normalize_band_name(band: str) -> str:
+    """Normalize band string (e.g. 'LTE 900', 'L900', '900', 'B8') into canonical format like 'LTE900'."""
+    if not band:
+        return ""
+    b = str(band).strip().upper()
+    clean = re.sub(r'[\s\-_]', '', b)
+    if clean in ("B8", "900", "L900", "LTE900"):
+        return "LTE900"
+    if clean in ("B3", "1800", "L1800", "LTE1800"):
+        return "LTE1800"
+    if clean in ("B1", "2100", "L2100", "LTE2100"):
+        return "LTE2100"
+    if clean in ("B28", "700", "L700", "LTE700"):
+        return "LTE700"
+    if "2300" in clean:
+        suffix = clean[clean.index("2300") + 4:]
+        if "3" in suffix or "3RD" in clean:
+            return "LTE2300-3RD"
+        elif "2" in suffix or "2ND" in clean:
+            return "LTE2300-2ND"
+        elif "1" in suffix or "1ST" in clean:
+            return "LTE2300-1ST"
+        return "LTE2300-1ST"
+    if clean.isdigit():
+        return f"LTE{clean}"
+    if clean.startswith("L") and clean[1:].isdigit():
+        return f"LTE{clean[1:]}"
+    return clean
+
 def get_band_params(beam: str, custom_bands: Optional[Dict[str, Dict[str, Any]]] = None) -> dict:
     """Return altitude, beamwidth, and radius for a given carrier beam with custom bands support."""
     if not beam:
         return DEFAULT_BAND_PARAM
-    key = str(beam).strip()
-    key_upper = key.upper()
+    norm_key = normalize_band_name(beam)
 
     # Check custom bands first
     if custom_bands and isinstance(custom_bands, dict):
         for cb_name, cb_vals in custom_bands.items():
-            if str(cb_name).strip().upper() == key_upper and isinstance(cb_vals, dict):
+            if normalize_band_name(cb_name) == norm_key and isinstance(cb_vals, dict):
                 return {
                     "altitude": float(cb_vals.get("altitude", DEFAULT_BAND_PARAM["altitude"])),
                     "beamwidth": float(cb_vals.get("beamwidth", DEFAULT_BAND_PARAM["beamwidth"])),
@@ -41,7 +70,7 @@ def get_band_params(beam: str, custom_bands: Optional[Dict[str, Dict[str, Any]]]
 
     # Standard lookup
     for band_name, band_vals in BAND_PARAMETERS.items():
-        if band_name.upper() == key_upper:
+        if normalize_band_name(band_name) == norm_key:
             return band_vals
 
     return DEFAULT_BAND_PARAM
@@ -150,4 +179,4 @@ DEFAULT_LEFT_LOGO = "https://raw.githubusercontent.com/danuar20/image/main/Infra
 DEFAULT_RIGHT_LOGO = "https://raw.githubusercontent.com/danuar20/image/main/PUMA.png"
 DEFAULT_RF_TOOLS_LEFT_LOGO = "assets/logos/rf_tools_logo_left.png"
 DEFAULT_RF_TOOLS_RIGHT_LOGO = "assets/logos/rf_tools_logo_right.png"
-DEFAULT_LEGEND_URL = "https://raw.githubusercontent.com/danuar20/image/main/Legend.png"
+DEFAULT_LEGEND_URL = "https://drive.google.com/uc?export=view&id=1FUMTnOF6rluHJ4WbFSqwmOdERQALn6rV"

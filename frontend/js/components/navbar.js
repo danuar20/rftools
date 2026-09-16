@@ -90,8 +90,9 @@ export class NavbarComponent {
     }
     if (route.startsWith('tool-')) {
       const toolId = route.replace('tool-', '');
-      const tool = state.tools.find(t => t.id === toolId);
-      const toolTitle = tool ? (state.t(`tool_${toolId.replace(/-/g, '_')}_title`, tool.title)) : toolId;
+      const tool = (state.tools || []).find(t => t.id === toolId);
+      const fallback = state.t(`tool_${toolId.replace(/-/g, '_')}_title`, toolId);
+      const toolTitle = tool ? (state.t(`tool_${toolId.replace(/-/g, '_')}_title`, tool.title)) : fallback;
       return `<span class="breadcrumbs__current">${toolTitle}</span>`;
     }
     if (route === 'about') {

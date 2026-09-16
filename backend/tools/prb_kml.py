@@ -164,7 +164,7 @@ def build_balloon_description(
         f'<tr><td><b>PCI.</b></td><td>{pci}</td></tr>'
         '</table>'
         '<table border="0" padding="0" style="margin-top: 4px;">'
-        '<tr><td><span class="small-text"><b>©2026-Telkominfra- </b>danuartrianurrohman@telkominfra.com</span></td></tr>'
+        '<tr><td><span class="small-text"><b>©2025-Telkominfra- </b>danuartrianurrohman@telkominfra.com</span></td></tr>'
         '</table>'
     )
     return html
@@ -243,7 +243,7 @@ def convert_excel_to_prb_kml(
         effective_legend_url = legend_url.strip() if (legend_url and legend_url.strip()) else DEFAULT_LEGEND_URL
         screen.icon.href = effective_legend_url
         # Position at top-left with fractional screen coordinates (standard across all display sizes)
-        screen.overlayxy = OverlayXY(x=0.02, y=0.98, xunits=Units.fraction, yunits=Units.fraction)
+        screen.overlayxy = OverlayXY(x=0, y=1, xunits=Units.fraction, yunits=Units.fraction)
         screen.screenxy = ScreenXY(x=0.02, y=0.98, xunits=Units.fraction, yunits=Units.fraction)
         screen.size.x = 0.14
         screen.size.y = 0.24

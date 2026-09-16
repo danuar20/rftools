@@ -91,7 +91,7 @@ def convert_excel_to_kml(
 
     # Name column heuristics
     if name_idx is None:
-        for candidate in ['site_id', 'siteid', 'sitename', 'site_name', 'site', 'name']:
+        for candidate in ['site', 'sitename', 'site_name', 'site_id', 'siteid', 'name']:
             if candidate in header_map:
                 name_idx = header_map[candidate]
                 break
@@ -136,20 +136,19 @@ def convert_excel_to_kml(
                 continue
 
             name = None
-            if name_col and name_idx is not None and name_idx < len(r) and r[name_idx] not in (None, "") and not str(r[name_idx]).startswith("="):
+            if name_idx is not None and name_idx < len(r) and r[name_idx] not in (None, ""):
                 name = str(r[name_idx]).strip()
             else:
-                s_id_idx = header_map.get('site_id') if 'site_id' in header_map else header_map.get('siteid')
-                s_name_idx = header_map.get('sitename') if 'sitename' in header_map else header_map.get('site_name')
-                if s_id_idx is not None and s_name_idx is not None and s_id_idx < len(r) and s_name_idx < len(r) and r[s_id_idx] and r[s_name_idx]:
-                    name = f"{str(r[s_id_idx]).strip()} : {str(r[s_name_idx]).strip()}"
-                elif name_idx is not None and name_idx < len(r) and r[name_idx] not in (None, "") and not str(r[name_idx]).startswith("="):
-                    name = str(r[name_idx]).strip()
-                else:
-                    for try_k in ['sitename', 'site_name', 'site_id', 'siteid', 'site', 'name']:
-                        t_idx = header_map.get(try_k)
-                        if t_idx is not None and t_idx < len(r) and r[t_idx] not in (None, "") and not str(r[t_idx]).startswith("="):
-                            name = str(r[t_idx]).strip()
+                for cand in ['sitename', 'site_name', 'site_id', 'siteid', 'name', 'site']:
+                    if cand in header_map:
+                        idx_cand = header_map[cand]
+                        if idx_cand not in (lat_idx, lon_idx) and idx_cand < len(r) and r[idx_cand] not in (None, ""):
+                            name = str(r[idx_cand]).strip()
+                            break
+                if not name:
+                    for try_idx in range(len(r)):
+                        if try_idx not in (lat_idx, lon_idx) and r[try_idx] not in (None, ""):
+                            name = str(r[try_idx]).strip()
                             break
             final_name = name or f"Site_{valid_points + 1}"
 

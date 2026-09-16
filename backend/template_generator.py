@@ -27,7 +27,7 @@ def generate_template(template_id: str) -> tuple[bytes, str]:
             ["SUB001", "Surabaya_TuguPahlawan_01", 112.737829, -7.245842],
         ]
         for idx, r in enumerate(rows, start=2):
-            ws.append([r[0], r[1], f'=UPPER(A{idx}&" : "&B{idx})', r[2], r[3]])
+            ws.append([r[0], r[1], f"{r[0]} : {r[1]}", r[2], r[3]])
 
     elif tid in ("prb", "prb_kml", "sample_prb_kml"):
         filename = "Sample_PRB_KML.xlsx"

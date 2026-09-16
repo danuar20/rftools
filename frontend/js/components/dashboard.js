@@ -12,7 +12,7 @@ export class DashboardComponent {
     this.container = container;
     this.activeFilter = 'all';
     this.searchQuery = '';
-    this.currentSlide = 0;
+    this.currentSlide = typeof state.dashboardSlide === 'number' ? state.dashboardSlide : 0;
     this.slideshowTimer = null;
 
     this.render();
@@ -435,12 +435,16 @@ export class DashboardComponent {
   render() {
     if (state.route && state.route !== 'dashboard') return;
     const slides = this.getSlides();
+    if (this.currentSlide >= slides.length || this.currentSlide < 0) {
+      this.currentSlide = 0;
+      state.dashboardSlide = 0;
+    }
 
     this.container.innerHTML = `
       <!-- INTERACTIVE SHOWCASE SLIDESHOW -->
       <section class="dashboard-slideshow" id="dashboard-slideshow">
         <div class="slideshow-viewport">
-          <div class="slideshow-track" id="slideshow-track">
+          <div class="slideshow-track" id="slideshow-track" style="transform: translateX(-${this.currentSlide * 100}%);">
             ${slides.map((s, idx) => `
               <div class="slideshow-slide" data-slide-index="${idx}">
                 <div class="slide-content">
@@ -542,6 +546,7 @@ export class DashboardComponent {
     const updateSlide = () => {
       if (!track) return;
       track.style.transform = `translateX(-${this.currentSlide * 100}%)`;
+      state.dashboardSlide = this.currentSlide;
 
       if (counter) {
         counter.textContent = `${this.currentSlide + 1} / ${slides.length}`;
@@ -555,6 +560,9 @@ export class DashboardComponent {
         }
       });
     };
+
+    // Immediately reflect active slide upon binding/re-render
+    updateSlide();
 
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
@@ -664,6 +672,18 @@ export class DashboardComponent {
         sample_template_id: 'isd_a'
       },
       {
+        id: 'geohash-converter',
+        title: isId ? 'Geohash Converter' : 'Geohash Converter',
+        category: isId ? 'GEOSPASIAL & GEOHASH' : 'GEOSPATIAL & GEOHASH',
+        category_id: 'gis',
+        description: isId
+          ? 'Konversi dua arah instan antara kode string GeoHash dan koordinat lintang/bujur (Lat/Lng) dengan kontrol presisi.'
+          : 'Instant bidirectional conversion between GeoHash strings and Lat/Lng coordinates with precision control and boundary inspection.',
+        icon: 'tool-geohash-converter.svg',
+        tags: ['Hierarchical Base-32', 'WGS84 Coordinates', 'geohash.co UX'],
+        sample_template_id: null
+      },
+      {
         id: 'geohash-to-shp',
         title: isId ? 'Geohash ke ESRI Shapefile' : 'Geohash to ESRI Shapefile',
         category: isId ? 'GEOSPASIAL & GEOHASH' : 'GEOSPATIAL & GEOHASH',
@@ -757,6 +777,7 @@ export class DashboardComponent {
           <a href="#tool-${tool.id}" class="rf-btn rf-btn-primary" style="padding: 7px 16px; font-size: 0.8125rem; text-decoration: none; border-radius: 6px; font-weight: 500;">
             <span>Launch Tool &rarr;</span>
           </a>
+          ${tool.sample_template_id ? `
           <a 
             href="/api/v1/templates/${tool.sample_template_id}/download" 
             class="rf-template-link" 
@@ -765,7 +786,11 @@ export class DashboardComponent {
             style="display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; color: var(--color-text-secondary); text-decoration: none; font-weight: 500;"
           >
             <span>📥 Template</span>
-          </a>
+          </a>` : `
+          <span style="font-size: 0.8125rem; color: var(--color-brand, #38BDF8); font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10B981; box-shadow: 0 0 6px #10B981;"></span>
+            <span>${state.lang === 'id' ? 'Interaktif ⇄' : 'Interactive ⇄'}</span>
+          </span>`}
         </div>
       </div>
     `).join('');

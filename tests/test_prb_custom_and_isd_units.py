@@ -64,7 +64,7 @@ def test_prb_24_row_html_balloon_table():
     assert "&lt;td&gt;-&lt;/td&gt;" in kml_text or "<td>-</td>" in kml_text
 
     # Verify copyright footer
-    assert "©2026-Telkominfra- " in kml_text
+    assert "©2025-Telkominfra- " in kml_text
     assert "danuartrianurrohman@telkominfra.com" in kml_text
 
 def test_prb_custom_bands():
@@ -100,6 +100,53 @@ def test_prb_legend_screen_overlay_fractional():
     kml_text = kml_bytes.decode('utf-8')
     assert "<ScreenOverlay" in kml_text
     assert "fraction" in kml_text
+    # Verify default legend reference from kml_isd.py (1FUMTnOF6rluHJ4WbFSqwmOdERQALn6rV)
+    assert "1FUMTnOF6rluHJ4WbFSqwmOdERQALn6rV" in kml_text
+    # Verify overlayxy is anchored top-left (x=0, y=1)
+    assert 'overlayXY x="0"' in kml_text or 'overlayXY x="0.0"' in kml_text or 'x="0"' in kml_text
+
+def test_prb_6_tier_kpi_color_thresholds():
+    from backend.tools.constants import get_dl_prb_color, get_ul_prb_color, get_rrc_color, get_kpi_color
+    # PRB tiers
+    assert get_dl_prb_color(0.0) == "BFBFBF"
+    assert get_dl_prb_color(35.0) == "0000FF"
+    assert get_dl_prb_color(35.1) == "00FF00"
+    assert get_dl_prb_color(60.0) == "00FF00"
+    assert get_dl_prb_color(60.1) == "FFFF00"
+    assert get_dl_prb_color(75.0) == "FFFF00"
+    assert get_dl_prb_color(75.1) == "FFBF00"
+    assert get_dl_prb_color(90.0) == "FFBF00"
+    assert get_dl_prb_color(90.1) == "FF0000"
+    assert get_dl_prb_color(99.0) == "FF0000"
+
+    # RRC tiers
+    assert get_rrc_color(0.0) == "BFBFBF"
+    assert get_rrc_color(40.0) == "0000FF"
+    assert get_rrc_color(40.1) == "00FF00"
+    assert get_rrc_color(60.0) == "00FF00"
+    assert get_rrc_color(60.1) == "FFFF00"
+    assert get_rrc_color(90.0) == "FFFF00"
+    assert get_rrc_color(90.1) == "FFBF00"
+    assert get_rrc_color(120.0) == "FFBF00"
+    assert get_rrc_color(120.1) == "FF0000"
+
+def test_band_name_normalization_stacking():
+    from backend.tools.constants import normalize_band_name, get_band_params
+    assert normalize_band_name("LTE 900") == "LTE900"
+    assert normalize_band_name("L900") == "LTE900"
+    assert normalize_band_name("900") == "LTE900"
+    assert normalize_band_name("LTE-900") == "LTE900"
+    assert normalize_band_name("B8") == "LTE900"
+    assert normalize_band_name("LTE 2300 (1st)") == "LTE2300-1ST"
+    assert normalize_band_name("2300-1st") == "LTE2300-1ST"
+
+    # Custom bands matching with different naming formats
+    custom_bands = {"LTE 900": {"altitude": 52, "beamwidth": 30, "radius_km": 0.07}}
+    assert get_band_params("LTE900", custom_bands)["altitude"] == 52
+    assert get_band_params("L900", custom_bands)["altitude"] == 52
+    assert get_band_params("900", custom_bands)["altitude"] == 52
+    assert get_band_params("LTE 900", custom_bands)["altitude"] == 52
+
 
 def test_isd_units_meters_and_kilometers():
     wb_a, _ = generate_template("isd_a")

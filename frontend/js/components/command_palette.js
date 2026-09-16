@@ -20,6 +20,7 @@ export class CommandPaletteComponent {
       { id: 'excel-to-kml', title: state.t('tool_excel_to_kml_title'), category: state.t('nav_kml'), route: '#tool-excel-to-kml' },
       { id: 'prb-kml', title: state.t('tool_prb_kml_title'), category: state.t('nav_kml'), route: '#tool-prb-kml' },
       { id: 'isd-calculator', title: state.t('tool_isd_calculator_title'), category: state.t('nav_topology'), route: '#tool-isd-calculator' },
+      { id: 'geohash-converter', title: state.t('tool_geohash_converter_title', 'Geohash Converter'), category: state.t('nav_gis'), route: '#tool-geohash-converter' },
       { id: 'geohash-to-shp', title: state.t('tool_geohash_to_shp_title'), category: state.t('nav_gis'), route: '#tool-geohash-to-shp' },
       { id: 'geohash-to-latlon', title: state.t('tool_geohash_to_latlon_title'), category: state.t('nav_gis'), route: '#tool-geohash-to-latlon' },
       { id: 'latlon-to-geohash', title: state.t('tool_latlon_to_geohash_title'), category: state.t('nav_gis'), route: '#tool-latlon-to-geohash' },

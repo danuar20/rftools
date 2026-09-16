@@ -39,7 +39,7 @@ export const translations = {
     stat_verified_label: 'Verified Algorithms',
 
     // Dashboard Filters
-    filter_all: 'All Tools (6)',
+    filter_all: 'All Tools (7)',
     filter_kml: 'KML & Visualization',
     filter_topology: 'Topology & Distance',
     filter_gis: 'Geospatial & Geohash',
@@ -104,6 +104,9 @@ export const translations = {
     tool_isd_calculator_title: 'Inter-Site Distance (ISD) Calculator',
     tool_isd_calculator_desc: 'Calculate high-precision geodesic Haversine distances between site datasets and identify N-nearest neighbors.',
 
+    tool_geohash_converter_title: 'Geohash Converter',
+    tool_geohash_converter_desc: 'Instant bidirectional conversion between GeoHash strings and Lat, Lng coordinates inspired by geohash.co.',
+
     tool_geohash_to_shp_title: 'Geohash to ESRI Shapefile',
     tool_geohash_to_shp_desc: 'Transform geohash records into vector polygon shapefiles (.zip archive with .shp, .shx, .dbf, .prj).',
 
@@ -119,7 +122,8 @@ export const translations = {
     toast_template_failed: 'Failed to download template',
     toast_executing: 'Running engineering engine...',
     toast_success: 'Operation completed successfully',
-    toast_error: 'Calculation failed'
+    toast_error: 'Calculation failed',
+    toast_copied: 'Copied to clipboard!'
   },
 
   id: {
@@ -157,7 +161,7 @@ export const translations = {
     stat_verified_label: 'Algoritma Terverifikasi',
 
     // Dashboard Filters
-    filter_all: 'Semua Alat (6)',
+    filter_all: 'Semua Alat (7)',
     filter_kml: 'KML & Visualisasi',
     filter_topology: 'Topologi & Jarak',
     filter_gis: 'Geospasial & Geohash',
@@ -222,6 +226,9 @@ export const translations = {
     tool_isd_calculator_title: 'Kalkulator Jarak Antar Site (ISD)',
     tool_isd_calculator_desc: 'Hitung jarak geodesik Haversine presisi tinggi antar site dan tentukan N-tetangga terdekat.',
 
+    tool_geohash_converter_title: 'Konverter Geohash',
+    tool_geohash_converter_desc: 'Konversi dua arah instan antara kode string GeoHash dan koordinat Lat, Lng terinspirasi dari geohash.co.',
+
     tool_geohash_to_shp_title: 'Geohash ke ESRI Shapefile',
     tool_geohash_to_shp_desc: 'Konversi data geohash menjadi paket shapefile polygon GIS (.zip berisi .shp, .shx, .dbf, .prj).',
 
@@ -237,7 +244,8 @@ export const translations = {
     toast_template_failed: 'Gagal mengunduh templat',
     toast_executing: 'Menjalankan mesin perhitungan...',
     toast_success: 'Operasi berhasil diselesaikan',
-    toast_error: 'Perhitungan gagal'
+    toast_error: 'Perhitungan gagal',
+    toast_copied: 'Disalin ke papan klip!'
   }
 };
 

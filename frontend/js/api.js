@@ -170,4 +170,43 @@ export class ApiService {
 
     return { success: true, filename, size: blob.size, summary };
   }
+
+  /**
+   * Bidirectional point conversion between Geohash and Lat/Long coordinates
+   */
+  static async convertGeohash({ geohash, latitude, longitude, precision } = {}) {
+    const payload = {};
+    if (geohash !== undefined && geohash !== null && geohash !== '') {
+      payload.geohash = String(geohash).trim();
+    }
+    if (latitude !== undefined && latitude !== null && !isNaN(Number(latitude))) {
+      payload.latitude = Number(latitude);
+    }
+    if (longitude !== undefined && longitude !== null && !isNaN(Number(longitude))) {
+      payload.longitude = Number(longitude);
+    }
+    if (precision !== undefined && precision !== null && !isNaN(Number(precision))) {
+      payload.precision = Number(precision);
+    }
+
+    const res = await fetch(`${API_BASE}/api/v1/geohash/convert`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      let detail = 'Conversion failed';
+      try {
+        const errJson = await res.json();
+        detail = errJson.detail || detail;
+      } catch (e) {}
+      throw new Error(detail);
+    }
+
+    return await res.json();
+  }
 }

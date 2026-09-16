@@ -169,6 +169,18 @@ export class AboutComponent {
               </p>
             </div>
 
+            <div class="about-tool-card" data-tool-id="geohash-converter">
+              <div class="about-tool-card__header">
+                <span class="about-tool-card__icon">⇄</span>
+                <span class="about-tool-card__name">Geohash Converter</span>
+              </div>
+              <p class="about-tool-card__desc">
+                ${state.lang === 'id'
+                  ? 'Konversi interaktif dua arah instan antara kode GeoHash dan koordinat Lat/Long dengan kontrol presisi (1-12) dan eksplorasi tetangga 8-arah.'
+                  : 'Instant bidirectional point conversion between GeoHash and Lat/Long coordinates with precision control (1-12) and 8-direction neighbor exploration.'}
+              </p>
+            </div>
+
             <div class="about-tool-card" data-tool-id="geohash-to-shp">
               <div class="about-tool-card__header">
                 <span class="about-tool-card__icon">🗺️</span>
@@ -232,6 +244,19 @@ export class AboutComponent {
           </div>
         </div>
       `;
+
+      // Enable clicking tool cards to navigate
+      bodyEl.querySelectorAll('.about-tool-card').forEach(card => {
+        card.style.cursor = 'pointer';
+        card.title = 'Click to open tool';
+        card.addEventListener('click', () => {
+          const tid = card.dataset.toolId;
+          if (tid) {
+            this.close();
+            window.location.hash = `#tool-${tid}`;
+          }
+        });
+      });
     }
   }
 

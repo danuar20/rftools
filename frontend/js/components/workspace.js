@@ -6,6 +6,15 @@
 import { state } from '../state.js';
 import { ApiService } from '../api.js';
 import { toast } from './toast.js';
+import {
+  decode as ghDecode,
+  encode as ghEncode,
+  getNeighbors as ghGetNeighbors,
+  toBitRepresentation as ghToBitRep,
+  isValidGeohash as ghIsValid,
+  PRECISION_META,
+  BASE32
+} from '../utils/geohash.js';
 
 export class WorkspaceComponent {
   constructor(container, toolId) {
@@ -79,6 +88,14 @@ export class WorkspaceComponent {
         description: state.t('tool_latlon_to_geohash_desc'),
         sample_template_id: 'latlon',
         outputExt: 'xlsx'
+      },
+      'geohash-converter': {
+        title: state.t('tool_geohash_converter_title', 'Geohash Converter'),
+        category: state.t('nav_gis', 'Geospatial & Geohash'),
+        icon: 'tool-geohash-converter.svg',
+        description: state.t('tool_geohash_converter_desc', 'Instant bidirectional conversion between GeoHash strings and Lat/Lng coordinates with precision control and boundary inspection.'),
+        sample_template_id: null,
+        outputExt: 'json'
       }
     };
 
@@ -87,6 +104,10 @@ export class WorkspaceComponent {
 
   render() {
     if (state.route !== `tool-${this.toolId}`) return;
+    if (this.toolId === 'geohash-converter') {
+      this.renderGeohashConverter();
+      return;
+    }
     const meta = this.getToolMeta();
     const isISD = this.toolId === 'isd-calculator';
 
@@ -671,47 +692,125 @@ export class WorkspaceComponent {
                 <img id="preview-logo-left" src="${this.getEffectiveLeftLogo(p)}" alt="Left Logo" style="max-width: 130px; max-height: 34px; object-fit: contain;">
               </div>
               <span style="color: var(--color-text-muted); font-size: 0.75rem;">&amp;</span>
-              <div style="display: flex; align-items: center; justify-content: center; width: 140px; height: 38px; background: #000000; border-radius: 3px; padding: 2px;">
+              <div style="display: flex; align-items: center; justify-content: center; width: 140px; height: 38px; background: #ffffff; border-radius: 3px; padding: 2px;">
                 <img id="preview-logo-right" src="${this.getEffectiveRightLogo(p)}" alt="Right Logo" style="max-width: 130px; max-height: 34px; object-fit: contain;">
               </div>
             </div>
           </div>
 
-          <!-- Custom PRB Range Inputs -->
+          <!-- Custom PRB Range Inputs (6 Tiers) -->
           <div class="rf-param-group">
             <div class="rf-param-header">
-              <span class="rf-param-title">Custom PRB &amp; KPI Color Ranges</span>
-              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Thresholds</span>
+              <span class="rf-param-title">KPI Color Thresholds (6 Tiers)</span>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Tiers: Idle / Blue / Green / Yellow / Amber / Red</span>
             </div>
-            <div class="rf-param-desc">Customize threshold scales for Red (High load), Yellow (Mid load), and Green (Normal)</div>
+            <div class="rf-param-desc">Customize threshold cutoffs aligned with standard 6-tier KPI scales (0=Idle, T1=Blue, T2=Green, T3=Yellow, T4=Amber, &gt;T4=Red)</div>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+              <!-- DL PRB (%) -->
               <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 6px;">DL PRB (%)</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">Red (&ge; %):</label>
-                  <input type="number" class="rf-stepper-input" id="range-dl-high" value="${p.ranges?.dl_high ?? 90}" style="width: 100%;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Yellow (&ge; %):</label>
-                  <input type="number" class="rf-stepper-input" id="range-dl-mid" value="${p.ranges?.dl_mid ?? 80}" style="width: 100%;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                  <span>DL PRB (%)</span>
+                  <span style="font-size: 0.6875rem; color: var(--color-text-muted);">6 Tiers</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary);">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #BFBFBF; display: inline-block;"></span> 0% Idle:</span>
+                    <span style="font-family: monospace; color: var(--color-text-muted);">0%</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #0000FF; display: inline-block;"></span> &le; % (Blue):</span>
+                    <input type="number" class="rf-stepper-input" id="range-dl-t1" value="${p.ranges?.dl_t1 ?? 35}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #00FF00; display: inline-block;"></span> &le; % (Green):</span>
+                    <input type="number" class="rf-stepper-input" id="range-dl-t2" value="${p.ranges?.dl_t2 ?? 60}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFFF00; display: inline-block;"></span> &le; % (Yellow):</span>
+                    <input type="number" class="rf-stepper-input" id="range-dl-t3" value="${p.ranges?.dl_t3 ?? (p.ranges?.dl_mid ?? 75)}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFBF00; display: inline-block;"></span> &le; % (Amber):</span>
+                    <input type="number" class="rf-stepper-input" id="range-dl-t4" value="${p.ranges?.dl_t4 ?? (p.ranges?.dl_high ?? 90)}" style="width: 58px;">
+                  </div>
+                  <input type="hidden" id="range-dl-high" value="${p.ranges?.dl_high ?? 90}">
+                  <input type="hidden" id="range-dl-mid" value="${p.ranges?.dl_mid ?? 75}">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary); padding-top: 2px;">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FF0000; display: inline-block;"></span> &gt; Amber:</span>
+                    <span style="color: #EF4444; font-weight: 600;">Red (Crit)</span>
+                  </div>
                 </div>
               </div>
 
+              <!-- UL PRB (%) -->
               <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #3B82F6; margin-bottom: 6px;">UL PRB (%)</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">High (&ge; %):</label>
-                  <input type="number" class="rf-stepper-input" id="range-ul-high" value="${p.ranges?.ul_high ?? 70}" style="width: 100%;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Mid (&ge; %):</label>
-                  <input type="number" class="rf-stepper-input" id="range-ul-mid" value="${p.ranges?.ul_mid ?? 50}" style="width: 100%;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                  <span>UL PRB (%)</span>
+                  <span style="font-size: 0.6875rem; color: var(--color-text-muted);">6 Tiers</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary);">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #BFBFBF; display: inline-block;"></span> 0% Idle:</span>
+                    <span style="font-family: monospace; color: var(--color-text-muted);">0%</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #0000FF; display: inline-block;"></span> &le; % (Blue):</span>
+                    <input type="number" class="rf-stepper-input" id="range-ul-t1" value="${p.ranges?.ul_t1 ?? 35}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #00FF00; display: inline-block;"></span> &le; % (Green):</span>
+                    <input type="number" class="rf-stepper-input" id="range-ul-t2" value="${p.ranges?.ul_t2 ?? 60}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFFF00; display: inline-block;"></span> &le; % (Yellow):</span>
+                    <input type="number" class="rf-stepper-input" id="range-ul-t3" value="${p.ranges?.ul_t3 ?? (p.ranges?.ul_mid ?? 75)}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFBF00; display: inline-block;"></span> &le; % (Amber):</span>
+                    <input type="number" class="rf-stepper-input" id="range-ul-t4" value="${p.ranges?.ul_t4 ?? (p.ranges?.ul_high ?? 90)}" style="width: 58px;">
+                  </div>
+                  <input type="hidden" id="range-ul-high" value="${p.ranges?.ul_high ?? 90}">
+                  <input type="hidden" id="range-ul-mid" value="${p.ranges?.ul_mid ?? 75}">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary); padding-top: 2px;">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FF0000; display: inline-block;"></span> &gt; Amber:</span>
+                    <span style="color: #EF4444; font-weight: 600;">Red (Crit)</span>
+                  </div>
                 </div>
               </div>
 
+              <!-- RRC Users -->
               <div style="background: var(--color-bg-sunken); padding: 8px 10px; border-radius: var(--rounded-sm); border: 1px solid var(--color-border-subtle);">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 6px;">RRC Users</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary);">High (&ge;):</label>
-                  <input type="number" class="rf-stepper-input" id="range-rrc-high" value="${p.ranges?.rrc_high ?? 100}" style="width: 100%;">
-                  <label style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-top: 4px;">Mid (&ge;):</label>
-                  <input type="number" class="rf-stepper-input" id="range-rrc-mid" value="${p.ranges?.rrc_mid ?? 50}" style="width: 100%;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                  <span>RRC Users</span>
+                  <span style="font-size: 0.6875rem; color: var(--color-text-muted);">6 Tiers</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary);">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #BFBFBF; display: inline-block;"></span> 0 Users:</span>
+                    <span style="font-family: monospace; color: var(--color-text-muted);">0</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #0000FF; display: inline-block;"></span> &le; User (Blue):</span>
+                    <input type="number" class="rf-stepper-input" id="range-rrc-t1" value="${p.ranges?.rrc_t1 ?? 40}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #00FF00; display: inline-block;"></span> &le; User (Green):</span>
+                    <input type="number" class="rf-stepper-input" id="range-rrc-t2" value="${p.ranges?.rrc_t2 ?? 60}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFFF00; display: inline-block;"></span> &le; User (Yellow):</span>
+                    <input type="number" class="rf-stepper-input" id="range-rrc-t3" value="${p.ranges?.rrc_t3 ?? (p.ranges?.rrc_mid ?? 90)}" style="width: 58px;">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                    <span style="font-size: 0.6875rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FFBF00; display: inline-block;"></span> &le; User (Amber):</span>
+                    <input type="number" class="rf-stepper-input" id="range-rrc-t4" value="${p.ranges?.rrc_t4 ?? (p.ranges?.rrc_high ?? 120)}" style="width: 58px;">
+                  </div>
+                  <input type="hidden" id="range-rrc-high" value="${p.ranges?.rrc_high ?? 120}">
+                  <input type="hidden" id="range-rrc-mid" value="${p.ranges?.rrc_mid ?? 90}">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.6875rem; color: var(--color-text-secondary); padding-top: 2px;">
+                    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #FF0000; display: inline-block;"></span> &gt; Amber:</span>
+                    <span style="color: #EF4444; font-weight: 600;">Red (Crit)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1093,7 +1192,7 @@ export class WorkspaceComponent {
                 if (h.toLowerCase() === 'color_hex' && val) {
                   return `
                     <td>
-                      <span class="rf-kpi-chip" style="background-color: ${val}22; border-color: ${val}; color: #F8FAFC;">
+                      <span class="rf-kpi-chip" style="background-color: ${val}22; border-color: ${val}; color: var(--color-text-primary);">
                         <span class="rf-kpi-chip__dot" style="background-color: ${val};"></span>
                         ${val}
                       </span>
@@ -1609,25 +1708,47 @@ export class WorkspaceComponent {
       });
     }
 
-    // PRB Custom KPI Range Inputs
+    // PRB Custom KPI Range Inputs (6 Tiers)
     if (!p.ranges) {
-      p.ranges = { dl_high: 90, dl_mid: 80, ul_high: 70, ul_mid: 50, rrc_high: 100, rrc_mid: 50 };
+      p.ranges = {
+        dl_t1: 35, dl_t2: 60, dl_t3: 75, dl_t4: 90,
+        ul_t1: 35, ul_t2: 60, ul_t3: 75, ul_t4: 90,
+        rrc_t1: 40, rrc_t2: 60, rrc_t3: 90, rrc_t4: 120,
+        dl_high: 90, dl_mid: 75, ul_high: 90, ul_mid: 75, rrc_high: 120, rrc_mid: 90
+      };
     }
-    const bindRangeInput = (id, key) => {
+    const bindRangeInput = (id, key, syncKey) => {
       const el = this.container.querySelector(id);
       if (el) {
         el.addEventListener('input', (e) => {
           const v = parseFloat(e.target.value);
-          if (!isNaN(v)) p.ranges[key] = v;
+          if (!isNaN(v)) {
+            p.ranges[key] = v;
+            if (syncKey) p.ranges[syncKey] = v;
+          }
         });
       }
     };
-    bindRangeInput('#range-dl-high', 'dl_high');
-    bindRangeInput('#range-dl-mid', 'dl_mid');
-    bindRangeInput('#range-ul-high', 'ul_high');
-    bindRangeInput('#range-ul-mid', 'ul_mid');
-    bindRangeInput('#range-rrc-high', 'rrc_high');
-    bindRangeInput('#range-rrc-mid', 'rrc_mid');
+    bindRangeInput('#range-dl-t1', 'dl_t1');
+    bindRangeInput('#range-dl-t2', 'dl_t2');
+    bindRangeInput('#range-dl-t3', 'dl_t3', 'dl_mid');
+    bindRangeInput('#range-dl-t4', 'dl_t4', 'dl_high');
+    bindRangeInput('#range-dl-high', 'dl_high', 'dl_t4');
+    bindRangeInput('#range-dl-mid', 'dl_mid', 'dl_t3');
+
+    bindRangeInput('#range-ul-t1', 'ul_t1');
+    bindRangeInput('#range-ul-t2', 'ul_t2');
+    bindRangeInput('#range-ul-t3', 'ul_t3', 'ul_mid');
+    bindRangeInput('#range-ul-t4', 'ul_t4', 'ul_high');
+    bindRangeInput('#range-ul-high', 'ul_high', 'ul_t4');
+    bindRangeInput('#range-ul-mid', 'ul_mid', 'ul_t3');
+
+    bindRangeInput('#range-rrc-t1', 'rrc_t1');
+    bindRangeInput('#range-rrc-t2', 'rrc_t2');
+    bindRangeInput('#range-rrc-t3', 'rrc_t3', 'rrc_mid');
+    bindRangeInput('#range-rrc-t4', 'rrc_t4', 'rrc_high');
+    bindRangeInput('#range-rrc-high', 'rrc_high', 'rrc_t4');
+    bindRangeInput('#range-rrc-mid', 'rrc_mid', 'rrc_t3');
 
     // PRB Custom Bands Table
     if (!p.bands || !Array.isArray(p.bands)) {
@@ -1835,28 +1956,58 @@ export class WorkspaceComponent {
           fd.append('custom_bands', JSON.stringify(bandsDict));
         }
         if (p.ranges) {
+          const dl1 = parseFloat(p.ranges.dl_t1 ?? 35);
+          const dl2 = parseFloat(p.ranges.dl_t2 ?? 60);
+          const dl3 = parseFloat(p.ranges.dl_t3 ?? (p.ranges.dl_mid ?? 75));
+          const dl4 = parseFloat(p.ranges.dl_t4 ?? (p.ranges.dl_high ?? 90));
+
+          const ul1 = parseFloat(p.ranges.ul_t1 ?? 35);
+          const ul2 = parseFloat(p.ranges.ul_t2 ?? 60);
+          const ul3 = parseFloat(p.ranges.ul_t3 ?? (p.ranges.ul_mid ?? 75));
+          const ul4 = parseFloat(p.ranges.ul_t4 ?? (p.ranges.ul_high ?? 90));
+
+          const rrc1 = parseFloat(p.ranges.rrc_t1 ?? 40);
+          const rrc2 = parseFloat(p.ranges.rrc_t2 ?? 60);
+          const rrc3 = parseFloat(p.ranges.rrc_t3 ?? (p.ranges.rrc_mid ?? 90));
+          const rrc4 = parseFloat(p.ranges.rrc_t4 ?? (p.ranges.rrc_high ?? 120));
+
           const customRanges = {
             dl_prb: [
-              { min: 0, max: p.ranges.dl_mid || 80, color: '00FF00' },
-              { min: p.ranges.dl_mid || 80, max: p.ranges.dl_high || 90, color: 'FFFF00' },
-              { min: p.ranges.dl_high || 90, max: 100, color: 'FF0000' }
+              { min: 0, max: 0, color: 'BFBFBF' },
+              { min: 0, max: dl1, color: '0000FF' },
+              { min: dl1, max: dl2, color: '00FF00' },
+              { min: dl2, max: dl3, color: 'FFFF00' },
+              { min: dl3, max: dl4, color: 'FFBF00' },
+              { min: dl4, max: 100, color: 'FF0000' }
             ],
             ul_prb: [
-              { min: 0, max: p.ranges.ul_mid || 50, color: '00FF00' },
-              { min: p.ranges.ul_mid || 50, max: p.ranges.ul_high || 70, color: 'FFFF00' },
-              { min: p.ranges.ul_high || 70, max: 100, color: 'FF0000' }
+              { min: 0, max: 0, color: 'BFBFBF' },
+              { min: 0, max: ul1, color: '0000FF' },
+              { min: ul1, max: ul2, color: '00FF00' },
+              { min: ul2, max: ul3, color: 'FFFF00' },
+              { min: ul3, max: ul4, color: 'FFBF00' },
+              { min: ul4, max: 100, color: 'FF0000' }
             ],
             rrc: [
-              { min: 0, max: p.ranges.rrc_mid || 50, color: '00FF00' },
-              { min: p.ranges.rrc_mid || 50, max: p.ranges.rrc_high || 100, color: 'FFFF00' },
-              { min: p.ranges.rrc_high || 100, max: 999999, color: 'FF0000' }
+              { min: 0, max: 0, color: 'BFBFBF' },
+              { min: 0, max: rrc1, color: '0000FF' },
+              { min: rrc1, max: rrc2, color: '00FF00' },
+              { min: rrc2, max: rrc3, color: 'FFFF00' },
+              { min: rrc3, max: rrc4, color: 'FFBF00' },
+              { min: rrc4, max: 999999, color: 'FF0000' }
             ]
           };
           fd.append('custom_ranges', JSON.stringify(customRanges));
         }
         {
-          const leftLogo = this.getEffectiveLeftLogo(p);
-          const rightLogo = this.getEffectiveRightLogo(p);
+          let leftLogo = this.getEffectiveLeftLogo(p);
+          let rightLogo = this.getEffectiveRightLogo(p);
+          if (leftLogo && leftLogo.startsWith('/') && typeof window !== 'undefined' && window.location.origin) {
+            leftLogo = window.location.origin + leftLogo;
+          }
+          if (rightLogo && rightLogo.startsWith('/') && typeof window !== 'undefined' && window.location.origin) {
+            rightLogo = window.location.origin + rightLogo;
+          }
           if (leftLogo) fd.append('left_logo_url', leftLogo);
           if (rightLogo) fd.append('right_logo_url', rightLogo);
         }
@@ -2024,5 +2175,822 @@ export class WorkspaceComponent {
         }
       });
     }
+  }
+
+  /* ==========================================================================
+     Geohash Converter View & Interaction Logic (geohash.co style UX)
+     ========================================================================== */
+
+  renderGeohashConverter() {
+    const meta = this.getToolMeta();
+    const params = this.ws.params || {};
+    const curHash = params.geohash || 'qqguygv';
+    const curLat = params.latitude !== undefined ? Number(params.latitude) : -6.175392;
+    const curLon = params.longitude !== undefined ? Number(params.longitude) : 106.827153;
+    const curPrec = params.precision || 7;
+
+    let decoded = null;
+    let neighbors = null;
+    let bits = null;
+    let isValid = ghIsValid(curHash);
+
+    if (isValid) {
+      try {
+        decoded = ghDecode(curHash);
+        neighbors = ghGetNeighbors(curHash);
+        bits = ghToBitRep(curHash);
+      } catch (e) {
+        isValid = false;
+      }
+    }
+
+    const precMeta = PRECISION_META[curPrec] || { label: 'Custom', scale: 'Block' };
+
+    this.container.innerHTML = `
+      <div class="workspace-container">
+        <!-- WORKSPACE TOOLBAR HEADER -->
+        <header class="workspace-header-bar">
+          <div class="workspace-title-group">
+            <div class="workspace-icon-box">
+              <img src="/assets/icons/${meta.icon}" alt="${meta.title}">
+            </div>
+            <div>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                <h1 class="workspace-title">${meta.title}</h1>
+                <span class="zone-badge">CRS EPSG:4326</span>
+                <span class="zone-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border-color: rgba(16, 185, 129, 0.3);">
+                  ${state.lang === 'id' ? 'Interaktif ⇄' : 'Interactive ⇄'}
+                </span>
+                <span class="zone-badge">Base-32 Morton</span>
+              </div>
+              <p class="workspace-desc">${meta.description}</p>
+            </div>
+          </div>
+
+          <div class="workspace-header-actions">
+            <button class="rf-btn rf-btn-ghost" id="gh-reset-btn" title="Reset to default coordinates">
+              <span>🔄 ${state.t('btn_reset', 'Reset')}</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- GEOHASH CONVERTER LAYOUT -->
+        <div class="gh-converter-wrap">
+          <div class="gh-converter-grid">
+            <!-- LEFT COLUMN: TWO-WAY INPUTS & CONTROLS -->
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+              
+              <!-- CARD 1: GEOHASH STRING (DECODE) -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>#️⃣</span>
+                    <span>${state.lang === 'id' ? 'Kode String GeoHash' : 'GeoHash String'}</span>
+                  </h2>
+                  <span class="gh-card__badge" id="gh-status-badge">
+                    ${isValid ? `● Valid Base-32 (${curHash.length} chars)` : `⚠️ ${state.lang === 'id' ? 'Tidak Valid' : 'Invalid Base-32'}`}
+                  </span>
+                </div>
+
+                <div class="gh-big-input-wrap">
+                  <input 
+                    type="text" 
+                    id="gh-input-hash" 
+                    class="gh-big-input" 
+                    placeholder="e.g. qqguygv" 
+                    value="${curHash}" 
+                    maxlength="12" 
+                    autocomplete="off" 
+                    spellcheck="false"
+                  >
+                  <div style="position: absolute; right: 8px; display: flex; gap: 4px;">
+                    <button class="rf-btn rf-btn-ghost" id="gh-copy-hash-btn" title="Copy GeoHash" style="padding: 6px 10px; font-size: 0.75rem;">
+                      <span>📋</span>
+                    </button>
+                    <button class="rf-btn rf-btn-ghost" id="gh-clear-hash-btn" title="Clear input" style="padding: 6px 10px; font-size: 0.75rem;">
+                      <span>✕</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Character Token Breakdown -->
+                <div>
+                  <div class="gh-field-label" style="margin-bottom: 4px;">
+                    <span>${state.lang === 'id' ? 'Karakter Base-32 (5-bit per karakter)' : 'Base-32 Characters (5-bit per token)'}</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.6875rem;" id="gh-bits-summary">
+                      ${bits ? `${bits.totalBits} bits (${bits.lonBits.length} lon / ${bits.latBits.length} lat)` : ''}
+                    </span>
+                  </div>
+                  <div class="gh-char-tokens" id="gh-char-tokens">
+                    ${this.renderCharTokens(curHash)}
+                  </div>
+                </div>
+              </div>
+
+              <!-- CARD 2: LAT / LONG COORDINATES (ENCODE) -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>🌐</span>
+                    <span>${state.lang === 'id' ? 'Koordinat WGS84 (Lat / Long)' : 'WGS84 Coordinates (Lat / Long)'}</span>
+                  </h2>
+                  <div style="display: flex; gap: 6px;">
+                    <button class="rf-btn rf-btn-secondary" id="gh-copy-coords-btn" style="padding: 3px 10px; font-size: 0.75rem;">
+                      <span>📋 ${state.lang === 'id' ? 'Salin Koordinat' : 'Copy Coords'}</span>
+                    </button>
+                    <button class="rf-btn rf-btn-ghost" id="gh-swap-coords-btn" title="Swap Lat and Long" style="padding: 3px 8px; font-size: 0.75rem;">
+                      <span>⇄</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="gh-coords-grid">
+                  <div class="gh-field-group">
+                    <label class="gh-field-label" for="gh-input-lat">
+                      <span>${state.lang === 'id' ? 'Lintang / Latitude (°N/S)' : 'Latitude (°N/S)'}</span>
+                      <span style="color: var(--color-text-muted); font-size: 0.6875rem;">-90 to +90</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      id="gh-input-lat" 
+                      class="gh-input" 
+                      step="any" 
+                      min="-90" 
+                      max="90" 
+                      value="${curLat.toFixed(6)}"
+                    >
+                  </div>
+
+                  <div class="gh-field-group">
+                    <label class="gh-field-label" for="gh-input-lon">
+                      <span>${state.lang === 'id' ? 'Bujur / Longitude (°E/W)' : 'Longitude (°E/W)'}</span>
+                      <span style="color: var(--color-text-muted); font-size: 0.6875rem;">-180 to +180</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      id="gh-input-lon" 
+                      class="gh-input" 
+                      step="any" 
+                      min="-180" 
+                      max="180" 
+                      value="${curLon.toFixed(6)}"
+                    >
+                  </div>
+                </div>
+
+                <!-- Combined Quick-Paste Input -->
+                <div class="gh-field-group" style="margin-top: 4px;">
+                  <label class="gh-field-label" for="gh-input-combined">
+                    <span>${state.lang === 'id' ? 'Tempel Cepat Pasangan "Lat, Long"' : 'Quick-Paste "Lat, Long" Pair'}</span>
+                    <span style="font-size: 0.6875rem; color: var(--color-text-muted);">${state.lang === 'id' ? 'Format: Lat, Lon' : 'Format: Lat, Lon'}</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    id="gh-input-combined" 
+                    class="gh-input" 
+                    placeholder="-6.175392, 106.827153" 
+                    value="${curLat.toFixed(6)}, ${curLon.toFixed(6)}"
+                  >
+                </div>
+              </div>
+
+              <!-- CARD 3: PRECISION CONTROL (1 - 12) -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>🎯</span>
+                    <span>${state.lang === 'id' ? 'Pengaturan Presisi (1 – 12)' : 'Precision Tuning (1 – 12)'}</span>
+                  </h2>
+                  <span class="gh-card__badge" id="gh-prec-badge" style="background: rgba(56, 189, 248, 0.15); color: var(--color-primary); border-color: rgba(56, 189, 248, 0.3);">
+                    ${curPrec} chars &bull; ${precMeta.label}
+                  </span>
+                </div>
+
+                <div class="gh-precision-control">
+                  <div class="gh-slider-row">
+                    <button class="rf-btn rf-btn-secondary" id="gh-prec-dec-btn" style="padding: 4px 12px; font-size: 0.8125rem; font-weight: 700;">-</button>
+                    <input 
+                      type="range" 
+                      id="gh-slider-precision" 
+                      class="gh-slider" 
+                      min="1" 
+                      max="12" 
+                      step="1" 
+                      value="${curPrec}"
+                    >
+                    <button class="rf-btn rf-btn-secondary" id="gh-prec-inc-btn" style="padding: 4px 12px; font-size: 0.8125rem; font-weight: 700;">+</button>
+                    <span style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; min-width: 28px; text-align: center;" id="gh-prec-val-display">
+                      ${curPrec}
+                    </span>
+                  </div>
+
+                  <!-- Quick Presets -->
+                  <div class="gh-quick-prec-pills" id="gh-quick-prec-pills">
+                    ${[4, 5, 6, 7, 8, 9, 10].map(p => `
+                      <button class="gh-quick-pill ${p === curPrec ? 'gh-quick-pill--active' : ''}" data-prec="${p}">
+                        P${p} (${PRECISION_META[p].scale})
+                      </button>
+                    `).join('')}
+                  </div>
+
+                  <div style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-top: 4px; padding: 6px 10px; background: var(--color-bg-sunken); border-radius: var(--rounded-xs); border: 1px solid var(--color-border-subtle);" id="gh-prec-desc-box">
+                    <strong>${state.lang === 'id' ? 'Dimensi Sel Geodesi:' : 'Cell Geodesic Dimensions:'}</strong>
+                    ${precMeta.label} (${precMeta.scale})
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: BOUNDING BOX & 8-NEIGHBOR EXPLORER -->
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+              
+              <!-- CARD 4: BOUNDING BOX & EXTENTS -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>📐</span>
+                    <span>${state.lang === 'id' ? 'Batas Sel Bounding Box' : 'Bounding Box & Dimensions'}</span>
+                  </h2>
+                  <div style="display: flex; gap: 6px;">
+                    <button class="rf-btn rf-btn-secondary" id="gh-copy-bbox-btn" style="padding: 3px 10px; font-size: 0.75rem;">
+                      <span>📋 BBox JSON</span>
+                    </button>
+                    <button class="rf-btn rf-btn-ghost" id="gh-copy-geojson-btn" style="padding: 3px 10px; font-size: 0.75rem;">
+                      <span>🗺️ GeoJSON</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="gh-bbox-diagram" id="gh-bbox-diagram">
+                  ${this.renderBboxDiagram(decoded)}
+                </div>
+
+                <table class="gh-dim-table" id="gh-dim-table">
+                  ${this.renderDimTable(decoded)}
+                </table>
+              </div>
+
+              <!-- CARD 5: 8-NEIGHBOR COMPASS PAD (3X3 GRID) -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>🧭</span>
+                    <span>${state.lang === 'id' ? 'Eksplorasi 8-Tetangga Terdekat' : '8-Neighbor Adjacent Explorer'}</span>
+                  </h2>
+                  <span class="gh-card__badge">${state.lang === 'id' ? '3x3 Matriks' : '3x3 Matrix'}</span>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--color-text-secondary);">
+                  ${state.lang === 'id' ? 'Klik sel tetangga untuk berpindah koordinat secara interaktif:' : 'Click any neighbor cell to navigate to that adjacent bucket:'}
+                </div>
+
+                <div class="gh-neighbor-grid" id="gh-neighbor-grid">
+                  ${this.renderNeighborGrid(curHash, neighbors)}
+                </div>
+              </div>
+
+              <!-- CARD 6: PRESETS & BACKEND TELEMETRY -->
+              <div class="gh-card">
+                <div class="gh-card__header">
+                  <h2 class="gh-card__title">
+                    <span>📍</span>
+                    <span>${state.lang === 'id' ? 'Pilihan Landmark Populer' : 'Quick Landmark Presets'}</span>
+                  </h2>
+                  <span class="gh-card__badge" id="gh-backend-sync" style="background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: rgba(16, 185, 129, 0.3);">
+                    ● Backend Sync
+                  </span>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.175392" data-lon="106.827153" data-name="Monas Jakarta" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🇮🇩 Monas Jakarta
+                  </button>
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.218335" data-lon="106.802216" data-name="GBK Senayan" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🇮🇩 GBK Stadium
+                  </button>
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.230556" data-lon="106.819444" data-name="Telkom Landmark" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🏢 Telkom Landmark
+                  </button>
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="48.858370" data-lon="2.294480" data-name="Eiffel Tower" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🇫🇷 Eiffel Tower
+                  </button>
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="35.658580" data-lon="139.745430" data-name="Tokyo Tower" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🇯🇵 Tokyo Tower
+                  </button>
+                  <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="40.758896" data-lon="-73.985130" data-name="Times Square" style="padding: 5px 10px; font-size: 0.75rem;">
+                    🇺🇸 Times Square
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.bindGeohashConverter();
+  }
+
+  renderCharTokens(hash) {
+    if (!hash) return '';
+    const clean = String(hash).trim().toLowerCase();
+    return clean.split('').map((c, i) => {
+      const idx = BASE32.indexOf(c);
+      const bin = idx !== -1 ? idx.toString(2).padStart(5, '0') : '?????';
+      return `
+        <div class="gh-char-chip" title="Character '${c}' = decimal ${idx}, binary ${bin}">
+          <span>${c}</span>
+          <span class="bits">${bin}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderBboxDiagram(decoded) {
+    if (!decoded || !decoded.boundingBox) {
+      return `
+        <div style="text-align: center; padding: 24px; color: var(--color-text-muted);">
+          Awaiting valid geohash...
+        </div>
+      `;
+    }
+    const b = decoded.boundingBox;
+    return `
+      <div class="gh-bbox-compass">
+        <div class="gh-bbox-node north" title="Northernmost Latitude">
+          <span style="color: var(--color-text-muted); font-size: 0.65rem; display: block;">NORTH (Max Lat)</span>
+          <strong>${b.maxLat.toFixed(6)}°</strong>
+        </div>
+        <div class="gh-bbox-node west" title="Westernmost Longitude">
+          <span style="color: var(--color-text-muted); font-size: 0.65rem; display: block;">WEST (Min Lon)</span>
+          <strong>${b.minLon.toFixed(6)}°</strong>
+        </div>
+        <div class="gh-bbox-node center" title="Cell Centroid Coordinate">
+          <span style="font-size: 0.65rem; color: var(--color-primary); display: block;">CENTROID</span>
+          <span>${decoded.latitude.toFixed(6)}°, ${decoded.longitude.toFixed(6)}°</span>
+        </div>
+        <div class="gh-bbox-node east" title="Easternmost Longitude">
+          <span style="color: var(--color-text-muted); font-size: 0.65rem; display: block;">EAST (Max Lon)</span>
+          <strong>${b.maxLon.toFixed(6)}°</strong>
+        </div>
+        <div class="gh-bbox-node south" title="Southernmost Latitude">
+          <span style="color: var(--color-text-muted); font-size: 0.65rem; display: block;">SOUTH (Min Lat)</span>
+          <strong>${b.minLat.toFixed(6)}°</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  renderDimTable(decoded) {
+    if (!decoded || !decoded.dimensions) {
+      return `
+        <tbody>
+          <tr>
+            <td colspan="2" style="text-align: center; color: var(--color-text-muted);">No dimension data</td>
+          </tr>
+        </tbody>
+      `;
+    }
+    const d = decoded.dimensions;
+    const isId = state.lang === 'id';
+    const heightStr = d.heightM >= 1000 ? `${d.heightKm.toFixed(3)} km` : `${d.heightM.toFixed(1)} m`;
+    const widthStr = d.widthM >= 1000 ? `${d.widthKm.toFixed(3)} km` : `${d.widthM.toFixed(1)} m`;
+    const areaKm2 = d.heightKm * d.widthKm;
+    const areaStr = areaKm2 >= 1 ? `${areaKm2.toFixed(2)} km²` : `${(d.heightM * d.widthM).toFixed(0)} m²`;
+
+    return `
+      <tbody>
+        <tr>
+          <td class="label">${isId ? 'Tinggi Sel (Rentang Lintang)' : 'Cell Height (Lat Span)'}</td>
+          <td class="val">${heightStr} (${d.latSpanDeg.toFixed(6)}°)</td>
+        </tr>
+        <tr>
+          <td class="label">${isId ? 'Lebar Sel (Rentang Bujur)' : 'Cell Width (Lon Span)'}</td>
+          <td class="val">${widthStr} (${d.lonSpanDeg.toFixed(6)}°)</td>
+        </tr>
+        <tr>
+          <td class="label">${isId ? 'Perkiraan Luas Area' : 'Approximate Area'}</td>
+          <td class="val">${areaStr}</td>
+        </tr>
+        <tr>
+          <td class="label">${isId ? 'Toleransi Margin Error' : 'Centroid Error Margin'}</td>
+          <td class="val">&plusmn;${decoded.error.latitude.toFixed(6)}° Lat, &plusmn;${decoded.error.longitude.toFixed(6)}° Lon</td>
+        </tr>
+      </tbody>
+    `;
+  }
+
+  renderNeighborGrid(hash, neighbors) {
+    const items = [
+      { dir: 'NW', key: 'nw', label: '↖ NW' },
+      { dir: 'N', key: 'n', label: '↑ N' },
+      { dir: 'NE', key: 'ne', label: '↗ NE' },
+      { dir: 'W', key: 'w', label: '← W' },
+      { dir: 'CENTER', key: 'center', label: '● CENTER' },
+      { dir: 'E', key: 'e', label: '→ E' },
+      { dir: 'SW', key: 'sw', label: '↙ SW' },
+      { dir: 'S', key: 's', label: '↓ S' },
+      { dir: 'SE', key: 'se', label: '↘ SE' }
+    ];
+
+    return items.map(item => {
+      if (item.key === 'center') {
+        return `
+          <div class="gh-neighbor-btn gh-neighbor-btn--center" title="Current Active Geohash">
+            <span class="gh-neighbor-dir">${item.label}</span>
+            <span class="gh-neighbor-val">${hash}</span>
+          </div>
+        `;
+      }
+      const nHash = neighbors ? neighbors[item.key] : null;
+      return `
+        <button 
+          type="button" 
+          class="gh-neighbor-btn gh-neighbor-item-btn" 
+          data-neighbor-hash="${nHash || ''}" 
+          title="Navigate to ${item.dir} neighbor: ${nHash || ''}"
+          ${!nHash ? 'disabled' : ''}
+        >
+          <span class="gh-neighbor-dir">${item.label}</span>
+          <span class="gh-neighbor-val">${nHash || '—'}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  bindGeohashConverter() {
+    const inputHash = this.container.querySelector('#gh-input-hash');
+    const inputLat = this.container.querySelector('#gh-input-lat');
+    const inputLon = this.container.querySelector('#gh-input-lon');
+    const inputCombined = this.container.querySelector('#gh-input-combined');
+    const sliderPrec = this.container.querySelector('#gh-slider-precision');
+    const btnDec = this.container.querySelector('#gh-prec-dec-btn');
+    const btnInc = this.container.querySelector('#gh-prec-inc-btn');
+    const btnCopyHash = this.container.querySelector('#gh-copy-hash-btn');
+    const btnClearHash = this.container.querySelector('#gh-clear-hash-btn');
+    const btnCopyCoords = this.container.querySelector('#gh-copy-coords-btn');
+    const btnSwapCoords = this.container.querySelector('#gh-swap-coords-btn');
+    const btnCopyBbox = this.container.querySelector('#gh-copy-bbox-btn');
+    const btnCopyGeoJson = this.container.querySelector('#gh-copy-geojson-btn');
+    const btnReset = this.container.querySelector('#gh-reset-btn');
+
+    const statusBadge = this.container.querySelector('#gh-status-badge');
+    const precBadge = this.container.querySelector('#gh-prec-badge');
+    const precNum = this.container.querySelector('#gh-prec-val-display');
+    const precDescBox = this.container.querySelector('#gh-prec-desc-box');
+    const charTokens = this.container.querySelector('#gh-char-tokens');
+    const bitsSummary = this.container.querySelector('#gh-bits-summary');
+    const bboxDiagram = this.container.querySelector('#gh-bbox-diagram');
+    const dimTable = this.container.querySelector('#gh-dim-table');
+    const neighborGrid = this.container.querySelector('#gh-neighbor-grid');
+    const backendSyncBadge = this.container.querySelector('#gh-backend-sync');
+
+    let isInternalUpdate = false;
+    let syncTimeout = null;
+
+    const copyText = async (text, msg) => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        toast.success(msg || state.t('toast_copied', 'Copied to clipboard!'));
+      } catch (e) {
+        toast.error('Could not copy to clipboard');
+      }
+    };
+
+    const scheduleBackendSync = (hash, lat, lon, prec) => {
+      if (syncTimeout) clearTimeout(syncTimeout);
+      if (backendSyncBadge) {
+        backendSyncBadge.innerHTML = '● Syncing...';
+        backendSyncBadge.style.color = '#38BDF8';
+      }
+      syncTimeout = setTimeout(async () => {
+        try {
+          const t0 = performance.now();
+          await ApiService.convertGeohash({ geohash: hash, latitude: lat, longitude: lon, precision: prec });
+          const ms = Math.round(performance.now() - t0);
+          if (backendSyncBadge) {
+            backendSyncBadge.innerHTML = `● Verified (${ms}ms)`;
+            backendSyncBadge.style.color = '#10B981';
+          }
+        } catch (e) {
+          if (backendSyncBadge) {
+            backendSyncBadge.innerHTML = '● Client Engine';
+            backendSyncBadge.style.color = '#94A3B8';
+          }
+        }
+      }, 350);
+    };
+
+    const bindNeighborButtons = () => {
+      if (!neighborGrid) return;
+      neighborGrid.querySelectorAll('.gh-neighbor-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const nHash = btn.dataset.neighborHash;
+          if (nHash && ghIsValid(nHash)) {
+            if (inputHash) inputHash.value = nHash;
+            updateFromHash(nHash);
+            toast.info(`Navigated to ${nHash}`);
+          }
+        });
+      });
+    };
+
+    const updatePills = (prec) => {
+      const pills = this.container.querySelectorAll('.gh-quick-pill');
+      pills.forEach(pill => {
+        const p = parseInt(pill.dataset.prec, 10);
+        if (p === prec) {
+          pill.classList.add('gh-quick-pill--active');
+        } else {
+          pill.classList.remove('gh-quick-pill--active');
+        }
+      });
+    };
+
+    const updateFromHash = (rawHash, skipInputs = false) => {
+      const hash = String(rawHash).trim().toLowerCase();
+      const valid = ghIsValid(hash);
+
+      if (!valid) {
+        if (statusBadge) {
+          statusBadge.innerHTML = `⚠️ ${state.lang === 'id' ? 'Karakter Base-32 tidak valid' : 'Invalid Base-32 chars'}`;
+          statusBadge.style.color = '#EF4444';
+        }
+        return;
+      }
+
+      try {
+        const decoded = ghDecode(hash);
+        const neighbors = ghGetNeighbors(hash);
+        const bits = ghToBitRep(hash);
+        const prec = hash.length;
+        const pMeta = PRECISION_META[prec] || { label: 'Custom', scale: 'Block' };
+
+        this.ws.params.geohash = hash;
+        this.ws.params.latitude = decoded.latitude;
+        this.ws.params.longitude = decoded.longitude;
+        this.ws.params.precision = prec;
+
+        isInternalUpdate = true;
+        if (!skipInputs) {
+          if (inputLat) inputLat.value = decoded.latitude.toFixed(6);
+          if (inputLon) inputLon.value = decoded.longitude.toFixed(6);
+          if (inputCombined) inputCombined.value = `${decoded.latitude.toFixed(6)}, ${decoded.longitude.toFixed(6)}`;
+        }
+        if (sliderPrec) sliderPrec.value = prec;
+        if (precNum) precNum.textContent = prec;
+        isInternalUpdate = false;
+
+        if (statusBadge) {
+          statusBadge.innerHTML = `● Valid Base-32 (${prec} chars)`;
+          statusBadge.style.color = '#10B981';
+        }
+        if (precBadge) {
+          precBadge.innerHTML = `${prec} chars &bull; ${pMeta.label}`;
+        }
+        if (precDescBox) {
+          precDescBox.innerHTML = `<strong>${state.lang === 'id' ? 'Dimensi Sel Geodesi:' : 'Cell Geodesic Dimensions:'}</strong> ${pMeta.label} (${pMeta.scale})`;
+        }
+        if (charTokens) {
+          charTokens.innerHTML = this.renderCharTokens(hash);
+        }
+        if (bitsSummary && bits) {
+          bitsSummary.textContent = `${bits.totalBits} bits (${bits.lonBits.length} lon / ${bits.latBits.length} lat)`;
+        }
+        if (bboxDiagram) {
+          bboxDiagram.innerHTML = this.renderBboxDiagram(decoded);
+        }
+        if (dimTable) {
+          dimTable.innerHTML = this.renderDimTable(decoded);
+        }
+        if (neighborGrid) {
+          neighborGrid.innerHTML = this.renderNeighborGrid(hash, neighbors);
+          bindNeighborButtons();
+        }
+
+        updatePills(prec);
+        scheduleBackendSync(hash, decoded.latitude, decoded.longitude, prec);
+      } catch (err) {
+        console.warn('Geohash decode error:', err);
+      }
+    };
+
+    const updateFromCoords = (latVal, lonVal) => {
+      const lat = parseFloat(latVal);
+      const lon = parseFloat(lonVal);
+
+      if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        return;
+      }
+
+      const prec = parseInt(sliderPrec.value, 10) || 7;
+      const hash = ghEncode(lat, lon, prec);
+
+      this.ws.params.geohash = hash;
+      this.ws.params.latitude = lat;
+      this.ws.params.longitude = lon;
+      this.ws.params.precision = prec;
+
+      isInternalUpdate = true;
+      if (inputHash) inputHash.value = hash;
+      if (inputCombined) inputCombined.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+      isInternalUpdate = false;
+
+      updateFromHash(hash, true);
+    };
+
+    // 1. Hash input listener
+    if (inputHash) {
+      inputHash.addEventListener('input', (e) => {
+        if (isInternalUpdate) return;
+        const val = e.target.value.toLowerCase().replace(/[^0-9bcdefghjkmnpqrstuvwxyz]/g, '');
+        e.target.value = val;
+        updateFromHash(val);
+      });
+    }
+
+    // 2. Lat and Lon input listeners
+    if (inputLat && inputLon) {
+      const onCoordInput = () => {
+        if (isInternalUpdate) return;
+        updateFromCoords(inputLat.value, inputLon.value);
+      };
+      inputLat.addEventListener('input', onCoordInput);
+      inputLon.addEventListener('input', onCoordInput);
+    }
+
+    // 3. Combined input listener
+    if (inputCombined) {
+      inputCombined.addEventListener('input', (e) => {
+        if (isInternalUpdate) return;
+        const parts = e.target.value.split(/[,;\s]+/).map(p => parseFloat(p.trim())).filter(n => !isNaN(n));
+        if (parts.length >= 2) {
+          const lat = parts[0];
+          const lon = parts[1];
+          if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+            isInternalUpdate = true;
+            if (inputLat) inputLat.value = lat.toFixed(6);
+            if (inputLon) inputLon.value = lon.toFixed(6);
+            isInternalUpdate = false;
+            updateFromCoords(lat, lon);
+          }
+        }
+      });
+    }
+
+    // 4. Precision slider and steppers
+    const setPrecision = (p) => {
+      const prec = Math.max(1, Math.min(12, p));
+      if (sliderPrec) sliderPrec.value = prec;
+      if (precNum) precNum.textContent = prec;
+      const lat = parseFloat(inputLat.value) || this.ws.params.latitude || -6.175392;
+      const lon = parseFloat(inputLon.value) || this.ws.params.longitude || 106.827153;
+      updateFromCoords(lat, lon);
+    };
+
+    if (sliderPrec) {
+      sliderPrec.addEventListener('input', (e) => {
+        setPrecision(parseInt(e.target.value, 10));
+      });
+    }
+    if (btnDec) {
+      btnDec.addEventListener('click', () => {
+        const cur = parseInt(sliderPrec.value, 10) || 7;
+        setPrecision(cur - 1);
+      });
+    }
+    if (btnInc) {
+      btnInc.addEventListener('click', () => {
+        const cur = parseInt(sliderPrec.value, 10) || 7;
+        setPrecision(cur + 1);
+      });
+    }
+
+    // Quick precision pills
+    this.container.querySelectorAll('.gh-quick-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        const p = parseInt(pill.dataset.prec, 10);
+        if (!isNaN(p)) {
+          setPrecision(p);
+        }
+      });
+    });
+
+    // 5. Button actions
+    if (btnCopyHash && inputHash) {
+      btnCopyHash.addEventListener('click', () => {
+        copyText(inputHash.value, 'GeoHash code copied!');
+      });
+    }
+
+    if (btnClearHash && inputHash) {
+      btnClearHash.addEventListener('click', () => {
+        inputHash.value = '';
+        inputHash.focus();
+        if (statusBadge) {
+          statusBadge.innerHTML = '⚠️ Awaiting geohash input';
+          statusBadge.style.color = '#94A3B8';
+        }
+      });
+    }
+
+    if (btnCopyCoords && inputLat && inputLon) {
+      btnCopyCoords.addEventListener('click', () => {
+        copyText(`${inputLat.value}, ${inputLon.value}`, 'Coordinates (Lat, Lng) copied!');
+      });
+    }
+
+    if (btnSwapCoords && inputLat && inputLon) {
+      btnSwapCoords.addEventListener('click', () => {
+        const tmp = inputLat.value;
+        inputLat.value = inputLon.value;
+        inputLon.value = tmp;
+        updateFromCoords(inputLat.value, inputLon.value);
+        toast.info('Swapped Latitude & Longitude');
+      });
+    }
+
+    if (btnCopyBbox) {
+      btnCopyBbox.addEventListener('click', () => {
+        const hash = inputHash.value;
+        if (ghIsValid(hash)) {
+          const d = ghDecode(hash);
+          const bboxJson = JSON.stringify({
+            geohash: hash,
+            precision: hash.length,
+            centroid: { latitude: d.latitude, longitude: d.longitude },
+            boundingBox: d.boundingBox,
+            dimensions: d.dimensions
+          }, null, 2);
+          copyText(bboxJson, 'Bounding Box JSON copied!');
+        } else {
+          toast.error('Invalid geohash');
+        }
+      });
+    }
+
+    if (btnCopyGeoJson) {
+      btnCopyGeoJson.addEventListener('click', () => {
+        const hash = inputHash.value;
+        if (ghIsValid(hash)) {
+          const d = ghDecode(hash);
+          const b = d.boundingBox;
+          const geojson = JSON.stringify({
+            type: "Feature",
+            properties: { geohash: hash, precision: hash.length },
+            geometry: {
+              type: "Polygon",
+              coordinates: [[
+                [b.minLon, b.minLat],
+                [b.maxLon, b.minLat],
+                [b.maxLon, b.maxLat],
+                [b.minLon, b.maxLat],
+                [b.minLon, b.minLat]
+              ]]
+            }
+          }, null, 2);
+          copyText(geojson, 'GeoJSON Polygon copied!');
+        } else {
+          toast.error('Invalid geohash');
+        }
+      });
+    }
+
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (inputHash) inputHash.value = 'qqguygv';
+        if (sliderPrec) sliderPrec.value = 7;
+        updateFromHash('qqguygv');
+        toast.info('Reset to Monas Jakarta (qqguygv)');
+      });
+    }
+
+    // 6. Landmark presets
+    this.container.querySelectorAll('.gh-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lat = parseFloat(btn.dataset.lat);
+        const lon = parseFloat(btn.dataset.lon);
+        const name = btn.dataset.name || 'Landmark';
+        if (!isNaN(lat) && !isNaN(lon)) {
+          if (inputLat) inputLat.value = lat.toFixed(6);
+          if (inputLon) inputLon.value = lon.toFixed(6);
+          updateFromCoords(lat, lon);
+          toast.info(`Loaded ${name}`);
+        }
+      });
+    });
+
+    // 7. Initial bind for neighbor buttons
+    bindNeighborButtons();
   }
 }
