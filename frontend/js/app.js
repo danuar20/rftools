@@ -32,20 +32,6 @@ class App {
   }
 
   async init() {
-    // Initial health check
-    await this.checkHealth();
-    // Periodic health check every 15s
-    setInterval(() => this.checkHealth(), 15000);
-
-    // Fetch tool catalog
-    try {
-      const tools = await ApiService.getTools();
-      state.tools = tools;
-      state.emit('tools-loaded', tools);
-    } catch (err) {
-      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
-    }
-
     // Bind route and language changes
     state.subscribe((event, data) => {
       if (event === 'route-change') {
@@ -63,8 +49,21 @@ class App {
       }
     });
 
-    // Initial render
+    // Immediate initial render so viewport renders synchronously on first paint
     this.renderRoute(state.route);
+
+    // Initial health check in background & periodic polling
+    this.checkHealth().catch(() => {});
+    setInterval(() => this.checkHealth(), 15000);
+
+    // Fetch tool catalog in background
+    try {
+      const tools = await ApiService.getTools();
+      state.tools = tools;
+      state.emit('tools-loaded', tools);
+    } catch (err) {
+      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
+    }
   }
 
   async checkHealth() {
