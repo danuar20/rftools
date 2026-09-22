@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RF TOOLS — Visual Design System & Component Lab</title>
+  <title>RF TOOLS — Enterprise Visual Design System & Component Lab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./tokens.css">
-  <link rel="stylesheet" href="./components.css">
+  <link rel="stylesheet" href="./frontend/css/tokens.css">
+  <link rel="stylesheet" href="./frontend/css/components.css">
+  <link rel="stylesheet" href="./frontend/css/app.css">
   <style>
-    /* Custom Showcase Layout Styles */
+    /* Showcase Layout Styles */
     .showcase-container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 32px 24px 80px 24px;
+      padding: 36px 28px 80px 28px;
     }
     .showcase-header {
       display: flex;
@@ -30,8 +31,8 @@
       gap: 16px;
     }
     .showcase-brand__logo {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
     }
     .showcase-brand__title {
       margin: 0;
@@ -61,6 +62,7 @@
       font-size: 0.875rem;
       color: var(--color-text-secondary);
       margin: 0 0 24px 0;
+      line-height: 1.5;
     }
     .palette-grid {
       display: grid;
@@ -72,6 +74,7 @@
       border: 1px solid var(--color-border-default);
       border-radius: var(--rounded-md);
       overflow: hidden;
+      box-shadow: var(--shadow-xs);
     }
     .palette-swatch {
       height: 64px;
@@ -83,6 +86,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
       font-weight: 600;
+      border-bottom: 1px solid var(--color-border-default);
     }
     .palette-info {
       padding: 12px;
@@ -104,6 +108,7 @@
       border-radius: var(--rounded-lg);
       padding: 24px;
       margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
     }
     .component-box__title {
       font-size: 0.875rem;
@@ -118,7 +123,7 @@
       grid-template-columns: 55% 45%;
       gap: 24px;
       background-color: var(--color-bg-base);
-      padding: 20px;
+      padding: 24px;
       border: 1px solid var(--color-border-default);
       border-radius: var(--rounded-lg);
     }
@@ -126,6 +131,25 @@
       .dual-workspace-preview {
         grid-template-columns: 1fr;
       }
+    }
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--rounded-sm);
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border-default);
+      color: var(--color-text-primary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-xs);
+      transition: all 0.15s ease;
+    }
+    .theme-toggle-btn:hover {
+      background-color: var(--color-bg-overlay);
+      border-color: var(--color-border-strong);
     }
   </style>
 </head>
@@ -137,80 +161,85 @@
       <div class="showcase-brand">
         <img src="./assets/icons/rf-logo.svg" alt="RF TOOLS" class="showcase-brand__logo">
         <div>
-          <h1 class="showcase-brand__title">RF TOOLS Design System</h1>
-          <p class="showcase-brand__subtitle">High-Precision Telecommunications & Engineering Design System (v1.0.0)</p>
+          <h1 class="showcase-brand__title">RF TOOLS Enterprise Design System</h1>
+          <p class="showcase-brand__subtitle">Telecom Engineering Visual Language &bull; Light Mode Primary Foundation</p>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <span class="rf-confidence-pill rf-confidence-pill--high">WCAG AAA / AA Validated</span>
-        <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(14,165,233,0.15); color: #0EA5E9; border-color: rgba(14,165,233,0.35);">Phase 3: Visual &amp; System Design</span>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle">
+          <span id="theme-icon">🌙</span> <span id="theme-label">Switch to Dark Mode</span>
+        </button>
+        <span class="rf-confidence-pill rf-confidence-pill--high">WCAG AAA / AA</span>
+        <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary-border);">
+          Enterprise Ready
+        </span>
       </div>
     </header>
 
-    <!-- SECTION 1: DESIGN TOKENS & OBSIDIAN SLATE PALETTE -->
+    <!-- SECTION 1: DESIGN TOKENS & ENTERPRISE LIGHT PALETTE -->
     <section class="showcase-section">
       <h2 class="showcase-section__title">
-        <span>🎨</span> Section 1: Design Tokens &amp; Obsidian Slate Palette
+        <span>🎨</span> Section 1: Design Tokens &amp; Surfaces
       </h2>
       <p class="showcase-section__desc">
-        Engineered dark surfaces calibrated for zero eye strain in Network Operations Centers (NOC), high-contrast text, and primary interaction cyan.
+        Refined, clean surfaces optimized for clarity, legible typography, and crisp 1px structural borders without artificial neon glows.
       </p>
 
       <div class="palette-grid">
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #0B0F17; color: #F8FAFC; border-bottom: 1px solid #334155;">#0B0F17</div>
+          <div class="palette-swatch" style="background-color: var(--color-bg-base); color: var(--color-text-primary);">Base Canvas</div>
           <div class="palette-info">
-            <div class="palette-name">Canvas Base</div>
+            <div class="palette-name">Base Canvas</div>
             <div class="palette-token">--color-bg-base</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #111827; color: #F8FAFC; border-bottom: 1px solid #334155;">#111827</div>
+          <div class="palette-swatch" style="background-color: var(--color-bg-surface); color: var(--color-text-primary);">Surface Card</div>
           <div class="palette-info">
-            <div class="palette-name">Surface Card</div>
+            <div class="palette-name">Card Surface</div>
             <div class="palette-token">--color-bg-surface</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #1E293B; color: #F8FAFC;">#1E293B</div>
+          <div class="palette-swatch" style="background-color: var(--color-bg-overlay); color: var(--color-text-primary);">Overlay Hover</div>
           <div class="palette-info">
-            <div class="palette-name">Elevated Panel</div>
-            <div class="palette-token">--color-bg-elevated</div>
-          </div>
-        </div>
-        <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #253349; color: #F8FAFC;">#253349</div>
-          <div class="palette-info">
-            <div class="palette-name">Hover Overlay</div>
+            <div class="palette-name">Hover / Table Header</div>
             <div class="palette-token">--color-bg-overlay</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #070A10; color: #94A3B8; border-bottom: 1px solid #334155;">#070A10</div>
+          <div class="palette-swatch" style="background-color: var(--color-bg-sunken); color: var(--color-text-primary);">Sunken Well</div>
           <div class="palette-info">
-            <div class="palette-name">Sunken Well</div>
+            <div class="palette-name">Recessed Input / Well</div>
             <div class="palette-token">--color-bg-sunken</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #0EA5E9; color: #0B0F17;">#0EA5E9</div>
+          <div class="palette-swatch" style="background-color: var(--color-primary); color: #ffffff;">Primary Blue</div>
           <div class="palette-info">
-            <div class="palette-name">Technical Cyan</div>
+            <div class="palette-name">Enterprise Cobalt</div>
             <div class="palette-token">--color-primary</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #4F46E5; color: #FFFFFF;">#4F46E5</div>
+          <div class="palette-swatch" style="background-color: var(--color-accent-indigo); color: #ffffff;">GIS Indigo</div>
           <div class="palette-info">
-            <div class="palette-name">GIS Indigo</div>
+            <div class="palette-name">Shapefile GIS</div>
             <div class="palette-token">--color-accent-indigo</div>
           </div>
         </div>
         <div class="palette-card">
-          <div class="palette-swatch" style="background-color: #10B981; color: #0B0F17;">#10B981</div>
+          <div class="palette-swatch" style="background-color: var(--color-accent-emerald); color: #ffffff;">Topology Green</div>
           <div class="palette-info">
-            <div class="palette-name">Success / Topology</div>
+            <div class="palette-name">Inter-Site Distance</div>
             <div class="palette-token">--color-accent-emerald</div>
+          </div>
+        </div>
+        <div class="palette-card">
+          <div class="palette-swatch" style="background-color: var(--color-border-default); color: var(--color-text-primary);">Border Default</div>
+          <div class="palette-info">
+            <div class="palette-name">1px Border Stroke</div>
+            <div class="palette-token">--color-border-default</div>
           </div>
         </div>
       </div>
@@ -222,51 +251,51 @@
         <span>📊</span> Section 2: Telecom PRB &amp; RRC Load Threshold Chips
       </h2>
       <p class="showcase-section__desc">
-        Exact color tokens and chip styling adhering to 3GPP LTE/NR PRB congestion benchmarks and active RRC connected user states.
+        High-legibility telecom utilization status chips with crisp contrast, compliant with 3GPP LTE/NR operational standards.
       </p>
 
       <div class="component-box">
         <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Inactive (0%)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">Inactive (0%)</span>
             <span class="rf-kpi-chip rf-kpi-chip--gray">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 0.0% · Inactive
+              PRB 0.0% &bull; Inactive
             </span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Low Load (&le; 35% / RRC &le; 40)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">Low Load (&le; 35% / RRC &le; 40)</span>
             <span class="rf-kpi-chip rf-kpi-chip--blue">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 24.8% · Low Load
+              PRB 24.8% &bull; Low Load
             </span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Normal (35-60% / RRC 40-60)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">Normal (35-60% / RRC 40-60)</span>
             <span class="rf-kpi-chip rf-kpi-chip--green">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 48.2% · Normal
+              PRB 48.2% &bull; Normal
             </span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Medium (60-75% / RRC 60-90)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">Medium (60-75% / RRC 60-90)</span>
             <span class="rf-kpi-chip rf-kpi-chip--yellow">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 68.5% · Medium
+              PRB 68.5% &bull; Medium
             </span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">High (75-90% / RRC 90-120)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">High (75-90% / RRC 90-120)</span>
             <span class="rf-kpi-chip rf-kpi-chip--amber">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 84.1% · High Load
+              PRB 84.1% &bull; High Load
             </span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Congested (&gt; 90% / RRC &gt; 120)</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500;">Congested (&gt; 90% / RRC &gt; 120)</span>
             <span class="rf-kpi-chip rf-kpi-chip--red">
               <span class="rf-kpi-chip__dot"></span>
-              PRB 94.7% · Congested
+              PRB 94.7% &bull; Congested
             </span>
           </div>
         </div>
@@ -279,14 +308,14 @@
         <span>📥</span> Section 3: Zone 1 — File Ingestion Dropzones
       </h2>
       <p class="showcase-section__desc">
-        Empty drag-and-drop state, active drag-over wash with cyan border, and collapsed high-density metadata chip.
+        Refined drag-and-drop ingestion: clean dashed borders, subtle hover tints, and space-efficient metadata summary chips.
       </p>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
         <!-- Idle Dropzone -->
         <div class="component-box" style="margin-bottom: 0;">
           <div class="component-box__title">Idle State</div>
-          <div class="rf-dropzone" id="demo-dropzone-idle">
+          <div class="rf-dropzone">
             <svg class="rf-dropzone__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
@@ -302,15 +331,15 @@
 
         <!-- Drag-over Simulated State -->
         <div class="component-box" style="margin-bottom: 0;">
-          <div class="component-box__title">Active Drag-Over State (Simulated)</div>
+          <div class="component-box__title">Active Drag-Over State (Refined Tint)</div>
           <div class="rf-dropzone rf-dropzone--dragover">
             <svg class="rf-dropzone__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
             <div class="rf-dropzone__title" style="color: var(--color-primary);">Drop spreadsheet to inspect columns</div>
-            <div class="rf-dropzone__desc">Automatic header extraction &amp; alias mapping will initiate immediately</div>
+            <div class="rf-dropzone__desc">Automatic header extraction and alias mapping initiate immediately</div>
             <div class="rf-dropzone__formats">
-              <span class="rf-dropzone__format-pill" style="border-color: var(--color-primary); color: var(--color-primary);">READY</span>
+              <span class="rf-dropzone__format-pill" style="border-color: var(--color-primary); color: var(--color-primary); font-weight: 700;">READY</span>
             </div>
           </div>
         </div>
@@ -354,7 +383,7 @@
         <div class="rf-dropzone-dual">
           <div class="rf-dropzone-chip" style="border-left: 3px solid var(--color-primary);">
             <div class="rf-dropzone-chip__meta">
-              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(14,165,233,0.2); color: #0EA5E9; border-color: rgba(14,165,233,0.4);">FILE A: SOURCE</span>
+              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary-border);">FILE A: SOURCE</span>
               <div>
                 <div class="rf-dropzone-chip__name">Source_Sites_Cluster_North.xlsx</div>
                 <div class="rf-dropzone-chip__stats">
@@ -369,7 +398,7 @@
 
           <div class="rf-dropzone-chip" style="border-left: 3px solid var(--color-accent-indigo);">
             <div class="rf-dropzone-chip__meta">
-              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(99,102,241,0.2); color: #818CF8; border-color: rgba(99,102,241,0.4);">FILE B: TARGET</span>
+              <span class="rf-confidence-pill rf-confidence-pill--medium" style="background-color: rgba(79, 70, 229, 0.1); color: var(--color-accent-indigo); border-color: rgba(79, 70, 229, 0.25);">FILE B: TARGET</span>
               <div>
                 <div class="rf-dropzone-chip__name">Competitor_Sites_Master.xlsx</div>
                 <div class="rf-dropzone-chip__stats">
@@ -388,10 +417,10 @@
     <!-- SECTION 4: SPLIT WORKSPACE - ZONE 2 (MAPPING) & ZONE 3 (PARAMETERS) -->
     <section class="showcase-section">
       <h2 class="showcase-section__title">
-        <span>⚡</span> Section 4: Zones 2 &amp; 3 — Column Mapping &amp; Physics Parameters (PRB KML Workspace)
+        <span>⚡</span> Section 4: Zones 2 &amp; 3 — Column Mapping &amp; Physics Parameters
       </h2>
       <p class="showcase-section__desc">
-        Dual-column 55%/45% layout providing rapid column inspection, auto-selected dropdowns, and interactive antenna parameter tuning.
+        Crisp 55%/45% layout providing rapid column inspection, auto-selected dropdowns, and interactive antenna parameter tuning.
       </p>
 
       <div class="dual-workspace-preview">
@@ -521,7 +550,7 @@
         <div class="rf-param-panel">
           <div class="rf-mapping-section-header">
             <span style="font-size: 0.9375rem; font-weight: 600; color: var(--color-text-primary);">Zone 3: Parameter Controls &amp; Physics</span>
-            <span class="rf-confidence-pill rf-confidence-pill--high" style="background-color: rgba(14,165,233,0.15); color: #0EA5E9; border-color: rgba(14,165,233,0.35);">PRB Sector Engine</span>
+            <span class="rf-confidence-pill rf-confidence-pill--high" style="background-color: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary-border);">PRB Sector Engine</span>
           </div>
 
           <!-- Metric Selector Segmented Toggle -->
@@ -542,27 +571,13 @@
           <div class="rf-param-group">
             <div class="rf-param-header">
               <span class="rf-param-title">Polygon Fill Opacity</span>
-              <span class="rf-tabular-nums" style="font-size: 0.8125rem; color: var(--color-primary);">40%</span>
+              <span class="rf-tabular-nums" style="font-size: 0.8125rem; font-weight: 600; color: var(--color-primary);">40%</span>
             </div>
             <div class="rf-param-desc">Alpha transparency in Google Earth polygon rendering</div>
             <div class="rf-slider-row">
               <input type="range" class="rf-slider" min="10" max="100" value="40" id="demo-opacity-slider">
               <input type="number" class="rf-stepper-input" value="40" min="10" max="100">
             </div>
-          </div>
-
-          <!-- Extrude to Ground Toggle -->
-          <div class="rf-param-group">
-            <div class="rf-param-header">
-              <span class="rf-param-title">3D Extrude to Ground</span>
-              <label style="position: relative; display: inline-block; width: 38px; height: 20px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-primary); border-radius: 20px; transition: .2s;">
-                  <span style="position: absolute; content: ''; height: 14px; width: 14px; left: 20px; bottom: 3px; background-color: #0B0F17; border-radius: 50%; transition: .2s;"></span>
-                </span>
-              </label>
-            </div>
-            <div class="rf-param-desc">Draws vertical curtain walls from sector polygon down to terrain surface</div>
           </div>
 
           <!-- LTE Band Altitude Stacking Matrix -->
@@ -583,27 +598,27 @@
               <tbody>
                 <tr>
                   <td style="color: var(--color-text-primary); font-weight: 600;">LTE 700</td>
-                  <td style="color: var(--color-primary);">30 m</td>
+                  <td style="color: var(--color-primary); font-weight: 600;">30 m</td>
                   <td>180 m</td>
                 </tr>
                 <tr>
                   <td style="color: var(--color-text-primary); font-weight: 600;">LTE 900</td>
-                  <td style="color: var(--color-primary);">34 m</td>
+                  <td style="color: var(--color-primary); font-weight: 600;">34 m</td>
                   <td>160 m</td>
                 </tr>
                 <tr>
                   <td style="color: var(--color-text-primary); font-weight: 600;">LTE 1800</td>
-                  <td style="color: var(--color-primary);">38 m</td>
+                  <td style="color: var(--color-primary); font-weight: 600;">38 m</td>
                   <td>140 m</td>
                 </tr>
                 <tr>
                   <td style="color: var(--color-text-primary); font-weight: 600;">LTE 2100</td>
-                  <td style="color: var(--color-primary);">42 m</td>
+                  <td style="color: var(--color-primary); font-weight: 600;">42 m</td>
                   <td>120 m</td>
                 </tr>
                 <tr>
                   <td style="color: var(--color-text-primary); font-weight: 600;">LTE 2300</td>
-                  <td style="color: var(--color-primary);">54 m</td>
+                  <td style="color: var(--color-primary); font-weight: 600;">54 m</td>
                   <td>100 m</td>
                 </tr>
               </tbody>
@@ -637,7 +652,7 @@
             <span>&bull;</span>
             <span class="rf-tabular-nums">1,450 Polygons Created</span>
             <span>&bull;</span>
-            <span class="rf-tabular-nums" style="color: var(--color-status-success);">Computed in 312ms</span>
+            <span class="rf-tabular-nums" style="color: var(--color-status-success); font-weight: 600;">Computed in 312ms</span>
           </div>
           <div>
             <button class="rf-btn rf-btn-primary" style="padding: 6px 14px; font-size: 0.8125rem;">
@@ -736,54 +751,6 @@
                 <td class="rf-mono">0.0%</td>
                 <td><span class="rf-kpi-chip rf-kpi-chip--gray"><span class="rf-kpi-chip__dot"></span>Inactive</span></td>
               </tr>
-              <tr>
-                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
-                <td>JKT003_L09_1</td>
-                <td class="rf-mono">-6.190125</td>
-                <td class="rf-mono">106.815678</td>
-                <td class="rf-mono">60&deg;</td>
-                <td class="rf-mono">65&deg;</td>
-                <td class="rf-mono">LTE900</td>
-                <td class="rf-mono">34m</td>
-                <td class="rf-mono">88.5%</td>
-                <td><span class="rf-kpi-chip rf-kpi-chip--amber"><span class="rf-kpi-chip__dot"></span>High Load</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
-                <td>JKT003_L09_2</td>
-                <td class="rf-mono">-6.190125</td>
-                <td class="rf-mono">106.815678</td>
-                <td class="rf-mono">180&deg;</td>
-                <td class="rf-mono">65&deg;</td>
-                <td class="rf-mono">LTE900</td>
-                <td class="rf-mono">34m</td>
-                <td class="rf-mono">55.2%</td>
-                <td><span class="rf-kpi-chip rf-kpi-chip--green"><span class="rf-kpi-chip__dot"></span>Normal</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT003</td>
-                <td>JKT003_L09_3</td>
-                <td class="rf-mono">-6.190125</td>
-                <td class="rf-mono">106.815678</td>
-                <td class="rf-mono">300&deg;</td>
-                <td class="rf-mono">65&deg;</td>
-                <td class="rf-mono">LTE900</td>
-                <td class="rf-mono">34m</td>
-                <td class="rf-mono">96.3%</td>
-                <td><span class="rf-kpi-chip rf-kpi-chip--red"><span class="rf-kpi-chip__dot"></span>Congested</span></td>
-              </tr>
-              <tr>
-                <td class="rf-mono" style="font-weight: 600; color: var(--color-primary);">JKT004</td>
-                <td>JKT004_L23_1</td>
-                <td class="rf-mono">-6.201450</td>
-                <td class="rf-mono">106.841200</td>
-                <td class="rf-mono">45&deg;</td>
-                <td class="rf-mono">65&deg;</td>
-                <td class="rf-mono">LTE2300</td>
-                <td class="rf-mono">54m</td>
-                <td class="rf-mono">31.8%</td>
-                <td><span class="rf-kpi-chip rf-kpi-chip--blue"><span class="rf-kpi-chip__dot"></span>Low Load</span></td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -801,7 +768,7 @@
 
       <div class="rf-card-grid">
         <!-- Tool 1 -->
-        <a href="#tool-excel-to-kml" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-excel-to-kml.svg" alt="Excel to KML" style="width: 24px; height: 24px;">
@@ -814,10 +781,10 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.kml output</span>
           </div>
-        </a>
+        </div>
 
         <!-- Tool 2 -->
-        <a href="#tool-prb-kml" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-prb-kml.svg" alt="PRB KML" style="width: 24px; height: 24px;">
@@ -830,10 +797,10 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.kml 3D layer</span>
           </div>
-        </a>
+        </div>
 
         <!-- Tool 3 -->
-        <a href="#tool-isd" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-isd-calculator.svg" alt="ISD Calculator" style="width: 24px; height: 24px;">
@@ -846,10 +813,10 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.xlsx dual sheet</span>
           </div>
-        </a>
+        </div>
 
         <!-- Tool 4 -->
-        <a href="#tool-geohash-shp" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-geohash-to-shp.svg" alt="Geohash to Shapefile" style="width: 24px; height: 24px;">
@@ -862,10 +829,10 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.zip archive</span>
           </div>
-        </a>
+        </div>
 
         <!-- Tool 5 -->
-        <a href="#tool-geohash-latlon" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-geohash-to-latlon.svg" alt="Geohash Decoder" style="width: 24px; height: 24px;">
@@ -878,10 +845,10 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.xlsx / .csv</span>
           </div>
-        </a>
+        </div>
 
         <!-- Tool 6 -->
-        <a href="#tool-latlon-geohash" class="rf-card-tool">
+        <div class="rf-card-tool">
           <div class="rf-card-tool__header">
             <div class="rf-card-tool__icon">
               <img src="./assets/icons/tool-latlon-to-geohash.svg" alt="Coordinate Encoder" style="width: 24px; height: 24px;">
@@ -894,13 +861,26 @@
             <span style="color: var(--color-primary); font-weight: 600;">Launch Tool &rarr;</span>
             <span style="color: var(--color-text-muted);">.xlsx / .csv</span>
           </div>
-        </a>
+        </div>
       </div>
     </section>
   </div>
 
   <script>
-    // Live slider value sync
+    // Theme Switcher Logic
+    const toggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+    
+    toggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+      themeLabel.textContent = newTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    });
+
+    // Slider sync
     const slider = document.getElementById('demo-opacity-slider');
     if (slider) {
       slider.addEventListener('input', (e) => {

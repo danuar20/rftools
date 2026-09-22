@@ -1,43 +1,191 @@
-:root {
-  --color-primary: #0ea5e9;
-  --color-primary-hover: #0284c7;
-  --color-primary-active: #0369a1;
-  --color-bg-base: #0b0f17;
-  --color-bg-surface: #111827;
-  --color-bg-elevated: #1e293b;
-  --color-bg-overlay: #253349;
-  --color-bg-sunken: #070a10;
-  --color-border-subtle: #1e293b;
-  --color-border-default: #334155;
-  --color-border-strong: #475569;
-  --color-border-accent: #0ea5e9;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #7c8b9e;
-  --color-text-inverse: #0b0f17;
+/**
+ * RF TOOLS Enterprise Design Tokens
+ * Visual Foundation: Clean, professional, enterprise telecom engineering aesthetic.
+ * Default: Light mode primary visual foundation with high contrast and refined elevation.
+ */
+
+:root,
+html[data-theme="light"] {
+  color-scheme: light;
+
+  /* Primary Brand & Actions (Telecom Cobalt / Sky) */
+  --color-primary: #0284c7;
+  --color-primary-hover: #0369a1;
+  --color-primary-active: #075985;
+  --color-primary-subtle: rgba(2, 132, 199, 0.08);
+  --color-primary-border: rgba(2, 132, 199, 0.22);
+
+  /* Canvas & Surface Layers */
+  --color-bg-base: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-overlay: #f1f5f9;
+  --color-bg-sunken: #f8fafc;
+  --color-bg-input: #ffffff;
+
+  /* Borders & Framing */
+  --color-border-subtle: #f1f5f9;
+  --color-border-default: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-border-accent: #0284c7;
+
+  /* Typography & Foregrounds */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #ffffff;
   --color-text-white: #ffffff;
+
+  /* Domain Accents */
   --color-accent-indigo: #4f46e5;
-  --color-accent-emerald: #10b981;
-  --color-status-success: #10b981;
-  --color-status-warning: #f59e0b;
-  --color-status-danger: #ef4444;
-  --color-status-info: #0ea5e9;
-  --color-kpi-gray: #bfbfbf;
-  --color-kpi-blue: #3b82f6;
-  --color-kpi-green: #22c55e;
-  --color-kpi-yellow: #eab308;
-  --color-kpi-amber: #f59e0b;
-  --color-kpi-red: #ef4444;
+  --color-accent-emerald: #059669;
+
+  /* System Status */
+  --color-status-success: #16a34a;
+  --color-status-warning: #d97706;
+  --color-status-danger: #dc2626;
+  --color-status-info: #0284c7;
+
+  /* Telecom KPI Load Thresholds (3GPP PRB & RRC Load) */
+  --color-kpi-gray: #64748b;
+  --color-kpi-blue: #2563eb;
+  --color-kpi-green: #16a34a;
+  --color-kpi-yellow: #ca8a04;
+  --color-kpi-amber: #d97706;
+  --color-kpi-red: #dc2626;
+
+  /* KPI Chip Backgrounds & Borders (Light Mode - Clean, High Legibility) */
+  --kpi-bg-gray: #f1f5f9;
+  --kpi-border-gray: #cbd5e1;
+  --kpi-text-gray: #475569;
+
+  --kpi-bg-blue: #eff6ff;
+  --kpi-border-blue: #bfdbfe;
+  --kpi-text-blue: #1d4ed8;
+
+  --kpi-bg-green: #f0fdf4;
+  --kpi-border-green: #bbf7d0;
+  --kpi-text-green: #15803d;
+
+  --kpi-bg-yellow: #fefce8;
+  --kpi-border-yellow: #fef08a;
+  --kpi-text-yellow: #a16207;
+
+  --kpi-bg-amber: #fffbeb;
+  --kpi-border-amber: #fde68a;
+  --kpi-text-amber: #b45309;
+
+  --kpi-bg-red: #fef2f2;
+  --kpi-border-red: #fecaca;
+  --kpi-text-red: #b91c1c;
+
+  /* Spacing Scale (4px baseline) */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
+
+  /* Corner Radii */
   --rounded-xs: 2px;
   --rounded-sm: 4px;
   --rounded-md: 6px;
   --rounded-lg: 8px;
   --rounded-full: 9999px;
+
+  /* Refined Elevation Shadows (No AI Neon Glow) */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.15);
+
+  /* Font Stacks */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', monospace;
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Primary Brand & Actions */
+  --color-primary: #38bdf8;
+  --color-primary-hover: #0ea5e9;
+  --color-primary-active: #0284c7;
+  --color-primary-subtle: rgba(56, 189, 248, 0.1);
+  --color-primary-border: rgba(56, 189, 248, 0.25);
+
+  /* Canvas & Surface Layers */
+  --color-bg-base: #0b0f17;
+  --color-bg-surface: #111827;
+  --color-bg-elevated: #1e293b;
+  --color-bg-overlay: #253349;
+  --color-bg-sunken: #070a10;
+  --color-bg-input: #0f172a;
+
+  /* Borders & Framing */
+  --color-border-subtle: #1e293b;
+  --color-border-default: #334155;
+  --color-border-strong: #475569;
+  --color-border-accent: #38bdf8;
+
+  /* Typography & Foregrounds */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #0b0f17;
+  --color-text-white: #ffffff;
+
+  /* Domain Accents */
+  --color-accent-indigo: #6366f1;
+  --color-accent-emerald: #10b981;
+
+  /* System Status */
+  --color-status-success: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-danger: #ef4444;
+  --color-status-info: #38bdf8;
+
+  /* Telecom KPI Load Thresholds (Dark Mode) */
+  --color-kpi-gray: #94a3b8;
+  --color-kpi-blue: #60a5fa;
+  --color-kpi-green: #4ade80;
+  --color-kpi-yellow: #facc15;
+  --color-kpi-amber: #fbbf24;
+  --color-kpi-red: #f87171;
+
+  /* KPI Chip Backgrounds & Borders (Dark Mode - Refined, No Overglow) */
+  --kpi-bg-gray: rgba(148, 163, 184, 0.1);
+  --kpi-border-gray: rgba(148, 163, 184, 0.25);
+  --kpi-text-gray: #94a3b8;
+
+  --kpi-bg-blue: rgba(59, 130, 246, 0.12);
+  --kpi-border-blue: rgba(59, 130, 246, 0.3);
+  --kpi-text-blue: #60a5fa;
+
+  --kpi-bg-green: rgba(34, 197, 94, 0.12);
+  --kpi-border-green: rgba(34, 197, 94, 0.3);
+  --kpi-text-green: #4ade80;
+
+  --kpi-bg-yellow: rgba(234, 179, 8, 0.12);
+  --kpi-border-yellow: rgba(234, 179, 8, 0.3);
+  --kpi-text-yellow: #facc15;
+
+  --kpi-bg-amber: rgba(245, 158, 11, 0.12);
+  --kpi-border-amber: rgba(245, 158, 11, 0.3);
+  --kpi-text-amber: #fbbf24;
+
+  --kpi-bg-red: rgba(239, 68, 68, 0.15);
+  --kpi-border-red: rgba(239, 68, 68, 0.35);
+  --kpi-text-red: #f87171;
+
+  /* Refined Elevation Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}

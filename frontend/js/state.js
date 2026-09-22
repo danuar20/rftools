@@ -15,7 +15,7 @@ export class AppState {
     this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
 
     // Theme & Language
-    this.theme = localStorage.getItem('rf_tools_theme') || 'dark';
+    this.theme = localStorage.getItem('rf_tools_theme') || 'light';
     this.lang = localStorage.getItem('rf_tools_lang') || 'en';
     this.dashboardSlide = 0;
 

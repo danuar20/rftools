@@ -1,7 +1,7 @@
 /**
  * RF TOOLS Component Design System
  * Version: 1.0.0
- * Theme: Obsidian Slate Engineering Dark Theme
+ * Theme: Enterprise Telecom Engineering Suite (Light Mode Foundation & Dark Mode Support)
  */
 
 @import './tokens.css';
@@ -69,7 +69,7 @@ body {
 
 .rf-btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
-  box-shadow: 0 0 16px rgba(14, 165, 233, 0.4);
+  box-shadow: var(--shadow-xs);
 }
 
 .rf-btn-primary:active:not(:disabled) {
@@ -107,7 +107,7 @@ body {
 .rf-btn-destructive:hover:not(:disabled) {
   background-color: var(--color-status-danger);
   color: var(--color-text-inverse);
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+  box-shadow: var(--shadow-xs);
 }
 
 .rf-btn:disabled {
@@ -137,14 +137,14 @@ body {
 
 .rf-dropzone:hover {
   border-color: var(--color-border-strong);
-  background-color: rgba(30, 41, 59, 0.5);
+  background-color: var(--color-bg-overlay);
 }
 
 .rf-dropzone--dragover {
   border-color: var(--color-border-accent) !important;
   border-style: solid !important;
-  background-color: rgba(14, 165, 233, 0.08) !important;
-  box-shadow: 0 0 24px -2px rgba(14, 165, 233, 0.35);
+  background-color: var(--color-primary-subtle) !important;
+  box-shadow: var(--shadow-sm);
 }
 
 .rf-dropzone__icon {
@@ -336,7 +336,7 @@ body {
 
 .rf-mapping-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  box-shadow: var(--focus-ring);
 }
 
 .rf-mapping-select--error {
@@ -451,7 +451,7 @@ body {
   background: var(--color-text-white);
   border: 2px solid var(--color-primary);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   transition: transform 0.1s ease;
 }
 
@@ -582,46 +582,46 @@ body {
 }
 
 .rf-kpi-chip--gray {
-  background-color: rgba(191, 191, 191, 0.12);
-  border: 1px solid rgba(191, 191, 191, 0.35);
-  color: var(--color-kpi-gray);
+  background-color: var(--kpi-bg-gray);
+  border: 1px solid var(--kpi-border-gray);
+  color: var(--kpi-text-gray);
 }
-.rf-kpi-chip--gray .rf-kpi-chip__dot { background-color: var(--color-kpi-gray); }
+.rf-kpi-chip--gray .rf-kpi-chip__dot { background-color: var(--kpi-text-gray); }
 
 .rf-kpi-chip--blue {
-  background-color: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.45);
-  color: #60A5FA;
+  background-color: var(--kpi-bg-blue);
+  border: 1px solid var(--kpi-border-blue);
+  color: var(--kpi-text-blue);
 }
-.rf-kpi-chip--blue .rf-kpi-chip__dot { background-color: #3B82F6; }
+.rf-kpi-chip--blue .rf-kpi-chip__dot { background-color: var(--kpi-text-blue); }
 
 .rf-kpi-chip--green {
-  background-color: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.45);
-  color: #4ADE80;
+  background-color: var(--kpi-bg-green);
+  border: 1px solid var(--kpi-border-green);
+  color: var(--kpi-text-green);
 }
-.rf-kpi-chip--green .rf-kpi-chip__dot { background-color: #22C55E; }
+.rf-kpi-chip--green .rf-kpi-chip__dot { background-color: var(--kpi-text-green); }
 
 .rf-kpi-chip--yellow {
-  background-color: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.45);
-  color: #FACC15;
+  background-color: var(--kpi-bg-yellow);
+  border: 1px solid var(--kpi-border-yellow);
+  color: var(--kpi-text-yellow);
 }
-.rf-kpi-chip--yellow .rf-kpi-chip__dot { background-color: #EAB308; }
+.rf-kpi-chip--yellow .rf-kpi-chip__dot { background-color: var(--kpi-text-yellow); }
 
 .rf-kpi-chip--amber {
-  background-color: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  color: #FBBF24;
+  background-color: var(--kpi-bg-amber);
+  border: 1px solid var(--kpi-border-amber);
+  color: var(--kpi-text-amber);
 }
-.rf-kpi-chip--amber .rf-kpi-chip__dot { background-color: #F59E0B; }
+.rf-kpi-chip--amber .rf-kpi-chip__dot { background-color: var(--kpi-text-amber); }
 
 .rf-kpi-chip--red {
-  background-color: rgba(239, 68, 68, 0.18);
-  border: 1px solid rgba(239, 68, 68, 0.50);
-  color: #F87171;
+  background-color: var(--kpi-bg-red);
+  border: 1px solid var(--kpi-border-red);
+  color: var(--kpi-text-red);
 }
-.rf-kpi-chip--red .rf-kpi-chip__dot { background-color: #EF4444; }
+.rf-kpi-chip--red .rf-kpi-chip__dot { background-color: var(--kpi-text-red); }
 
 /* ==========================================================================
    Zone 4: Virtualized Data Preview Table
@@ -686,7 +686,7 @@ body {
 }
 
 .rf-table tbody tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--color-bg-sunken);
 }
 
 .rf-table tbody tr:hover {
@@ -723,7 +723,7 @@ body {
 .rf-card-tool:hover {
   border-color: var(--color-border-accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(14, 165, 233, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .rf-card-tool__header {
@@ -901,7 +901,7 @@ body {
 
 .gh-big-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  box-shadow: var(--focus-ring);
 }
 
 .gh-char-tokens {
@@ -978,7 +978,7 @@ body {
 
 .gh-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+  box-shadow: var(--focus-ring);
 }
 
 .gh-precision-control {
