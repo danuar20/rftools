@@ -449,7 +449,7 @@ export class DashboardComponent {
               <div class="slideshow-slide" data-slide-index="${idx}">
                 <div class="slide-content">
                   <div class="slide-tag">
-                    <span>📡</span> ${s.tag}
+                    <span class="slide-tag__dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:var(--color-primary);margin-right:6px;"></span>${s.tag}
                   </div>
                   <h2 class="slide-title">${s.title}</h2>
                   <p class="slide-desc">${s.desc}</p>
@@ -460,7 +460,7 @@ export class DashboardComponent {
 
                   <div class="slide-actions">
                     <a href="${s.route}" class="rf-btn rf-btn-primary" style="padding: 8px 18px; text-decoration: none;">
-                      <span>⚡ ${state.lang === 'id' ? 'Buka Ruang Kerja' : 'Launch Workspace'} &rarr;</span>
+                      <span>${state.lang === 'id' ? 'Buka Ruang Kerja' : 'Launch Workspace'} &rarr;</span>
                     </a>
                   </div>
                 </div>
@@ -520,7 +520,9 @@ export class DashboardComponent {
             value="${this.searchQuery}"
             style="width: 100%; text-align: left; padding-left: 34px; border-radius: 9999px; box-sizing: border-box; font-size: 0.8125rem;"
           >
-          <span style="position: absolute; left: 12px; top: 7px; color: var(--color-text-muted); font-size: 0.875rem; pointer-events: none;">🔍</span>
+          <svg style="position: absolute; left: 12px; top: 9px; color: var(--color-text-muted); width: 15px; height: 15px; pointer-events: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
         </div>
       </div>
 

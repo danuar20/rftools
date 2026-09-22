@@ -145,7 +145,7 @@ export class WorkspaceComponent {
         <section class="zone-card">
           <div class="zone-header">
             <span class="zone-title">
-              <span>📥</span> ${state.t('zone1_title')}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${state.t('zone1_title')}
             </span>
             <span class="zone-badge" id="zone1-status-badge">
               ${isISD ? (this.ws.fileA && this.ws.fileB ? state.t('zone1_file_loaded') : 'Awaiting 2 Files') : (this.ws.file ? state.t('zone1_file_loaded') : 'Awaiting File')}
@@ -162,7 +162,7 @@ export class WorkspaceComponent {
           <section class="zone-card">
             <div class="zone-header">
               <span class="zone-title">
-                <span>🎛️</span> ${state.t('zone2_title')}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>${state.t('zone2_title')}
               </span>
               <div style="display: flex; gap: 8px; align-items: center;">
                 <button class="rf-btn rf-btn-ghost" id="reset-mappings-btn" style="padding: 2px 8px; font-size: 0.75rem;" title="Restore initial detected matches">
@@ -182,7 +182,7 @@ export class WorkspaceComponent {
           <section class="zone-card">
             <div class="zone-header">
               <span class="zone-title">
-                <span>⚡</span> ${state.t('zone3_title')}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>${state.t('zone3_title')}
               </span>
               <span class="zone-badge">Config</span>
             </div>
@@ -201,11 +201,12 @@ export class WorkspaceComponent {
           </div>
           <div class="action-bar-buttons">
             <button class="rf-btn rf-btn-secondary" id="action-preview-btn" ${this.canCalculate() ? '' : 'disabled'}>
-              <span>👁 ${state.t('zone4_preview_tab')}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>${state.t('zone4_preview_tab')}</span>
             </button>
             <button class="rf-btn rf-btn-primary" id="action-execute-btn" ${this.canCalculate() ? '' : 'disabled'}>
               <span id="action-execute-spinner" class="spinner" style="display: none;"></span>
-              <span id="action-execute-text">⚡ ${state.t('btn_execute')}</span>
+              <span id="action-execute-text">${state.t('btn_execute')}</span>
             </button>
           </div>
         </div>
@@ -214,14 +215,14 @@ export class WorkspaceComponent {
         <section class="zone-card" id="zone4-results-card" style="${this.ws.previewData || this.ws.resultSummary ? '' : 'display: none;'}">
           <div class="zone-header">
             <span class="zone-title">
-              <span>📋</span> ${state.t('zone4_title')}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>${state.t('zone4_title')}
             </span>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="rf-btn rf-btn-ghost" id="results-copy-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                📋 ${state.t('btn_copy')}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>${state.t('btn_copy')}
               </button>
               <button class="rf-btn rf-btn-ghost" id="results-fullscreen-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                🔍 Fullscreen
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>Fullscreen
               </button>
             </div>
           </div>
@@ -2265,7 +2266,7 @@ export class WorkspaceComponent {
                   >
                   <div style="position: absolute; right: 8px; display: flex; gap: 4px;">
                     <button class="rf-btn rf-btn-ghost" id="gh-copy-hash-btn" title="Copy GeoHash" style="padding: 6px 10px; font-size: 0.75rem;">
-                      <span>📋</span>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </button>
                     <button class="rf-btn rf-btn-ghost" id="gh-clear-hash-btn" title="Clear input" style="padding: 6px 10px; font-size: 0.75rem;">
                       <span>✕</span>
@@ -2291,12 +2292,13 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>🌐</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     <span>${state.lang === 'id' ? 'Koordinat WGS84 (Lat / Long)' : 'WGS84 Coordinates (Lat / Long)'}</span>
                   </h2>
                   <div style="display: flex; gap: 6px;">
                     <button class="rf-btn rf-btn-secondary" id="gh-copy-coords-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                      <span>📋 ${state.lang === 'id' ? 'Salin Koordinat' : 'Copy Coords'}</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      <span>${state.lang === 'id' ? 'Salin Koordinat' : 'Copy Coords'}</span>
                     </button>
                     <button class="rf-btn rf-btn-ghost" id="gh-swap-coords-btn" title="Swap Lat and Long" style="padding: 3px 8px; font-size: 0.75rem;">
                       <span>⇄</span>
@@ -2409,15 +2411,17 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>📐</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                     <span>${state.lang === 'id' ? 'Batas Sel Bounding Box' : 'Bounding Box & Dimensions'}</span>
                   </h2>
                   <div style="display: flex; gap: 6px;">
                     <button class="rf-btn rf-btn-secondary" id="gh-copy-bbox-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                      <span>📋 BBox JSON</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      <span>BBox JSON</span>
                     </button>
                     <button class="rf-btn rf-btn-ghost" id="gh-copy-geojson-btn" style="padding: 3px 10px; font-size: 0.75rem;">
-                      <span>🗺️ GeoJSON</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                      <span>GeoJSON</span>
                     </button>
                   </div>
                 </div>

@@ -32,7 +32,21 @@ class App {
   }
 
   async init() {
-    // Bind route and language changes immediately
+    // Initial health check
+    await this.checkHealth();
+    // Periodic health check every 15s
+    setInterval(() => this.checkHealth(), 15000);
+
+    // Fetch tool catalog
+    try {
+      const tools = await ApiService.getTools();
+      state.tools = tools;
+      state.emit('tools-loaded', tools);
+    } catch (err) {
+      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
+    }
+
+    // Bind route and language changes
     state.subscribe((event, data) => {
       if (event === 'route-change') {
         this.renderRoute(data);
@@ -40,9 +54,6 @@ class App {
         this.renderRoute(state.route);
       }
     });
-
-    // Initial render immediately without waiting for network calls
-    this.renderRoute(state.route);
 
     // Global keyboard shortcuts
     window.addEventListener('keydown', (e) => {
@@ -52,18 +63,8 @@ class App {
       }
     });
 
-    // Initial health check & periodic polling in background
-    this.checkHealth().catch(() => {});
-    setInterval(() => this.checkHealth(), 15000);
-
-    // Fetch tool catalog in background
-    try {
-      const tools = await ApiService.getTools();
-      state.tools = tools;
-      state.emit('tools-loaded', tools);
-    } catch (err) {
-      console.warn('Could not fetch tools catalog from API, using fallback catalog.', err);
-    }
+    // Initial render
+    this.renderRoute(state.route);
   }
 
   async checkHealth() {

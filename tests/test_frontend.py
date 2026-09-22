@@ -376,6 +376,41 @@ def test_navbar_breadcrumbs_tool_definition_and_state_emit_guard():
     assert "fn(event, data);" in res_state.text
     assert "console.error(`Error in state listener for event" in res_state.text
 
+def test_enterprise_light_mode_foundation_and_anti_slop_refinements():
+    # 1. State defaults to light mode on startup
+    res_state = client.get("/static/js/state.js")
+    assert res_state.status_code == 200
+    assert "this.theme = localStorage.getItem('rf_tools_theme') || 'light';" in res_state.text
+
+    # 2. HTML template declares data-theme="light" by default
+    res_html = client.get("/", headers={"Accept": "text/html"})
+    assert res_html.status_code == 200
+    assert '<html lang="en" data-theme="light">' in res_html.text
+
+    # 3. Design tokens provide light foundation with crisp typography & elevation
+    res_tokens = client.get("/static/css/tokens.css")
+    assert res_tokens.status_code == 200
+    assert ':root,\nhtml[data-theme="light"]' in res_tokens.text
+    assert '--shadow-xs' in res_tokens.text
+    assert '--shadow-focus' in res_tokens.text
+    assert '--font-sans' in res_tokens.text
+    assert '--font-mono' in res_tokens.text
+
+    # 4. Component styling has no tacky AI glow effects on buttons or cards
+    res_comp = client.get("/static/css/components.css")
+    assert res_comp.status_code == 200
+    assert "0 0 16px rgba(14, 165, 233, 0.4)" not in res_comp.text
+    assert "0 0 24px -2px rgba(14, 165, 233, 0.35)" not in res_comp.text
+    assert "0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(14, 165, 233, 0.2)" not in res_comp.text
+
+    # 5. Workspace headers utilize clean SVG icons rather than decorative emojis
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    assert "<span>📥</span>" not in res_ws.text
+    assert "<span>🎛️</span>" not in res_ws.text
+    assert "<span>📋</span>" not in res_ws.text
+
+
 
 
 
