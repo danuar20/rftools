@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rftools.infrahub.web.id/sitemap.xml

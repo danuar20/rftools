@@ -5,8 +5,9 @@ Target port: 5005
 
 import os
 import time
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -35,7 +36,10 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# Global Request Timing & Error Sanitizer
+# GZip Compression Middleware (compress responses >= 1000 bytes)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Global Request Timing, Smart Caching & Error Sanitizer
 @app.middleware("http")
 async def add_process_time_and_security(request: Request, call_next):
     start_time = time.time()
@@ -43,12 +47,47 @@ async def add_process_time_and_security(request: Request, call_next):
         response = await call_next(request)
         process_time = time.time() - start_time
         response.headers["X-Process-Time"] = f"{process_time:.4f}s"
-        # Prevent browser caching of HTML and static assets
+
         path = request.url.path
-        if path == "/" or path == "/app" or path == "/index.html" or path.startswith("/app/") or path.startswith("/static/") or path.startswith("/assets/"):
+        content_type = response.headers.get("content-type", "")
+
+        is_html = (
+            path in ("/", "/app", "/index.html")
+            or path.startswith("/app/")
+            or "text/html" in content_type
+        )
+        is_static = path.startswith("/static/") or path.startswith("/assets/")
+
+        if is_html:
+            # HTML shell is always uncached for instantaneous updates & fresh asset links
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
+        elif is_static:
+            # Smart caching: versioned assets (e.g. ?v=1.1.1) get long-lived immutable cache
+            is_versioned = bool(
+                request.query_params.get("v")
+                or request.query_params.get("version")
+                or request.query_params.get("hash")
+                or request.query_params.get("t")
+            )
+            if is_versioned:
+                response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+                if "pragma" in response.headers:
+                    del response.headers["pragma"]
+                if "expires" in response.headers:
+                    del response.headers["expires"]
+            else:
+                response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+                response.headers["Pragma"] = "no-cache"
+                response.headers["Expires"] = "0"
+        elif path in ("/robots.txt", "/sitemap.xml"):
+            response.headers["Cache-Control"] = "public, max-age=86400"
+            if "pragma" in response.headers:
+                del response.headers["pragma"]
+            if "expires" in response.headers:
+                del response.headers["expires"]
+
         return response
     except Exception as exc:
         process_time = time.time() - start_time
@@ -132,6 +171,26 @@ async def serve_frontend_app(path: str = ""):
     if os.path.isfile("frontend/index.html"):
         return FileResponse("frontend/index.html")
     return JSONResponse(status_code=404, content={"detail": "Frontend application not found"})
+
+@app.get("/robots.txt", tags=["seo"], include_in_schema=False)
+async def serve_robots_txt():
+    for candidate in ("frontend/robots.txt", "robots.txt"):
+        if os.path.isfile(candidate):
+            return FileResponse(candidate, media_type="text/plain")
+    return Response(
+        content="User-agent: *\nAllow: /\nSitemap: https://rftools.infrahub.web.id/sitemap.xml\n",
+        media_type="text/plain"
+    )
+
+@app.get("/sitemap.xml", tags=["seo"], include_in_schema=False)
+async def serve_sitemap_xml():
+    for candidate in ("frontend/sitemap.xml", "sitemap.xml"):
+        if os.path.isfile(candidate):
+            return FileResponse(candidate, media_type="application/xml")
+    return Response(
+        content="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://rftools.infrahub.web.id/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>",
+        media_type="application/xml"
+    )
 
 if __name__ == "__main__":
     import uvicorn

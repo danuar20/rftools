@@ -410,6 +410,172 @@ def test_enterprise_light_mode_foundation_and_anti_slop_refinements():
     assert "<span>🎛️</span>" not in res_ws.text
     assert "<span>📋</span>" not in res_ws.text
 
+def test_gzip_compression():
+    # 1. Requests with Accept-Encoding: gzip compress assets >= 1000 bytes
+    res_css = client.get("/static/css/app.css", headers={"Accept-Encoding": "gzip"})
+    assert res_css.status_code == 200
+    assert res_css.headers.get("content-encoding") == "gzip"
+    assert "gzip" in res_css.headers.get("content-encoding", "")
+    assert "Accept-Encoding" in res_css.headers.get("vary", "")
+
+    res_js = client.get("/static/js/app.js", headers={"Accept-Encoding": "gzip"})
+    assert res_js.status_code == 200
+    assert res_js.headers.get("content-encoding") == "gzip"
+
+    # API tools catalog is > 1KB and should also compress with gzip
+    res_api = client.get("/api/v1/tools", headers={"Accept-Encoding": "gzip"})
+    assert res_api.status_code == 200
+    assert res_api.headers.get("content-encoding") == "gzip"
+
+    # 2. Requests without Accept-Encoding: gzip do not receive gzip encoding
+    res_no_gzip = client.get("/static/css/app.css", headers={"Accept-Encoding": "identity"})
+    assert res_no_gzip.status_code == 200
+    assert res_no_gzip.headers.get("content-encoding") is None
+
+def test_smart_caching_headers():
+    # 1. Versioned static assets (?v=1.1.1) must receive long-lived immutable cache
+    res_v_js = client.get("/static/js/app.js?v=1.1.1")
+    assert res_v_js.status_code == 200
+    assert "public" in res_v_js.headers.get("cache-control", "")
+    assert "max-age=31536000" in res_v_js.headers.get("cache-control", "")
+    assert "immutable" in res_v_js.headers.get("cache-control", "")
+    assert res_v_js.headers.get("pragma") is None
+    assert res_v_js.headers.get("expires") is None
+
+    res_v_css = client.get("/static/css/tokens.css?v=1.1.1")
+    assert res_v_css.status_code == 200
+    assert "public" in res_v_css.headers.get("cache-control", "")
+    assert "max-age=31536000" in res_v_css.headers.get("cache-control", "")
+    assert "immutable" in res_v_css.headers.get("cache-control", "")
+
+    res_v_icon = client.get("/assets/icons/rf-logo.svg?v=1.1.1")
+    assert res_v_icon.status_code == 200
+    assert "public" in res_v_icon.headers.get("cache-control", "")
+    assert "max-age=31536000" in res_v_icon.headers.get("cache-control", "")
+
+    # 2. Unversioned static assets remain uncached for safety
+    res_raw_js = client.get("/static/js/app.js")
+    assert res_raw_js.status_code == 200
+    assert "no-cache" in res_raw_js.headers.get("cache-control", "")
+    assert "no-store" in res_raw_js.headers.get("cache-control", "")
+    assert res_raw_js.headers.get("pragma") == "no-cache"
+    assert res_raw_js.headers.get("expires") == "0"
+
+    # 3. HTML pages must ALWAYS be uncached so users immediately receive code updates
+    res_html = client.get("/", headers={"Accept": "text/html"})
+    assert res_html.status_code == 200
+    assert "no-cache" in res_html.headers.get("cache-control", "")
+    assert "no-store" in res_html.headers.get("cache-control", "")
+    assert "must-revalidate" in res_html.headers.get("cache-control", "")
+
+    res_app = client.get("/app")
+    assert res_app.status_code == 200
+    assert "no-cache" in res_app.headers.get("cache-control", "")
+    assert "no-store" in res_app.headers.get("cache-control", "")
+
+def test_robots_and_sitemap_endpoints():
+    # 1. /robots.txt
+    res_robots = client.get("/robots.txt")
+    assert res_robots.status_code == 200
+    assert "text/plain" in res_robots.headers.get("content-type", "")
+    assert "User-agent: *" in res_robots.text
+    assert "Allow: /" in res_robots.text
+    assert "Sitemap: https://rftools.infrahub.web.id/sitemap.xml" in res_robots.text
+    assert "max-age=86400" in res_robots.headers.get("cache-control", "")
+
+    # 2. /sitemap.xml
+    res_sitemap = client.get("/sitemap.xml")
+    assert res_sitemap.status_code == 200
+    assert "application/xml" in res_sitemap.headers.get("content-type", "") or "text/xml" in res_sitemap.headers.get("content-type", "")
+    assert "<urlset" in res_sitemap.text
+    assert "<loc>https://rftools.infrahub.web.id/</loc>" in res_sitemap.text
+    assert "<loc>https://rftools.infrahub.web.id/#tool-excel-to-kml</loc>" in res_sitemap.text
+    assert "<loc>https://rftools.infrahub.web.id/#tool-geohash-converter</loc>" in res_sitemap.text
+    assert "<loc>https://rftools.infrahub.web.id/#docs</loc>" in res_sitemap.text
+    assert "max-age=86400" in res_sitemap.headers.get("cache-control", "")
+
+
+def test_onpage_seo_and_metadata():
+    import json
+    import re
+    res = client.get("/", headers={"Accept": "text/html"})
+    assert res.status_code == 200
+    html = res.text
+
+    # 1. Title tag verification (50-65 characters optimal length)
+    title_match = re.search(r"<title>(.*?)</title>", html)
+    assert title_match is not None
+    title = title_match.group(1)
+    assert "RF TOOLS" in title.upper()
+    assert len(title) >= 30 and len(title) <= 70
+
+    # 2. Meta description (120-160 characters optimal length)
+    desc_match = re.search(r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']', html)
+    assert desc_match is not None
+    desc = desc_match.group(1)
+    assert len(desc) >= 100 and len(desc) <= 165
+    assert "RF engineering" in desc
+
+    # 3. Canonical and robots meta tags
+    assert '<link rel="canonical" href="https://rftools.infrahub.web.id/">' in html
+    assert 'name="robots"' in html
+    assert 'content="index, follow' in html
+
+    # 4. OpenGraph and Twitter cards
+    assert '<meta property="og:type" content="website">' in html
+    assert '<meta property="og:url" content="https://rftools.infrahub.web.id/">' in html
+    assert '<meta property="og:site_name" content="RF TOOLS">' in html
+    assert '<meta property="og:image" content="https://rftools.infrahub.web.id/assets/icons/rf-logo.png">' in html
+    assert '<meta name="twitter:card" content="summary">' in html
+    assert '<meta name="twitter:image" content="https://rftools.infrahub.web.id/assets/icons/rf-logo.png">' in html
+
+    # 5. Schema.org JSON-LD Structured Data
+    ld_match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
+    assert ld_match is not None
+    ld_data = json.loads(ld_match.group(1).strip())
+    assert ld_data["@context"] == "https://schema.org"
+    graph = ld_data["@graph"]
+    types = [item["@type"] for item in graph]
+    assert "WebApplication" in types
+    assert "WebSite" in types
+
+    webapp = next(item for item in graph if item["@type"] == "WebApplication")
+    assert webapp["name"] == "RF TOOLS"
+    assert webapp["applicationCategory"] == "EngineeringApplication"
+    assert len(webapp["featureList"]) >= 4
+
+    # 6. Semantic Heading Hierarchy in HTML Shell
+    assert '<h1 class="sr-only">RF TOOLS — Professional RF Engineering &amp; Geospatial Suite</h1>' in html
+
+
+def test_core_web_vitals_optimizations():
+    res = client.get("/", headers={"Accept": "text/html"})
+    assert res.status_code == 200
+    html = res.text
+
+    # 1. Preconnect and dns-prefetch hints
+    assert '<link rel="preconnect" href="https://fonts.googleapis.com">' in html
+    assert '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' in html
+    assert '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' in html
+
+    # 2. Non-render-blocking font loading
+    assert 'media="print" onload="this.media=\'all\'"' in html
+    assert '<noscript>' in html
+
+    # 3. Critical CSS preload and modulepreload
+    assert '<link rel="preload" href="/static/css/tokens.css?v=1.1.1" as="style">' in html
+    assert '<link rel="preload" href="/static/css/components.css?v=1.1.1" as="style">' in html
+    assert '<link rel="preload" href="/static/css/app.css?v=1.1.1" as="style">' in html
+    assert '<link rel="modulepreload" href="/static/js/app.js?v=1.1.1">' in html
+
+    # 4. Critical Layout CSS to prevent Cumulative Layout Shift (CLS)
+    assert "--sidebar-width: 260px;" in html
+    assert "--navbar-height: 56px;" in html
+    assert "#sidebar-container {" in html
+    assert ".content-viewport {" in html
+
+
+
 
 
 

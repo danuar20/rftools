@@ -441,6 +441,7 @@ export class DashboardComponent {
     }
 
     this.container.innerHTML = `
+      <h1 class="sr-only">${state.lang === 'id' ? 'RF TOOLS — Platform Teknik RF & Utilitas Geospasial' : 'RF TOOLS — Professional RF Engineering & Geospatial Suite'}</h1>
       <!-- INTERACTIVE SHOWCASE SLIDESHOW -->
       <section class="dashboard-slideshow" id="dashboard-slideshow">
         <div class="slideshow-viewport">
