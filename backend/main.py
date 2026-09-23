@@ -172,17 +172,17 @@ async def serve_frontend_app(path: str = ""):
         return FileResponse("frontend/index.html")
     return JSONResponse(status_code=404, content={"detail": "Frontend application not found"})
 
-@app.get("/robots.txt", tags=["seo"], include_in_schema=False)
+@app.api_route("/robots.txt", methods=["GET", "HEAD"], tags=["seo"], include_in_schema=False)
 async def serve_robots_txt():
     for candidate in ("frontend/robots.txt", "robots.txt"):
         if os.path.isfile(candidate):
-            return FileResponse(candidate, media_type="text/plain")
+            return FileResponse(candidate, media_type="text/plain; charset=utf-8")
     return Response(
         content="User-agent: *\nAllow: /\nSitemap: https://rftools.infrahub.web.id/sitemap.xml\n",
-        media_type="text/plain"
+        media_type="text/plain; charset=utf-8"
     )
 
-@app.get("/sitemap.xml", tags=["seo"], include_in_schema=False)
+@app.api_route("/sitemap.xml", methods=["GET", "HEAD"], tags=["seo"], include_in_schema=False)
 async def serve_sitemap_xml():
     for candidate in ("frontend/sitemap.xml", "sitemap.xml"):
         if os.path.isfile(candidate):
