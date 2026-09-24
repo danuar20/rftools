@@ -42,7 +42,9 @@ export class SidebarComponent {
           <ul class="sidebar__menu">
             <li>
               <a href="#dashboard" class="sidebar__link ${currentRoute === 'dashboard' ? 'sidebar__link--active' : ''}" title="${state.t('nav_dashboard')}">
-                <span class="sidebar__link-icon">📊</span>
+                <span class="sidebar__link-icon">
+                  <img src="/assets/icons/nav-dashboard.svg" alt="${state.t('nav_dashboard')}">
+                </span>
                 <span class="sidebar__link-text">${state.t('nav_dashboard')}</span>
               </a>
             </li>

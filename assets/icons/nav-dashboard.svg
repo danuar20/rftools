@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="navDashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#0284C7" fill-opacity="0.1" stroke="#0284C7" stroke-width="1" stroke-opacity="0.25"/>
+  <rect x="7" y="7" width="7" height="7" rx="2" fill="url(#navDashGrad)"/>
+  <rect x="18" y="7" width="7" height="7" rx="2" fill="#0284C7" fill-opacity="0.6"/>
+  <rect x="7" y="18" width="7" height="7" rx="2" fill="#0284C7" fill-opacity="0.6"/>
+  <rect x="18" y="18" width="7" height="7" rx="2" fill="url(#navDashGrad)"/>
+</svg>

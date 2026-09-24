@@ -1320,6 +1320,145 @@ html[data-theme="light"] .spinner {
   height: auto;
 }
 
+/* Dashboard Diagram Visualizations (Cohesive Light/Dark Aesthetic) */
+.diagram-canvas {
+  width: 100%;
+  height: 230px;
+  border-radius: var(--rounded-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+html[data-theme="light"] .diagram-canvas {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+
+html[data-theme="dark"] .diagram-canvas {
+  background-color: #0b0f19;
+  border-color: #1e293b;
+}
+
+.diagram-grid {
+  stroke: var(--color-border-subtle);
+}
+
+html[data-theme="light"] .diagram-grid {
+  stroke: #e2e8f0;
+}
+
+html[data-theme="dark"] .diagram-grid {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.diagram-axis {
+  stroke: var(--color-border-default);
+}
+
+html[data-theme="light"] .diagram-axis {
+  stroke: #cbd5e1;
+}
+
+html[data-theme="dark"] .diagram-axis {
+  stroke: #334155;
+}
+
+.diagram-panel {
+  fill: var(--color-bg-surface);
+  stroke: var(--color-border-default);
+}
+
+html[data-theme="light"] .diagram-panel {
+  fill: #ffffff;
+  stroke: #e2e8f0;
+}
+
+html[data-theme="dark"] .diagram-panel {
+  fill: #111827;
+  stroke: #334155;
+}
+
+.diagram-panel-subtle {
+  fill: var(--color-bg-sunken);
+  stroke: var(--color-border-subtle);
+}
+
+html[data-theme="light"] .diagram-panel-subtle {
+  fill: #f8fafc;
+  stroke: #e2e8f0;
+}
+
+html[data-theme="dark"] .diagram-panel-subtle {
+  fill: #090d16;
+  stroke: #1e293b;
+}
+
+.diagram-text-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+html[data-theme="light"] .diagram-text-title {
+  fill: #0f172a;
+}
+
+html[data-theme="dark"] .diagram-text-title {
+  fill: #f8fafc;
+}
+
+.diagram-text-body {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-sans);
+}
+
+html[data-theme="light"] .diagram-text-body {
+  fill: #475569;
+}
+
+html[data-theme="dark"] .diagram-text-body {
+  fill: #94a3b8;
+}
+
+.diagram-text-mono {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+html[data-theme="light"] .diagram-text-mono {
+  fill: #475569;
+}
+
+html[data-theme="dark"] .diagram-text-mono {
+  fill: #94a3b8;
+}
+
+.diagram-text-muted {
+  fill: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+html[data-theme="light"] .diagram-text-muted {
+  fill: #64748b;
+}
+
+html[data-theme="dark"] .diagram-text-muted {
+  fill: #64748b;
+}
+
+.diagram-divider {
+  stroke: var(--color-border-subtle);
+}
+
+html[data-theme="light"] .diagram-divider {
+  stroke: #e2e8f0;
+}
+
+html[data-theme="dark"] .diagram-divider {
+  stroke: #334155;
+}
+
 .slideshow-controls {
   display: flex;
   align-items: center;

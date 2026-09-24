@@ -2,199 +2,36 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>RF Tools-Telco — Professional RF Engineering &amp; Geospatial Suite</title>
-
-  <!-- Primary SEO Meta Tags -->
-  <meta name="title" content="RF Tools-Telco — Professional RF Engineering &amp; Geospatial Suite">
-  <meta name="description" content="Professional RF engineering and geospatial web suite. Convert Excel to KML points, generate PRB 3D sectors, calculate ISD, and convert Geohashes.">
-  <meta name="keywords" content="RF tools, radio frequency, KML converter, PRB 3D sector, inter-site distance, ISD calculator, geohash converter, GIS, shapefile, cellular network, LTE, 5G">
-  <meta name="author" content="InfraHub">
-  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" href="https://rftools.infrahub.web.id/">
-
-  <!-- Theme and Platform Icons -->
-  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
-  <meta name="color-scheme" content="light dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RF Tools-Telco</title>
   <link rel="icon" type="image/svg+xml" href="/assets/icons/rf-logo.svg">
-  <link rel="apple-touch-icon" href="/assets/icons/rf-logo.png">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://rftools.infrahub.web.id/">
-  <meta property="og:site_name" content="RF TOOLS">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:title" content="RF Tools-Telco — Professional RF Engineering &amp; Geospatial Suite">
-  <meta property="og:description" content="Professional RF engineering and geospatial web suite. Convert Excel to KML points, generate PRB 3D sectors, calculate ISD, and convert Geohashes.">
-  <meta property="og:image" content="https://rftools.infrahub.web.id/assets/icons/rf-logo.png">
-  <meta property="og:image:secure_url" content="https://rftools.infrahub.web.id/assets/icons/rf-logo.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
-  <meta property="og:image:alt" content="RF TOOLS Engineering Suite Logo">
-
-  <!-- Twitter Cards -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="RF Tools-Telco — Professional RF Engineering &amp; Geospatial Suite">
-  <meta name="twitter:description" content="Professional RF engineering and geospatial web suite. Convert Excel to KML points, generate PRB 3D sectors, calculate ISD, and convert Geohashes.">
-  <meta name="twitter:image" content="https://rftools.infrahub.web.id/assets/icons/rf-logo.png">
-  <meta name="twitter:image:alt" content="RF TOOLS Engineering Suite Logo">
-
-  <!-- Structured Data: Schema.org JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebApplication",
-        "@id": "https://rftools.infrahub.web.id/#webapp",
-        "name": "RF TOOLS",
-        "url": "https://rftools.infrahub.web.id/",
-        "applicationCategory": "EngineeringApplication",
-        "operatingSystem": "All",
-        "browserRequirements": "Requires JavaScript. Requires HTML5.",
-        "softwareVersion": "1.2.0",
-        "description": "Professional RF engineering and geospatial web application. Convert Excel datasets to KML points, generate 3D PRB sector polygons, calculate multi-neighbor Inter-Site Distances (ISD), and convert Geohashes to Shapefiles and Lat/Long.",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "featureList": [
-          "Excel to KML Point Converter",
-          "Excel to PRB 3D Sector Polygon Generator",
-          "Inter-Site Distance (ISD) & Nearest Neighbor Calculator",
-          "Geohash to Shapefile (.shp/.zip) Converter",
-          "Geohash to Latitude/Longitude Converter",
-          "Latitude/Longitude to Geohash Converter"
-        ]
-      },
-      {
-        "@type": "WebSite",
-        "@id": "https://rftools.infrahub.web.id/#website",
-        "url": "https://rftools.infrahub.web.id/",
-        "name": "RF TOOLS",
-        "description": "Professional RF Engineering & Geospatial Suite",
-        "publisher": {
-          "@type": "Organization",
-          "name": "InfraHub",
-          "url": "https://infrahub.web.id"
-        }
-      }
-    ]
-  }
-  </script>
-
-  <!-- Performance & Core Web Vitals Resource Hints -->
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Non-Render Blocking Web Fonts Loading -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
-  </noscript>
-
-  <!-- Preload Critical CSS Stylesheets -->
-  <link rel="preload" href="/static/css/tokens.css?v=1.1.1" as="style">
-  <link rel="preload" href="/static/css/components.css?v=1.1.1" as="style">
-  <link rel="preload" href="/static/css/app.css?v=1.1.1" as="style">
+  <!-- Design System & Components CSS -->
   <link rel="stylesheet" href="/static/css/tokens.css?v=1.1.1">
   <link rel="stylesheet" href="/static/css/components.css?v=1.1.1">
   <link rel="stylesheet" href="/static/css/app.css?v=1.1.1">
-
-  <!-- Modulepreload Critical JS Entrypoints -->
-  <link rel="modulepreload" href="/static/js/app.js?v=1.1.1">
-  <link rel="modulepreload" href="/static/js/state.js?v=1.1.1">
-  <link rel="modulepreload" href="/static/js/components/dashboard.js?v=1.1.1">
-
-  <!-- Critical Layout Shell Style to Eliminate CLS (Cumulative Layout Shift) -->
-  <style>
-    :root {
-      --sidebar-width: 260px;
-      --navbar-height: 56px;
-    }
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f8fafc;
-      color: #0f172a;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-    .app-shell {
-      display: flex;
-      min-height: 100vh;
-      width: 100%;
-    }
-    #sidebar-container {
-      width: var(--sidebar-width);
-      flex-shrink: 0;
-      min-height: 100vh;
-    }
-    .main-wrapper {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    #navbar-container {
-      height: var(--navbar-height);
-      flex-shrink: 0;
-    }
-    .content-viewport {
-      flex: 1;
-      padding: 1.5rem;
-    }
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
-    }
-    @media (max-width: 768px) {
-      #sidebar-container {
-        display: none;
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="app-shell">
     <!-- Collapsible Sidebar -->
-    <aside id="sidebar-container" aria-label="Primary Navigation"></aside>
+    <aside id="sidebar-container"></aside>
 
     <!-- Main Content Container -->
     <div class="main-wrapper">
       <!-- Top Action Header Navbar -->
-      <header id="navbar-container" role="banner"></header>
+      <div id="navbar-container"></div>
 
       <!-- Scrollable Main Viewport -->
-      <main class="content-viewport" id="content-viewport" role="main">
-        <!-- Accessible Semantic H1 for SEO Crawlers & Initial FCP -->
-        <h1 class="sr-only">RF TOOLS — Professional RF Engineering &amp; Geospatial Suite</h1>
-        <p class="sr-only">Interactive RF engineering web application integrating Python calculation engines for KML point conversion, PRB 3D sector generation, ISD analysis, and Geohash GIS converters.</p>
+      <main class="content-viewport" id="content-viewport">
+        <!-- Dynamic View Rendered Here by Router -->
       </main>
     </div>
   </div>
-
-  <noscript>
-    <div style="padding: 2rem; text-align: center; font-family: sans-serif; background: #fff; color: #1e293b;">
-      <h2>JavaScript Required</h2>
-      <p>RF TOOLS requires JavaScript enabled to run interactive calculation engines, map visualizers, and geospatial utilities.</p>
-    </div>
-  </noscript>
 
   <!-- Application Bundle -->
   <script type="module" src="/static/js/app.js?v=1.1.1"></script>
