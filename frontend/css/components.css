@@ -1170,9 +1170,9 @@ body {
   align-items: center;
   gap: 4px;
   width: fit-content;
-  margin-top: 3px;
-  padding: 1.5px 7px;
-  font-size: 0.6875rem;
+  margin-top: 2px;
+  padding: 1px 6px;
+  font-size: 0.6rem;
   font-weight: 600;
   font-family: var(--font-mono, monospace);
   letter-spacing: 0.02em;
@@ -1180,7 +1180,7 @@ body {
   background-color: var(--color-primary-subtle, rgba(2, 132, 199, 0.08));
   border: 1px solid var(--color-primary-border, rgba(2, 132, 199, 0.22));
   color: var(--color-primary, #0284c7);
-  line-height: 1.3;
+  line-height: 1.25;
   transition: all 0.2s ease;
 }
 
@@ -1220,4 +1220,99 @@ html[data-theme="dark"] .sidebar__brand-version {
   border-color: rgba(56, 189, 248, 0.25);
   color: #38bdf8;
 }
+
+/* Dashboard Diagram Visualizations (Cohesive Light/Dark Aesthetic) */
+.diagram-canvas {
+  width: 100%;
+  height: 230px;
+  border-radius: var(--rounded-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+html[data-theme="light"] .diagram-canvas { background-color: #ffffff; border-color: #e2e8f0; }
+html[data-theme="dark"] .diagram-canvas { background-color: #0b0f19; border-color: #1e293b; }
+
+.diagram-grid { stroke: var(--color-border-subtle); }
+html[data-theme="light"] .diagram-grid { stroke: #e2e8f0; }
+html[data-theme="dark"] .diagram-grid { stroke: rgba(255, 255, 255, 0.08); }
+
+.diagram-axis { stroke: var(--color-border-default); }
+html[data-theme="light"] .diagram-axis { stroke: #cbd5e1; }
+html[data-theme="dark"] .diagram-axis { stroke: #334155; }
+
+.diagram-panel { fill: var(--color-bg-surface); stroke: var(--color-border-default); }
+html[data-theme="light"] .diagram-panel { fill: #ffffff; stroke: #e2e8f0; }
+html[data-theme="dark"] .diagram-panel { fill: #111827; stroke: #334155; }
+
+.diagram-panel-subtle { fill: var(--color-bg-sunken); stroke: var(--color-border-subtle); }
+html[data-theme="light"] .diagram-panel-subtle { fill: #f8fafc; stroke: #e2e8f0; }
+html[data-theme="dark"] .diagram-panel-subtle { fill: #090d16; stroke: #1e293b; }
+
+.diagram-text-title { fill: var(--color-text-primary); font-family: var(--font-sans); }
+html[data-theme="light"] .diagram-text-title { fill: #0f172a; }
+html[data-theme="dark"] .diagram-text-title { fill: #f8fafc; }
+
+.diagram-text-body { fill: var(--color-text-secondary); font-family: var(--font-sans); }
+html[data-theme="light"] .diagram-text-body { fill: #334155; }
+html[data-theme="dark"] .diagram-text-body { fill: #cbd5e1; }
+
+.diagram-text-mono { fill: var(--color-text-secondary); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-mono { fill: #334155; }
+html[data-theme="dark"] .diagram-text-mono { fill: #cbd5e1; }
+
+.diagram-text-muted { fill: var(--color-text-muted); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-muted { fill: #64748b; }
+html[data-theme="dark"] .diagram-text-muted { fill: #94a3b8; }
+
+.diagram-text-primary { fill: var(--color-primary); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-primary { fill: #0284c7; }
+html[data-theme="dark"] .diagram-text-primary { fill: #38bdf8; }
+
+.diagram-text-success { fill: var(--color-accent-emerald); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-success { fill: #15803d; }
+html[data-theme="dark"] .diagram-text-success { fill: #4ade80; }
+
+.diagram-text-accent { fill: var(--color-accent-indigo); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-accent { fill: #4f46e5; }
+html[data-theme="dark"] .diagram-text-accent { fill: #a5b4fc; }
+
+.diagram-text-warning { fill: var(--color-status-warning); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-warning { fill: #b45309; }
+html[data-theme="dark"] .diagram-text-warning { fill: #fbbf24; }
+
+.diagram-text-danger { fill: var(--color-status-danger); font-family: var(--font-mono); }
+html[data-theme="light"] .diagram-text-danger { fill: #dc2626; }
+html[data-theme="dark"] .diagram-text-danger { fill: #f87171; }
+
+.diagram-header-primary { fill: #0284c7; }
+html[data-theme="dark"] .diagram-header-primary { fill: #0369a1; }
+
+.diagram-header-success { fill: #059669; }
+html[data-theme="dark"] .diagram-header-success { fill: #065f46; }
+
+.diagram-header-accent { fill: #4f46e5; }
+html[data-theme="dark"] .diagram-header-accent { fill: #3730a3; }
+
+.diagram-badge-primary { fill: rgba(2, 132, 199, 0.1); stroke: #0284c7; }
+html[data-theme="dark"] .diagram-badge-primary { fill: rgba(56, 189, 248, 0.15); stroke: #38bdf8; }
+
+.diagram-badge-success { fill: rgba(22, 163, 74, 0.1); stroke: #16a34a; }
+html[data-theme="dark"] .diagram-badge-success { fill: rgba(74, 222, 128, 0.15); stroke: #4ade80; }
+
+.diagram-badge-accent { fill: rgba(79, 70, 229, 0.1); stroke: #4f46e5; }
+html[data-theme="dark"] .diagram-badge-accent { fill: rgba(165, 180, 252, 0.15); stroke: #818cf8; }
+
+.diagram-meter-active { fill: #4f46e5; }
+html[data-theme="dark"] .diagram-meter-active { fill: #818cf8; }
+
+.diagram-meter-subtle { fill: #e2e8f0; }
+html[data-theme="dark"] .diagram-meter-subtle { fill: #334155; }
+
+.diagram-divider { stroke: var(--color-border-subtle); }
+html[data-theme="light"] .diagram-divider { stroke: #e2e8f0; }
+html[data-theme="dark"] .diagram-divider { stroke: #334155; }
+
 
