@@ -13,10 +13,10 @@ def test_frontend_html_root():
     assert "text/html" in res.headers["content-type"]
     assert "RF Tools-Telco" in res.text
     assert "app-shell" in res.text
-    assert "tokens.css?v=1.1.1" in res.text
-    assert "components.css?v=1.1.1" in res.text
-    assert "app.css?v=1.1.1" in res.text
-    assert "app.js?v=1.1.1" in res.text
+    assert "tokens.css?v=1.1.2" in res.text
+    assert "components.css?v=1.1.2" in res.text
+    assert "app.css?v=1.1.2" in res.text
+    assert "app.js?v=1.1.2" in res.text
     assert "Cache-Control" in res.headers
     assert "no-cache, no-store, must-revalidate" in res.headers["Cache-Control"]
 
@@ -583,6 +583,34 @@ def test_micro_badge_pill_and_slideshow_contrast_audit():
     assert "diagram-header-primary" in res_dash.text
     assert "diagram-header-success" in res_dash.text
     assert "diagram-header-accent" in res_dash.text
+
+def test_slideshow_explicit_presentation_fallbacks_and_cachebusters():
+    # 1. Stylesheets and scripts have cachebusting version v=1.1.2
+    res_html = client.get("/", headers={"Accept": "text/html"})
+    assert res_html.status_code == 200
+    assert 'href="/static/css/tokens.css?v=1.1.2"' in res_html.text
+    assert 'href="/static/css/components.css?v=1.1.2"' in res_html.text
+    assert 'href="/static/css/app.css?v=1.1.2"' in res_html.text
+    assert 'src="/static/js/app.js?v=1.1.2"' in res_html.text
+
+    # 2. Slideshow SVG diagrams have explicit presentation fallback attributes alongside CSS classes
+    res_dash = client.get("/static/js/components/dashboard.js")
+    assert res_dash.status_code == 200
+    content = res_dash.text
+
+    # Placemark Inspector and cards have explicit fill & stroke so they never default to black
+    assert 'fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel"' in content
+    assert 'fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle"' in content
+    assert 'fill="none" stroke="#E2E8F0" class="diagram-grid"' in content
+    assert 'stroke="#E2E8F0" class="diagram-divider"' in content
+
+    # Text elements have explicit fallback fills
+    assert 'fill="#64748B" class="diagram-text-muted"' in content
+    assert 'fill="#0F172A" class="diagram-text-title"' in content
+    assert 'fill="#0284C7" class="diagram-text-primary"' in content
+    assert 'fill="#334155" class="diagram-text-body"' in content
+    assert 'fill="#15803D" class="diagram-text-success"' in content
+
 
 
 

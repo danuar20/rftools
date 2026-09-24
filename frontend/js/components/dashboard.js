@@ -63,15 +63,15 @@ export class DashboardComponent {
             </defs>
 
             <!-- Coordinate / Radar Azimuth Range Rings -->
-            <circle cx="125" cy="180" r="140" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
-            <circle cx="125" cy="180" r="95" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
-            <circle cx="125" cy="180" r="50" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
+            <circle cx="125" cy="180" r="140" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+            <circle cx="125" cy="180" r="95" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+            <circle cx="125" cy="180" r="50" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
             
             <!-- Azimuth Radial Guides -->
-            <line x1="125" y1="180" x2="125" y2="35" class="diagram-grid" stroke-dasharray="2 2"/>
-            <line x1="125" y1="180" x2="230" y2="75" class="diagram-grid" stroke-dasharray="2 2"/>
-            <text x="128" y="48" class="diagram-text-muted" font-size="8">0° (N)</text>
-            <text x="215" y="88" class="diagram-text-muted" font-size="8">150° (Beam)</text>
+            <line x1="125" y1="180" x2="125" y2="35" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+            <line x1="125" y1="180" x2="230" y2="75" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+            <text x="128" y="48" fill="#64748B" class="diagram-text-muted" font-size="8">0° (N)</text>
+            <text x="215" y="88" fill="#64748B" class="diagram-text-muted" font-size="8">150° (Beam)</text>
 
             <!-- 3D Stacked Carrier Sectors -->
             <!-- Band 2100 (Blue - L2100) -->
@@ -88,12 +88,12 @@ export class DashboardComponent {
             <!-- Site Origin Node -->
             <circle cx="125" cy="180" r="5" fill="#0284C7"/>
             <circle cx="125" cy="180" r="10" fill="none" stroke="#0284C7" stroke-width="1.5" opacity="0.6"/>
-            <text x="100" y="206" class="diagram-text-title" font-size="9" font-weight="600" font-family="monospace">Site Origin</text>
-            <text x="96" y="217" class="diagram-text-muted" font-size="7.5">Parbulu_01</text>
+            <text x="100" y="206" fill="#0F172A" class="diagram-text-title" font-size="9" font-weight="600" font-family="monospace">Site Origin</text>
+            <text x="96" y="217" fill="#64748B" class="diagram-text-muted" font-size="7.5">Parbulu_01</text>
 
             <!-- Google Earth Balloon Telemetry Card -->
             <g transform="translate(252, 16)">
-              <rect width="154" height="198" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect width="154" height="198" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
 
               <!-- Dual Logos Header Simulation -->
               <rect x="7" y="7" width="67" height="22" rx="3" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
@@ -103,11 +103,11 @@ export class DashboardComponent {
               <text x="88" y="21" fill="#38BDF8" font-size="8.5" font-weight="800" font-family="sans-serif">PUMA / RF</text>
 
               <!-- Telemetry Header Line -->
-              <line x1="7" y1="35" x2="147" y2="35" class="diagram-divider"/>
+              <line x1="7" y1="35" x2="147" y2="35" stroke="#E2E8F0" class="diagram-divider"/>
 
-              <text x="9" y="47" class="diagram-text-title" font-size="7.5" font-family="monospace">WEEK: 06</text>
-              <text x="65" y="47" class="diagram-text-title" font-size="7.5" font-family="monospace">SITE: Parbulu</text>
-              <text x="9" y="59" class="diagram-text-body" font-size="7.5" font-family="monospace">CARRIER: LTE1800 (FDD)</text>
+              <text x="9" y="47" fill="#0F172A" class="diagram-text-title" font-size="7.5" font-family="monospace">WEEK: 06</text>
+              <text x="65" y="47" fill="#0F172A" class="diagram-text-title" font-size="7.5" font-family="monospace">SITE: Parbulu</text>
+              <text x="9" y="59" fill="#334155" class="diagram-text-body" font-size="7.5" font-family="monospace">CARRIER: LTE1800 (FDD)</text>
 
               <!-- KPI Threshold Status Chips -->
               <rect x="7" y="65" width="140" height="16" fill="#DC2626" rx="3"/>
@@ -120,14 +120,14 @@ export class DashboardComponent {
               <text x="12" y="117" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="sans-serif">RRC Connected: 44.71</text>
 
               <!-- Radio Metrics Details -->
-              <text x="9" y="134" class="diagram-text-body" font-size="7.5" font-family="monospace">PAYLOAD: 6.68 GB</text>
-              <text x="9" y="146" class="diagram-text-body" font-size="7.5" font-family="monospace">AZIMUTH: 150° | TILT: 4°</text>
-              <text x="9" y="158" class="diagram-text-body" font-size="7.5" font-family="monospace">PCI: 166 | EARFCN: 1750</text>
-              <text x="9" y="170" class="diagram-text-body" font-size="7.5" font-family="monospace">ALTITUDE: 42.0m AGL</text>
+              <text x="9" y="134" fill="#334155" class="diagram-text-body" font-size="7.5" font-family="monospace">PAYLOAD: 6.68 GB</text>
+              <text x="9" y="146" fill="#334155" class="diagram-text-body" font-size="7.5" font-family="monospace">AZIMUTH: 150° | TILT: 4°</text>
+              <text x="9" y="158" fill="#334155" class="diagram-text-body" font-size="7.5" font-family="monospace">PCI: 166 | EARFCN: 1750</text>
+              <text x="9" y="170" fill="#334155" class="diagram-text-body" font-size="7.5" font-family="monospace">ALTITUDE: 42.0m AGL</text>
 
               <!-- Card Footer -->
-              <line x1="7" y1="178" x2="147" y2="178" class="diagram-divider"/>
-              <text x="14" y="190" class="diagram-text-muted" font-size="6.5">© 2025 TelkomInfra • RF 3D</text>
+              <line x1="7" y1="178" x2="147" y2="178" stroke="#E2E8F0" class="diagram-divider"/>
+              <text x="14" y="190" fill="#64748B" class="diagram-text-muted" font-size="6.5">© 2025 TelkomInfra • RF 3D</text>
             </g>
           </svg>
         `
@@ -144,16 +144,16 @@ export class DashboardComponent {
         visual: `
           <svg viewBox="0 0 420 230" width="100%" height="230" xmlns="http://www.w3.org/2000/svg" class="diagram-canvas">
             <!-- Earth Graticule Lines -->
-            <path d="M 15 55 Q 120 75 220 55" fill="none" class="diagram-grid" stroke-width="1.2"/>
-            <path d="M 15 115 Q 120 135 220 115" fill="none" class="diagram-grid" stroke-width="1.2"/>
-            <path d="M 15 175 Q 120 195 220 175" fill="none" class="diagram-grid" stroke-width="1.2"/>
-            <line x1="60" y1="20" x2="60" y2="210" class="diagram-grid" stroke-dasharray="3 3"/>
-            <line x1="120" y1="20" x2="120" y2="210" class="diagram-grid" stroke-dasharray="3 3"/>
-            <line x1="180" y1="20" x2="180" y2="210" class="diagram-grid" stroke-dasharray="3 3"/>
+            <path d="M 15 55 Q 120 75 220 55" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.2"/>
+            <path d="M 15 115 Q 120 135 220 115" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.2"/>
+            <path d="M 15 175 Q 120 195 220 175" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.2"/>
+            <line x1="60" y1="20" x2="60" y2="210" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+            <line x1="120" y1="20" x2="120" y2="210" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+            <line x1="180" y1="20" x2="180" y2="210" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
 
             <!-- Geodetic Datum Badge -->
-            <rect x="20" y="20" width="108" height="18" rx="3" class="diagram-panel-subtle"/>
-            <text x="26" y="32" class="diagram-text-muted" font-size="8" font-weight="600">WGS84 EPSG:4326</text>
+            <rect x="20" y="20" width="108" height="18" rx="3" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle"/>
+            <text x="26" y="32" fill="#64748B" class="diagram-text-muted" font-size="8" font-weight="600">WGS84 EPSG:4326</text>
 
             <!-- Inter-site Geodesic Track -->
             <path d="M 85 110 Q 125 65 175 75" fill="none" stroke="#0284C7" stroke-width="1.2" stroke-dasharray="3 3"/>
@@ -164,7 +164,7 @@ export class DashboardComponent {
               <circle cx="0" cy="0" r="8" fill="#0284C7" fill-opacity="0.45"/>
               <circle cx="0" cy="0" r="3.5" fill="#0284C7"/>
               <circle cx="0" cy="0" r="1.5" fill="#FFFFFF"/>
-              <text x="12" y="4" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">JKT_SITE_01</text>
+              <text x="12" y="4" fill="#0F172A" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">JKT_SITE_01</text>
             </g>
 
             <!-- Placemark Site 2 (Coral Red Hub) -->
@@ -173,7 +173,7 @@ export class DashboardComponent {
               <circle cx="0" cy="0" r="9" fill="#EF4444" fill-opacity="0.45"/>
               <circle cx="0" cy="0" r="3.5" fill="#EF4444"/>
               <circle cx="0" cy="0" r="1.5" fill="#FFFFFF"/>
-              <text x="12" y="4" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">BDG_HUB_09</text>
+              <text x="12" y="4" fill="#0F172A" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">BDG_HUB_09</text>
             </g>
 
             <!-- Placemark Site 3 (Emerald Green Micro) -->
@@ -182,38 +182,38 @@ export class DashboardComponent {
               <circle cx="0" cy="0" r="7" fill="#10B981" fill-opacity="0.45"/>
               <circle cx="0" cy="0" r="3" fill="#10B981"/>
               <circle cx="0" cy="0" r="1.2" fill="#FFFFFF"/>
-              <text x="12" y="4" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">SUB_MICRO_14</text>
+              <text x="12" y="4" fill="#0F172A" class="diagram-text-title" font-size="9" font-weight="700" font-family="monospace">SUB_MICRO_14</text>
             </g>
 
             <!-- Google Earth Placemark Inspection Card -->
             <g transform="translate(225, 20)">
-              <rect width="180" height="190" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect width="180" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
               <!-- Inspector Header -->
-              <rect x="0" y="0" width="180" height="30" rx="5" class="diagram-header-primary"/>
+              <rect x="0" y="0" width="180" height="30" rx="5" fill="#0284C7" class="diagram-header-primary"/>
               <text x="12" y="20" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">📍 Placemark Inspector</text>
 
               <g transform="translate(12, 45)">
-                <text x="0" y="0" class="diagram-text-muted" font-size="7.5">TARGET SITENAME:</text>
-                <text x="0" y="13" class="diagram-text-title" font-size="9.5" font-weight="bold" font-family="monospace">JKT_SITE_01</text>
+                <text x="0" y="0" fill="#64748B" class="diagram-text-muted" font-size="7.5">TARGET SITENAME:</text>
+                <text x="0" y="13" fill="#0F172A" class="diagram-text-title" font-size="9.5" font-weight="bold" font-family="monospace">JKT_SITE_01</text>
 
-                <line x1="0" y1="22" x2="156" y2="22" class="diagram-divider"/>
+                <line x1="0" y1="22" x2="156" y2="22" stroke="#E2E8F0" class="diagram-divider"/>
 
-                <text x="0" y="34" class="diagram-text-muted" font-size="7.5">LATITUDE (WGS84):</text>
-                <text x="0" y="46" class="diagram-text-primary" font-size="9" font-weight="600" font-family="monospace">-6.175392° S</text>
+                <text x="0" y="34" fill="#64748B" class="diagram-text-muted" font-size="7.5">LATITUDE (WGS84):</text>
+                <text x="0" y="46" fill="#0284C7" class="diagram-text-primary" font-size="9" font-weight="600" font-family="monospace">-6.175392° S</text>
 
-                <text x="0" y="60" class="diagram-text-muted" font-size="7.5">LONGITUDE (WGS84):</text>
-                <text x="0" y="72" class="diagram-text-primary" font-size="9" font-weight="600" font-family="monospace">106.827153° E</text>
+                <text x="0" y="60" fill="#64748B" class="diagram-text-muted" font-size="7.5">LONGITUDE (WGS84):</text>
+                <text x="0" y="72" fill="#0284C7" class="diagram-text-primary" font-size="9" font-weight="600" font-family="monospace">106.827153° E</text>
 
-                <line x1="0" y1="81" x2="156" y2="81" class="diagram-divider"/>
+                <line x1="0" y1="81" x2="156" y2="81" stroke="#E2E8F0" class="diagram-divider"/>
 
-                <text x="0" y="93" class="diagram-text-body" font-size="8" font-family="monospace">Scale: 1.1x | Color: #0284C7</text>
-                <text x="0" y="105" class="diagram-text-body" font-size="8" font-family="monospace">Icon: wht-pushpin.png</text>
-                <text x="0" y="117" class="diagram-text-body" font-size="8" font-family="monospace">Altitude: 45.0m (Clamped)</text>
+                <text x="0" y="93" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Scale: 1.1x | Color: #0284C7</text>
+                <text x="0" y="105" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Icon: wht-pushpin.png</text>
+                <text x="0" y="117" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Altitude: 45.0m (Clamped)</text>
 
                 <!-- Status Chip -->
-                <rect x="0" y="124" width="156" height="16" rx="3" class="diagram-badge-success" stroke-width="1"/>
-                <text x="78" y="135" class="diagram-text-success" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle">✓ KML 2.2 Compliant</text>
+                <rect x="0" y="124" width="156" height="16" rx="3" fill="#DCFCE7" stroke="#16A34A" class="diagram-badge-success" stroke-width="1"/>
+                <text x="78" y="135" fill="#15803D" class="diagram-text-success" font-size="8" font-weight="bold" font-family="sans-serif" text-anchor="middle">✓ KML 2.2 Compliant</text>
               </g>
             </g>
           </svg>
@@ -233,76 +233,76 @@ export class DashboardComponent {
             <!-- Topology Mesh -->
             <g transform="translate(125, 115)">
               <!-- Range concentric distance circles -->
-              <circle cx="0" cy="0" r="105" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
-              <circle cx="0" cy="0" r="65" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
-              <text x="4" y="-68" class="diagram-text-muted" font-size="7">500 m</text>
-              <text x="4" y="-108" class="diagram-text-muted" font-size="7">1.0 km</text>
+              <circle cx="0" cy="0" r="105" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+              <circle cx="0" cy="0" r="65" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+              <text x="4" y="-68" fill="#64748B" class="diagram-text-muted" font-size="7">500 m</text>
+              <text x="4" y="-108" fill="#64748B" class="diagram-text-muted" font-size="7">1.0 km</text>
 
               <!-- Connection Vectors -->
               <line x1="0" y1="0" x2="100" y2="-55" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="4 2"/>
               <line x1="0" y1="0" x2="115" y2="40" stroke="#0284C7" stroke-width="1.4" stroke-dasharray="3 3"/>
-              <line x1="0" y1="0" x2="-75" y2="55" class="diagram-axis" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="0" y1="0" x2="-75" y2="55" stroke="#CBD5E1" class="diagram-axis" stroke-width="1" stroke-dasharray="2 2"/>
 
               <!-- Distance Badge Pills -->
               <g transform="translate(48, -35)">
-                <rect x="-30" y="-9" width="60" height="17" rx="8" class="diagram-header-primary"/>
+                <rect x="-30" y="-9" width="60" height="17" rx="8" fill="#0284C7" class="diagram-header-primary"/>
                 <text x="0" y="3" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">428.5 m</text>
               </g>
 
               <g transform="translate(62, 25)">
-                <rect x="-30" y="-9" width="60" height="17" rx="8" class="diagram-panel"/>
-                <text x="0" y="3" class="diagram-text-primary" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">1.25 km</text>
+                <rect x="-30" y="-9" width="60" height="17" rx="8" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel"/>
+                <text x="0" y="3" fill="#0284C7" class="diagram-text-primary" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">1.25 km</text>
               </g>
 
               <!-- Source Node (Center - Site A01) -->
               <circle cx="0" cy="0" r="14" fill="#EF4444" fill-opacity="0.2"/>
               <circle cx="0" cy="0" r="7" fill="#EF4444"/>
               <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
-              <text x="-25" y="24" class="diagram-text-danger" font-size="9" font-weight="bold" font-family="monospace">Site_A01</text>
+              <text x="-25" y="24" fill="#DC2626" class="diagram-text-danger" font-size="9" font-weight="bold" font-family="monospace">Site_A01</text>
 
               <!-- Candidate Neighbors -->
               <circle cx="100" cy="-55" r="7" fill="#0284C7"/>
               <circle cx="100" cy="-55" r="2.5" fill="#FFFFFF"/>
-              <text x="110" y="-52" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">Site_B04 (1st)</text>
+              <text x="110" y="-52" fill="#0284C7" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">Site_B04 (1st)</text>
 
               <circle cx="115" cy="40" r="6" fill="#10B981"/>
               <circle cx="115" cy="40" r="2" fill="#FFFFFF"/>
-              <text x="125" y="44" class="diagram-text-success" font-size="8.5" font-weight="600" font-family="monospace">Site_B12 (2nd)</text>
+              <text x="125" y="44" fill="#15803D" class="diagram-text-success" font-size="8.5" font-weight="600" font-family="monospace">Site_B12 (2nd)</text>
 
               <circle cx="-75" cy="55" r="5" fill="#64748B"/>
-              <text x="-125" y="59" class="diagram-text-muted" font-size="8" font-family="monospace">Site_B27</text>
+              <text x="-125" y="59" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="monospace">Site_B27</text>
             </g>
 
             <!-- Unit Selector Pill Banner -->
             <g transform="translate(262, 16)">
-              <rect width="144" height="40" rx="6" class="diagram-panel"/>
-              <text x="10" y="16" class="diagram-text-muted" font-size="7.5" font-family="sans-serif">Distance Unit Active:</text>
-              <rect x="10" y="21" width="58" height="15" rx="3" class="diagram-header-primary"/>
+              <rect width="144" height="40" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel"/>
+              <text x="10" y="16" fill="#64748B" class="diagram-text-muted" font-size="7.5" font-family="sans-serif">Distance Unit Active:</text>
+              <rect x="10" y="21" width="58" height="15" rx="3" fill="#0284C7" class="diagram-header-primary"/>
               <text x="39" y="32" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="monospace" text-anchor="middle">Meters</text>
-              <rect x="74" y="21" width="58" height="15" rx="3" class="diagram-panel-subtle"/>
-              <text x="103" y="32" class="diagram-text-muted" font-size="8" font-weight="600" font-family="monospace" text-anchor="middle">Km (km)</text>
+              <rect x="74" y="21" width="58" height="15" rx="3" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle"/>
+              <text x="103" y="32" fill="#64748B" class="diagram-text-muted" font-size="8" font-weight="600" font-family="monospace" text-anchor="middle">Km (km)</text>
             </g>
 
             <!-- Output Excel Preview Card -->
             <g transform="translate(262, 68)">
-              <rect width="144" height="144" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
-              <rect x="0" y="0" width="144" height="24" rx="5" class="diagram-header-success"/>
+              <rect width="144" height="144" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect x="0" y="0" width="144" height="24" rx="5" fill="#059669" class="diagram-header-success"/>
               <text x="10" y="16" fill="#FFFFFF" font-size="9" font-weight="bold" font-family="sans-serif">📊 ISD_Results.xlsx</text>
 
               <g transform="translate(10, 38)">
-                <text x="0" y="0" class="diagram-text-muted" font-size="7.5">COMPUTED PAIRS:</text>
-                <text x="0" y="12" class="diagram-text-success" font-size="9" font-weight="bold" font-family="monospace">1,482 pairs</text>
+                <text x="0" y="0" fill="#64748B" class="diagram-text-muted" font-size="7.5">COMPUTED PAIRS:</text>
+                <text x="0" y="12" fill="#15803D" class="diagram-text-success" font-size="9" font-weight="bold" font-family="monospace">1,482 pairs</text>
 
-                <line x1="0" y1="20" x2="124" y2="20" class="diagram-divider"/>
+                <line x1="0" y1="20" x2="124" y2="20" stroke="#E2E8F0" class="diagram-divider"/>
 
-                <text x="0" y="32" class="diagram-text-body" font-size="8" font-family="monospace">Min ISD: 182.40 m</text>
-                <text x="0" y="44" class="diagram-text-body" font-size="8" font-family="monospace">Mean ISD: 842.15 m</text>
-                <text x="0" y="56" class="diagram-text-body" font-size="8" font-family="monospace">Max ISD: 4,920.00 m</text>
+                <text x="0" y="32" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Min ISD: 182.40 m</text>
+                <text x="0" y="44" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Mean ISD: 842.15 m</text>
+                <text x="0" y="56" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Max ISD: 4,920.00 m</text>
 
-                <line x1="0" y1="64" x2="124" y2="64" class="diagram-divider"/>
+                <line x1="0" y1="64" x2="124" y2="64" stroke="#E2E8F0" class="diagram-divider"/>
 
-                <text x="0" y="76" class="diagram-text-primary" font-size="7.5" font-family="monospace">Sheet 1: Ranked Pairs</text>
-                <text x="0" y="88" class="diagram-text-primary" font-size="7.5" font-family="monospace">Sheet 2: Distribution</text>
+                <text x="0" y="76" fill="#0284C7" class="diagram-text-primary" font-size="7.5" font-family="monospace">Sheet 1: Ranked Pairs</text>
+                <text x="0" y="88" fill="#0284C7" class="diagram-text-primary" font-size="7.5" font-family="monospace">Sheet 2: Distribution</text>
               </g>
             </g>
           </svg>
@@ -323,58 +323,58 @@ export class DashboardComponent {
             <g transform="translate(35, 30)">
               <!-- Row 1 -->
               <rect x="0" y="0" width="65" height="52" fill="#0284C7" fill-opacity="0.12" stroke="#0284C7" stroke-width="1.2"/>
-              <text x="8" y="22" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">qqguw4</text>
+              <text x="8" y="22" fill="#0284C7" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">qqguw4</text>
               <circle cx="32" cy="26" r="2.5" fill="#0284C7"/>
 
               <rect x="70" y="0" width="65" height="52" fill="#6366F1" fill-opacity="0.2" stroke="#4F46E5" stroke-width="1.8"/>
-              <text x="78" y="22" class="diagram-text-accent" font-size="8.5" font-weight="bold" font-family="monospace">qqguw5</text>
+              <text x="78" y="22" fill="#4F46E5" class="diagram-text-accent" font-size="8.5" font-weight="bold" font-family="monospace">qqguw5</text>
               <circle cx="102" cy="26" r="3" fill="#4F46E5"/>
 
               <rect x="140" y="0" width="65" height="52" fill="#0284C7" fill-opacity="0.12" stroke="#0284C7" stroke-width="1.2"/>
-              <text x="148" y="22" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">qqguw7</text>
+              <text x="148" y="22" fill="#0284C7" class="diagram-text-primary" font-size="8.5" font-weight="600" font-family="monospace">qqguw7</text>
               <circle cx="172" cy="26" r="2.5" fill="#0284C7"/>
 
               <!-- Row 2 -->
-              <rect x="0" y="58" width="65" height="52" class="diagram-panel-subtle" stroke-width="1"/>
-              <text x="8" y="80" class="diagram-text-muted" font-size="8.5" font-family="monospace">qqguwh</text>
+              <rect x="0" y="58" width="65" height="52" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle" stroke-width="1"/>
+              <text x="8" y="80" fill="#64748B" class="diagram-text-muted" font-size="8.5" font-family="monospace">qqguwh</text>
 
               <rect x="70" y="58" width="65" height="52" fill="#10B981" fill-opacity="0.16" stroke="#059669" stroke-width="1.4"/>
-              <text x="78" y="80" class="diagram-text-success" font-size="8.5" font-weight="600" font-family="monospace">qqguwj</text>
+              <text x="78" y="80" fill="#15803D" class="diagram-text-success" font-size="8.5" font-weight="600" font-family="monospace">qqguwj</text>
               <circle cx="102" cy="84" r="2.5" fill="#059669"/>
 
-              <rect x="140" y="58" width="65" height="52" class="diagram-panel-subtle" stroke-width="1"/>
-              <text x="148" y="80" class="diagram-text-muted" font-size="8.5" font-family="monospace">qqguwm</text>
+              <rect x="140" y="58" width="65" height="52" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle" stroke-width="1"/>
+              <text x="148" y="80" fill="#64748B" class="diagram-text-muted" font-size="8.5" font-family="monospace">qqguwm</text>
             </g>
 
             <!-- Coordinate Axes -->
-            <line x1="28" y1="150" x2="245" y2="150" class="diagram-axis" stroke-width="1.2"/>
-            <line x1="28" y1="150" x2="28" y2="20" class="diagram-axis" stroke-width="1.2"/>
-            <text x="215" y="165" class="diagram-text-muted" font-size="8" font-family="monospace">Lon &rarr;</text>
-            <text x="12" y="16" class="diagram-text-muted" font-size="8" font-family="monospace">&uarr; Lat</text>
+            <line x1="28" y1="150" x2="245" y2="150" stroke="#CBD5E1" class="diagram-axis" stroke-width="1.2"/>
+            <line x1="28" y1="150" x2="28" y2="20" stroke="#CBD5E1" class="diagram-axis" stroke-width="1.2"/>
+            <text x="215" y="165" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="monospace">Lon &rarr;</text>
+            <text x="12" y="16" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="monospace">&uarr; Lat</text>
 
             <!-- Shapefile Bundle Card -->
             <g transform="translate(255, 20)">
-              <rect width="150" height="190" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect width="150" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
-              <rect x="0" y="0" width="150" height="28" rx="5" class="diagram-header-accent"/>
+              <rect x="0" y="0" width="150" height="28" rx="5" fill="#4F46E5" class="diagram-header-accent"/>
               <text x="12" y="18" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">📦 ESRI Shapefile Bundle</text>
 
               <g transform="translate(12, 40)">
-                <text x="0" y="10" class="diagram-text-primary" font-size="9" font-weight="bold" font-family="monospace">• layer.shp</text>
-                <text x="0" y="22" class="diagram-text-muted" font-size="7.5">Vector Polygon Geometries</text>
+                <text x="0" y="10" fill="#0284C7" class="diagram-text-primary" font-size="9" font-weight="bold" font-family="monospace">• layer.shp</text>
+                <text x="0" y="22" fill="#64748B" class="diagram-text-muted" font-size="7.5">Vector Polygon Geometries</text>
 
-                <text x="0" y="42" class="diagram-text-accent" font-size="9" font-weight="bold" font-family="monospace">• layer.shx</text>
-                <text x="0" y="54" class="diagram-text-muted" font-size="7.5">Spatial Index Offsets</text>
+                <text x="0" y="42" fill="#4F46E5" class="diagram-text-accent" font-size="9" font-weight="bold" font-family="monospace">• layer.shx</text>
+                <text x="0" y="54" fill="#64748B" class="diagram-text-muted" font-size="7.5">Spatial Index Offsets</text>
 
-                <text x="0" y="74" class="diagram-text-success" font-size="9" font-weight="bold" font-family="monospace">• layer.dbf</text>
-                <text x="0" y="86" class="diagram-text-muted" font-size="7.5">dBase Attribute Records</text>
+                <text x="0" y="74" fill="#15803D" class="diagram-text-success" font-size="9" font-weight="bold" font-family="monospace">• layer.dbf</text>
+                <text x="0" y="86" fill="#64748B" class="diagram-text-muted" font-size="7.5">dBase Attribute Records</text>
 
-                <text x="0" y="106" class="diagram-text-warning" font-size="9" font-weight="bold" font-family="monospace">• layer.prj</text>
-                <text x="0" y="118" class="diagram-text-muted" font-size="7.5">WGS84 EPSG:4326 Projection</text>
+                <text x="0" y="106" fill="#B45309" class="diagram-text-warning" font-size="9" font-weight="bold" font-family="monospace">• layer.prj</text>
+                <text x="0" y="118" fill="#64748B" class="diagram-text-muted" font-size="7.5">WGS84 EPSG:4326 Projection</text>
 
                 <!-- ZIP Packaging Pill -->
-                <rect x="0" y="128" width="126" height="16" rx="3" class="diagram-badge-accent" stroke-width="1"/>
-                <text x="63" y="139" class="diagram-text-accent" font-size="7.5" font-weight="bold" font-family="sans-serif" text-anchor="middle">ZIP Archive Container</text>
+                <rect x="0" y="128" width="126" height="16" rx="3" fill="#EEF2FF" stroke="#4F46E5" class="diagram-badge-accent" stroke-width="1"/>
+                <text x="63" y="139" fill="#4F46E5" class="diagram-text-accent" font-size="7.5" font-weight="bold" font-family="sans-serif" text-anchor="middle">ZIP Archive Container</text>
               </g>
             </g>
           </svg>
@@ -402,36 +402,36 @@ export class DashboardComponent {
               <circle cx="85" cy="67" r="4.5" fill="#EF4444"/>
               <circle cx="85" cy="67" r="1.5" fill="#FFFFFF"/>
 
-              <text x="94" y="60" class="diagram-text-danger" font-size="9" font-weight="bold" font-family="monospace">Centroid</text>
+              <text x="94" y="60" fill="#DC2626" class="diagram-text-danger" font-size="9" font-weight="bold" font-family="monospace">Centroid</text>
 
               <!-- Extents Labels -->
-              <text x="45" y="-8" class="diagram-text-muted" font-size="8" font-family="monospace">Lat Max: -6.1750°</text>
-              <text x="45" y="148" class="diagram-text-muted" font-size="8" font-family="monospace">Lat Min: -6.2150°</text>
-              <text x="-40" y="71" class="diagram-text-muted" font-size="7.5" font-family="monospace">Lon Min</text>
-              <text x="176" y="71" class="diagram-text-muted" font-size="7.5" font-family="monospace">Lon Max</text>
+              <text x="45" y="-8" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="monospace">Lat Max: -6.1750°</text>
+              <text x="45" y="148" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="monospace">Lat Min: -6.2150°</text>
+              <text x="-40" y="71" fill="#64748B" class="diagram-text-muted" font-size="7.5" font-family="monospace">Lon Min</text>
+              <text x="176" y="71" fill="#64748B" class="diagram-text-muted" font-size="7.5" font-family="monospace">Lon Max</text>
             </g>
 
             <!-- Decoded Data Preview Card -->
             <g transform="translate(250, 25)">
-              <rect width="154" height="180" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect width="154" height="180" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
-              <rect x="0" y="0" width="154" height="28" rx="5" class="diagram-header-primary"/>
+              <rect x="0" y="0" width="154" height="28" rx="5" fill="#0284C7" class="diagram-header-primary"/>
               <text x="12" y="19" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="monospace">TOKEN: "qqguw5"</text>
 
               <g transform="translate(12, 42)">
-                <text x="0" y="0" class="diagram-text-muted" font-size="7.5">DECODED CENTROID:</text>
-                <text x="0" y="15" class="diagram-text-primary" font-size="11" font-weight="bold" font-family="monospace">-6.195000° S</text>
-                <text x="0" y="30" class="diagram-text-primary" font-size="11" font-weight="bold" font-family="monospace">106.828125° E</text>
+                <text x="0" y="0" fill="#64748B" class="diagram-text-muted" font-size="7.5">DECODED CENTROID:</text>
+                <text x="0" y="15" fill="#0284C7" class="diagram-text-primary" font-size="11" font-weight="bold" font-family="monospace">-6.195000° S</text>
+                <text x="0" y="30" fill="#0284C7" class="diagram-text-primary" font-size="11" font-weight="bold" font-family="monospace">106.828125° E</text>
 
-                <line x1="0" y1="40" x2="130" y2="40" class="diagram-divider"/>
+                <line x1="0" y1="40" x2="130" y2="40" stroke="#E2E8F0" class="diagram-divider"/>
 
-                <text x="0" y="54" class="diagram-text-success" font-size="8" font-weight="600" font-family="monospace">± 0.02° Precision</text>
-                <text x="0" y="68" class="diagram-text-body" font-size="8" font-family="monospace">Area: ~4.9 × 4.9 km</text>
-                <text x="0" y="82" class="diagram-text-body" font-size="8" font-family="monospace">Bits: 30-bit Decoded</text>
-                <text x="0" y="96" class="diagram-text-body" font-size="8" font-family="monospace">Datum: WGS84 Geodetic</text>
+                <text x="0" y="54" fill="#15803D" class="diagram-text-success" font-size="8" font-weight="600" font-family="monospace">± 0.02° Precision</text>
+                <text x="0" y="68" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Area: ~4.9 × 4.9 km</text>
+                <text x="0" y="82" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Bits: 30-bit Decoded</text>
+                <text x="0" y="96" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">Datum: WGS84 Geodetic</text>
 
-                <rect x="0" y="106" width="130" height="18" rx="3" class="diagram-badge-success" stroke-width="1"/>
-                <text x="65" y="118" class="diagram-text-success" font-size="7.5" font-weight="bold" font-family="sans-serif" text-anchor="middle">✓ Bounding Box Enclosed</text>
+                <rect x="0" y="106" width="130" height="18" rx="3" fill="#DCFCE7" stroke="#16A34A" class="diagram-badge-success" stroke-width="1"/>
+                <text x="65" y="118" fill="#15803D" class="diagram-text-success" font-size="7.5" font-weight="bold" font-family="sans-serif" text-anchor="middle">✓ Bounding Box Enclosed</text>
               </g>
             </g>
           </svg>
@@ -450,11 +450,11 @@ export class DashboardComponent {
           <svg viewBox="0 0 420 230" width="100%" height="230" xmlns="http://www.w3.org/2000/svg" class="diagram-canvas">
             <!-- Coordinate Point on Earth Grid -->
             <g transform="translate(18, 20)">
-              <rect width="174" height="190" rx="6" class="diagram-panel"/>
+              <rect width="174" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel"/>
               
               <!-- Concentric Rings -->
-              <circle cx="87" cy="78" r="55" fill="none" class="diagram-grid" stroke-dasharray="3 3"/>
-              <circle cx="87" cy="78" r="38" fill="none" class="diagram-grid" stroke-dasharray="2 2"/>
+              <circle cx="87" cy="78" r="55" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="3 3"/>
+              <circle cx="87" cy="78" r="38" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
               <circle cx="87" cy="78" r="22" fill="#6366F1" fill-opacity="0.12"/>
               <circle cx="87" cy="78" r="22" fill="none" stroke="#6366F1" stroke-width="1.2"/>
               <circle cx="87" cy="78" r="4.5" fill="#4F46E5"/>
@@ -465,41 +465,41 @@ export class DashboardComponent {
               <line x1="27" y1="78" x2="147" y2="78" stroke="#6366F1" stroke-width="1.2" stroke-dasharray="2 2"/>
 
               <!-- Coordinate Badge -->
-              <rect x="14" y="150" width="146" height="24" rx="4" class="diagram-panel-subtle"/>
-              <text x="87" y="166" class="diagram-text-title" font-size="8.5" font-weight="600" font-family="monospace" text-anchor="middle">-6.2088°, 106.8456°</text>
+              <rect x="14" y="150" width="146" height="24" rx="4" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle"/>
+              <text x="87" y="166" fill="#0F172A" class="diagram-text-title" font-size="8.5" font-weight="600" font-family="monospace" text-anchor="middle">-6.2088°, 106.8456°</text>
             </g>
 
             <!-- Encoding Pipeline Card -->
             <g transform="translate(204, 20)">
-              <rect width="198" height="190" rx="6" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
+              <rect width="198" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
-              <text x="14" y="24" class="diagram-text-title" font-size="10.5" font-weight="bold" font-family="sans-serif">⚡ Geohash Pipeline</text>
-              <line x1="14" y1="32" x2="184" y2="32" class="diagram-divider"/>
+              <text x="14" y="24" fill="#0F172A" class="diagram-text-title" font-size="10.5" font-weight="bold" font-family="sans-serif">⚡ Geohash Pipeline</text>
+              <line x1="14" y1="32" x2="184" y2="32" stroke="#E2E8F0" class="diagram-divider"/>
 
               <!-- Precision Bar -->
-              <text x="14" y="48" class="diagram-text-muted" font-size="8" font-family="sans-serif">Precision Scale: Level 7 / 12</text>
+              <text x="14" y="48" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="sans-serif">Precision Scale: Level 7 / 12</text>
               
               <!-- Segmented meter (7 active, 5 muted) -->
               <g transform="translate(14, 54)">
-                <rect x="0" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="24" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="48" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="72" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="96" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="120" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
-                <rect x="144" y="0" width="20" height="6" rx="2" class="diagram-meter-active"/>
+                <rect x="0" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="24" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="48" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="72" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="96" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="120" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
+                <rect x="144" y="0" width="20" height="6" rx="2" fill="#4F46E5" class="diagram-meter-active"/>
               </g>
 
               <!-- Base-32 Geohash Token Output Container -->
-              <text x="14" y="80" class="diagram-text-muted" font-size="8" font-family="sans-serif">Base-32 Geohash Token:</text>
-              <rect x="14" y="86" width="170" height="34" rx="5" class="diagram-badge-accent" stroke-width="1.5"/>
-              <text x="99" y="108" class="diagram-text-accent" font-size="14" font-weight="bold" font-family="monospace" text-anchor="middle" letter-spacing="1.5">qqguw7k</text>
+              <text x="14" y="80" fill="#64748B" class="diagram-text-muted" font-size="8" font-family="sans-serif">Base-32 Geohash Token:</text>
+              <rect x="14" y="86" width="170" height="34" rx="5" fill="#EEF2FF" stroke="#4F46E5" class="diagram-badge-accent" stroke-width="1.5"/>
+              <text x="99" y="108" fill="#4F46E5" class="diagram-text-accent" font-size="14" font-weight="bold" font-family="monospace" text-anchor="middle" letter-spacing="1.5">qqguw7k</text>
 
               <!-- Specifications Box -->
-              <rect x="14" y="128" width="170" height="50" rx="4" class="diagram-panel-subtle"/>
-              <text x="22" y="142" class="diagram-text-success" font-size="8" font-weight="600" font-family="monospace">• Cell: ~153 × 153 m</text>
-              <text x="22" y="155" class="diagram-text-body" font-size="8" font-family="monospace">• Bits: 35-bit Interleaved</text>
-              <text x="22" y="168" class="diagram-text-body" font-size="8" font-family="monospace">• Datum: WGS84 Standard</text>
+              <rect x="14" y="128" width="170" height="50" rx="4" fill="#F8FAFC" stroke="#E2E8F0" class="diagram-panel-subtle"/>
+              <text x="22" y="142" fill="#15803D" class="diagram-text-success" font-size="8" font-weight="600" font-family="monospace">• Cell: ~153 × 153 m</text>
+              <text x="22" y="155" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">• Bits: 35-bit Interleaved</text>
+              <text x="22" y="168" fill="#334155" class="diagram-text-body" font-size="8" font-family="monospace">• Datum: WGS84 Standard</text>
             </g>
           </svg>
         `
