@@ -550,6 +550,41 @@ def test_sidebar_brand_header_and_vector_toggle():
     assert "<svg" in res_icon.text
     assert "#1E293B" not in res_icon.text
 
+def test_micro_badge_pill_and_slideshow_contrast_audit():
+    # 1. Sidebar brand version scaled down to compact micro-badge
+    res_comp = client.get("/static/css/components.css")
+    assert res_comp.status_code == 200
+    assert "font-size: 0.6rem;" in res_comp.text
+    assert "padding: 1px 6px;" in res_comp.text
+
+    # 2. Theme-adaptive diagram text tokens defined in CSS for light & dark modes
+    res_app = client.get("/static/css/app.css")
+    assert res_app.status_code == 200
+    assert 'html[data-theme="dark"] .diagram-text-muted' in res_app.text
+    assert 'html[data-theme="dark"] .diagram-text-primary' in res_app.text
+    assert 'html[data-theme="dark"] .diagram-text-success' in res_app.text
+    assert 'html[data-theme="dark"] .diagram-text-accent' in res_app.text
+    assert 'html[data-theme="dark"] .diagram-text-warning' in res_app.text
+    assert 'html[data-theme="dark"] .diagram-text-danger' in res_app.text
+
+    # 3. High-contrast values verified for dark mode readability
+    assert "#94a3b8" in res_app.text  # muted text in dark mode (> 4.5:1 contrast)
+    assert "#38bdf8" in res_app.text  # primary text in dark mode
+    assert "#4ade80" in res_app.text  # success text in dark mode
+    assert "#f87171" in res_app.text  # danger text in dark mode
+
+    # 4. Slideshow diagram SVGs use theme-adaptive classes rather than unstyled/hardcoded dark fills
+    res_dash = client.get("/static/js/components/dashboard.js")
+    assert res_dash.status_code == 200
+    assert "diagram-text-primary" in res_dash.text
+    assert "diagram-text-accent" in res_dash.text
+    assert "diagram-text-success" in res_dash.text
+    assert "diagram-text-danger" in res_dash.text
+    assert "diagram-header-primary" in res_dash.text
+    assert "diagram-header-success" in res_dash.text
+    assert "diagram-header-accent" in res_dash.text
+
+
 
 
 

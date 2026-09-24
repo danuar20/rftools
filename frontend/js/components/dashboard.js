@@ -245,7 +245,7 @@ export class DashboardComponent {
 
               <!-- Distance Badge Pills -->
               <g transform="translate(48, -35)">
-                <rect x="-30" y="-9" width="60" height="17" rx="8" fill="#0284C7"/>
+                <rect x="-30" y="-9" width="60" height="17" rx="8" class="diagram-header-primary"/>
                 <text x="0" y="3" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">428.5 m</text>
               </g>
 
@@ -277,7 +277,7 @@ export class DashboardComponent {
             <g transform="translate(262, 16)">
               <rect width="144" height="40" rx="6" class="diagram-panel"/>
               <text x="10" y="16" class="diagram-text-muted" font-size="7.5" font-family="sans-serif">Distance Unit Active:</text>
-              <rect x="10" y="21" width="58" height="15" rx="3" fill="#0284C7"/>
+              <rect x="10" y="21" width="58" height="15" rx="3" class="diagram-header-primary"/>
               <text x="39" y="32" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="monospace" text-anchor="middle">Meters</text>
               <rect x="74" y="21" width="58" height="15" rx="3" class="diagram-panel-subtle"/>
               <text x="103" y="32" class="diagram-text-muted" font-size="8" font-weight="600" font-family="monospace" text-anchor="middle">Km (km)</text>
