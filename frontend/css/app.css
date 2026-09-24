@@ -1397,7 +1397,7 @@ html[data-theme="dark"] .diagram-grid {
 }
 
 .diagram-axis {
-  stroke: var(--color-border-default);
+  stroke: var(--color-border-default, #cbd5e1);
 }
 
 html[data-theme="light"] .diagram-axis {
@@ -1409,8 +1409,8 @@ html[data-theme="dark"] .diagram-axis {
 }
 
 .diagram-panel {
-  fill: var(--color-bg-surface);
-  stroke: var(--color-border-default);
+  fill: var(--color-bg-surface, #ffffff);
+  stroke: var(--color-border-default, #e2e8f0);
 }
 
 html[data-theme="light"] .diagram-panel {
@@ -1424,8 +1424,8 @@ html[data-theme="dark"] .diagram-panel {
 }
 
 .diagram-panel-subtle {
-  fill: var(--color-bg-sunken);
-  stroke: var(--color-border-subtle);
+  fill: var(--color-bg-sunken, #f8fafc);
+  stroke: var(--color-border-subtle, #e2e8f0);
 }
 
 html[data-theme="light"] .diagram-panel-subtle {
@@ -1439,7 +1439,7 @@ html[data-theme="dark"] .diagram-panel-subtle {
 }
 
 .diagram-text-title {
-  fill: var(--color-text-primary);
+  fill: var(--color-text-primary, #0f172a);
   font-family: var(--font-sans);
 }
 
@@ -1452,7 +1452,7 @@ html[data-theme="dark"] .diagram-text-title {
 }
 
 .diagram-text-body {
-  fill: var(--color-text-secondary);
+  fill: var(--color-text-secondary, #334155);
   font-family: var(--font-sans);
 }
 
@@ -1465,7 +1465,7 @@ html[data-theme="dark"] .diagram-text-body {
 }
 
 .diagram-text-mono {
-  fill: var(--color-text-secondary);
+  fill: var(--color-text-secondary, #334155);
   font-family: var(--font-mono);
 }
 
@@ -1478,7 +1478,7 @@ html[data-theme="dark"] .diagram-text-mono {
 }
 
 .diagram-text-muted {
-  fill: var(--color-text-muted);
+  fill: var(--color-text-muted, #64748b);
   font-family: var(--font-mono);
 }
 
@@ -1491,7 +1491,7 @@ html[data-theme="dark"] .diagram-text-muted {
 }
 
 .diagram-text-primary {
-  fill: var(--color-primary);
+  fill: var(--color-primary, #0284c7);
   font-family: var(--font-mono);
 }
 
@@ -1504,7 +1504,7 @@ html[data-theme="dark"] .diagram-text-primary {
 }
 
 .diagram-text-success {
-  fill: var(--color-accent-emerald);
+  fill: var(--color-accent-emerald, #15803d);
   font-family: var(--font-mono);
 }
 
@@ -1517,7 +1517,7 @@ html[data-theme="dark"] .diagram-text-success {
 }
 
 .diagram-text-accent {
-  fill: var(--color-accent-indigo);
+  fill: var(--color-accent-indigo, #4f46e5);
   font-family: var(--font-mono);
 }
 
@@ -1530,7 +1530,7 @@ html[data-theme="dark"] .diagram-text-accent {
 }
 
 .diagram-text-warning {
-  fill: var(--color-status-warning);
+  fill: var(--color-status-warning, #b45309);
   font-family: var(--font-mono);
 }
 
@@ -1543,7 +1543,7 @@ html[data-theme="dark"] .diagram-text-warning {
 }
 
 .diagram-text-danger {
-  fill: var(--color-status-danger);
+  fill: var(--color-status-danger, #dc2626);
   font-family: var(--font-mono);
 }
 
