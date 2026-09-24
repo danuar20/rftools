@@ -29,7 +29,9 @@ export class SidebarComponent {
           <img src="/assets/icons/rf-logo.svg" alt="RF Tools-Telco" class="sidebar__logo">
           <div class="sidebar__brand-text">
             <span class="sidebar__brand-title">RF Tools-Telco</span>
-            <span class="sidebar__brand-version">version v1.0.0</span>
+            <div class="sidebar__brand-meta">
+              <span class="sidebar__brand-version">version v1.0.0</span>
+            </div>
           </div>
         </a>
       </div>
@@ -132,7 +134,13 @@ export class SidebarComponent {
       <!-- Sidebar Footer (Refined User-Friendly Toggle Button) -->
       <div class="sidebar__footer">
         <button class="sidebar__toggle" id="sidebar-toggle-btn" title="${state.t('toggle_sidebar')}" aria-label="${state.t('toggle_sidebar')}">
-          <span class="sidebar__toggle-icon">${isCollapsed ? '▶' : '◀'}</span>
+          <span class="sidebar__toggle-icon">
+            <svg class="sidebar__toggle-svg" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="2.5" width="15" height="15" rx="3" stroke-width="1.5"/>
+              <path d="M7.5 2.5V17.5" stroke-width="1.5"/>
+              ${isCollapsed ? '<path d="M11 8L13.5 10.5L11 13"/>' : '<path d="M13.5 8L11 10.5L13.5 13"/>'}
+            </svg>
+          </span>
           ${isCollapsed ? '' : `<span class="sidebar__toggle-label">${state.lang === 'id' ? 'Ciutkan Menu' : 'Collapse Sidebar'}</span>`}
         </button>
       </div>

@@ -451,7 +451,8 @@ def test_suite_icons_isd_calculator_design():
     res = client.get("/assets/icons/tool-isd-calculator.svg")
     assert res.status_code == 200
     assert "stroke-dasharray=\"2 2\"" in res.text
-    assert "&Delta;d" in res.text
+    assert "Δd" in res.text
+    assert "&Delta;" not in res.text
     assert "#10B981" in res.text
 
 def test_suite_icons_geohash_to_shp_design():
@@ -524,6 +525,30 @@ def test_theme_adaptive_icon_containers():
     res_comp = client.get("/static/css/components.css")
     assert res_comp.status_code == 200
     assert ".rf-card-tool__icon" in res_comp.text
+
+def test_sidebar_brand_header_and_vector_toggle():
+    res_side = client.get("/static/js/components/sidebar.js")
+    assert res_side.status_code == 200
+    # Brand header has prominent title and badge pill
+    assert "sidebar__brand-title" in res_side.text
+    assert "sidebar__brand-meta" in res_side.text
+    assert "sidebar__brand-version" in res_side.text
+    # Toggle button uses modern SVG vector icon instead of plain text triangle
+    assert "sidebar__toggle-svg" in res_side.text
+    assert "${isCollapsed ? '▶' : '◀'}" not in res_side.text
+
+    # CSS provides micro-badge pill and toggle styling
+    res_css = client.get("/static/css/components.css")
+    assert res_css.status_code == 200
+    assert ".sidebar__brand-version" in res_css.text
+    assert "border-radius: var(--rounded-full" in res_css.text
+    assert ".sidebar__toggle-svg" in res_css.text
+
+    # SVG toggle icon file exists and has valid XML
+    res_icon = client.get("/assets/icons/sidebar-toggle.svg")
+    assert res_icon.status_code == 200
+    assert "<svg" in res_icon.text
+    assert "#1E293B" not in res_icon.text
 
 
 
