@@ -618,3 +618,47 @@ def test_slideshow_explicit_presentation_fallbacks_and_cachebusters():
 
 
 
+
+
+def test_coverage_suite_icons():
+    # 1. nav-coverage.svg
+    res_nav = client.get("/assets/icons/nav-coverage.svg")
+    assert res_nav.status_code == 200
+    assert "<svg" in res_nav.text
+    assert "#0284C7" in res_nav.text
+
+    # 2. tool-coverage-simulation.svg
+    res_cov = client.get("/assets/icons/tool-coverage-simulation.svg")
+    assert res_cov.status_code == 200
+    assert "<svg" in res_cov.text
+    assert "ellipse" in res_cov.text
+
+    # 3. tool-okumura-hata.svg
+    res_hata = client.get("/assets/icons/tool-okumura-hata.svg")
+    assert res_hata.status_code == 200
+    assert "<svg" in res_hata.text
+    assert "#0284C7" in res_hata.text
+
+    # 4. tool-nettilt3d.svg and alias tool-nettilt-3d.svg
+    res_tilt = client.get("/assets/icons/tool-nettilt3d.svg")
+    assert res_tilt.status_code == 200
+    assert "<svg" in res_tilt.text
+    res_tilt_alias = client.get("/assets/icons/tool-nettilt-3d.svg")
+    assert res_tilt_alias.status_code == 200
+    assert "<svg" in res_tilt_alias.text
+
+def test_coverage_design_tokens_and_components():
+    res_tokens = client.get("/static/css/tokens.css")
+    assert res_tokens.status_code == 200
+    assert "--color-coverage-excellent" in res_tokens.text
+    assert "--color-tilt-mechanical" in res_tokens.text
+    assert "--color-env-urban" in res_tokens.text
+
+    res_comp = client.get("/static/css/components.css")
+    assert res_comp.status_code == 200
+    assert ".rf-coverage-grid" in res_comp.text
+    assert ".rf-metric-card" in res_comp.text
+    assert ".rf-env-selector" in res_comp.text
+    assert ".rf-tilt-badge" in res_comp.text
+    assert ".rf-coverage-chip" in res_comp.text
+    assert ".rf-coverage-canvas-frame" in res_comp.text

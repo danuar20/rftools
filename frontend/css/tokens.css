@@ -79,6 +79,38 @@ html[data-theme="light"] {
   --kpi-border-red: #fecaca;
   --kpi-text-red: #b91c1c;
 
+  /* RF Coverage & Propagation Standards (Light Mode) */
+  --color-coverage-excellent: #15803d;
+  --color-coverage-good: #0284c7;
+  --color-coverage-fair: #b45309;
+  --color-coverage-poor: #c2410c;
+  --color-coverage-bad: #b91c1c;
+
+  --coverage-bg-excellent: #f0fdf4;
+  --coverage-border-excellent: #bbf7d0;
+  --coverage-bg-good: #f0f9ff;
+  --coverage-border-good: #bae6fd;
+  --coverage-bg-fair: #fffbeb;
+  --coverage-border-fair: #fde68a;
+  --coverage-bg-poor: #fff7ed;
+  --coverage-border-poor: #fed7aa;
+  --coverage-bg-bad: #fef2f2;
+  --coverage-border-bad: #fecaca;
+
+  /* Antenna Tilt Geometric Channels */
+  --color-tilt-mechanical: #d97706;
+  --color-tilt-electrical: #0284c7;
+  --color-tilt-net: #4f46e5;
+  --color-tilt-boresight: #dc2626;
+
+  /* Propagation Environment Typologies */
+  --color-env-urban: #4f46e5;
+  --color-env-suburban: #0284c7;
+  --color-env-rural: #059669;
+  --env-bg-urban: #eef2ff;
+  --env-bg-suburban: #f0f9ff;
+  --env-bg-rural: #ecfdf5;
+
   /* Spacing Scale (4px baseline) */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -181,6 +213,38 @@ html[data-theme="dark"] {
   --kpi-bg-red: rgba(239, 68, 68, 0.15);
   --kpi-border-red: rgba(239, 68, 68, 0.35);
   --kpi-text-red: #f87171;
+
+  /* RF Coverage & Propagation Standards (Dark Mode) */
+  --color-coverage-excellent: #4ade80;
+  --color-coverage-good: #38bdf8;
+  --color-coverage-fair: #fbbf24;
+  --color-coverage-poor: #fb923c;
+  --color-coverage-bad: #f87171;
+
+  --coverage-bg-excellent: rgba(34, 197, 94, 0.12);
+  --coverage-border-excellent: rgba(34, 197, 94, 0.3);
+  --coverage-bg-good: rgba(56, 189, 248, 0.12);
+  --coverage-border-good: rgba(56, 189, 248, 0.3);
+  --coverage-bg-fair: rgba(245, 158, 11, 0.12);
+  --coverage-border-fair: rgba(245, 158, 11, 0.3);
+  --coverage-bg-poor: rgba(234, 88, 12, 0.12);
+  --coverage-border-poor: rgba(234, 88, 12, 0.3);
+  --coverage-bg-bad: rgba(239, 68, 68, 0.15);
+  --coverage-border-bad: rgba(239, 68, 68, 0.35);
+
+  /* Antenna Tilt Channels (Dark Mode) */
+  --color-tilt-mechanical: #fbbf24;
+  --color-tilt-electrical: #38bdf8;
+  --color-tilt-net: #818cf8;
+  --color-tilt-boresight: #f87171;
+
+  /* Propagation Environment Typologies (Dark Mode) */
+  --color-env-urban: #a5b4fc;
+  --color-env-suburban: #38bdf8;
+  --color-env-rural: #34d399;
+  --env-bg-urban: rgba(79, 70, 229, 0.15);
+  --env-bg-suburban: rgba(2, 132, 199, 0.15);
+  --env-bg-rural: rgba(5, 150, 105, 0.15);
 
   /* Refined Elevation Shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);

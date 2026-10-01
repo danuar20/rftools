@@ -1315,4 +1315,195 @@ html[data-theme="dark"] .diagram-meter-subtle { fill: #334155; }
 html[data-theme="light"] .diagram-divider { stroke: #e2e8f0; }
 html[data-theme="dark"] .diagram-divider { stroke: #334155; }
 
+/* ==========================================================================
+   RF Coverage & Propagation Simulation Standards
+   ========================================================================== */
+
+/* Coverage Metric Tiles & Grid */
+.rf-coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.rf-metric-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rf-metric-card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-xs);
+}
+
+.rf-metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rf-metric-card__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.rf-metric-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.rf-metric-card__unit {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-left: 3px;
+}
+
+.rf-metric-card__meta {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+/* Environment Type Segmented Selector */
+.rf-env-selector {
+  display: flex;
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.rf-env-option {
+  flex: 1;
+  text-align: center;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: var(--rounded-xs);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.rf-env-option--active {
+  background-color: var(--color-bg-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Tilt Parameter Visual Badges */
+.rf-tilt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--rounded-xs);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.rf-tilt-badge--mech {
+  background-color: var(--coverage-bg-fair);
+  border: 1px solid var(--coverage-border-fair);
+  color: var(--color-tilt-mechanical);
+}
+
+.rf-tilt-badge--elec {
+  background-color: var(--coverage-bg-good);
+  border: 1px solid var(--coverage-border-good);
+  color: var(--color-tilt-electrical);
+}
+
+.rf-tilt-badge--net {
+  background-color: var(--env-bg-urban);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  color: var(--color-tilt-net);
+}
+
+/* Coverage Signal & Path Loss Badges */
+.rf-coverage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--rounded-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.rf-coverage-chip--excellent {
+  background-color: var(--coverage-bg-excellent);
+  border: 1px solid var(--coverage-border-excellent);
+  color: var(--color-coverage-excellent);
+}
+
+.rf-coverage-chip--good {
+  background-color: var(--coverage-bg-good);
+  border: 1px solid var(--coverage-border-good);
+  color: var(--color-coverage-good);
+}
+
+.rf-coverage-chip--fair {
+  background-color: var(--coverage-bg-fair);
+  border: 1px solid var(--coverage-border-fair);
+  color: var(--color-coverage-fair);
+}
+
+.rf-coverage-chip--poor {
+  background-color: var(--coverage-bg-poor);
+  border: 1px solid var(--coverage-border-poor);
+  color: var(--color-coverage-poor);
+}
+
+.rf-coverage-chip--bad {
+  background-color: var(--coverage-bg-bad);
+  border: 1px solid var(--coverage-border-bad);
+  color: var(--color-coverage-bad);
+}
+
+/* Interactive Coverage & Tilt Visualization Canvas Frame */
+.rf-coverage-canvas-frame {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rf-coverage-canvas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: var(--color-bg-sunken);
+  border-bottom: 1px solid var(--color-border-default);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+
 
