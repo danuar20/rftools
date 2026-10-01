@@ -708,6 +708,48 @@ def test_coverage_workspace_components_and_visualizers():
     assert "bindNetTilt3D" in ws_text
 
 
+def test_sidebar_hierarchy_and_coverage_telemetry_refinements():
+    # 1. Sidebar section headers with counts and item domain badges
+    res_sb = client.get("/static/js/components/sidebar.js")
+    assert res_sb.status_code == 200
+    sb_text = res_sb.text
+    assert "sidebar__section-header" in sb_text
+    assert "sidebar__section-count" in sb_text
+    assert "sidebar__link-badge" in sb_text
+    assert "sidebar__link-badge--primary" in sb_text
+    assert "sidebar__link-badge--success" in sb_text
+    assert "sidebar__link-badge--accent" in sb_text
+    assert "sidebar__link-badge--info" in sb_text
+
+    # 2. Components CSS has refined sidebar hierarchy and coverage telemetry styles
+    res_css = client.get("/static/css/components.css")
+    assert res_css.status_code == 200
+    css_text = res_css.text
+    assert ".sidebar__section-header" in css_text
+    assert ".sidebar__section-count" in css_text
+    assert ".sidebar__link-badge" in css_text
+    assert ".rf-cov-presets" in css_text
+    assert ".rf-cov-preset-pill" in css_text
+    assert ".rf-cov-fieldset" in css_text
+    assert ".rf-cov-legend" in css_text
+    assert ".rf-watt-badge" in css_text
+    assert ".rf-band-presets" in css_text
+
+    # 3. Workspace has coverage telemetry presets, fieldsets, and watt badge
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+    assert "LIVE DOWNTILT ENGINE" in ws_text
+    assert "EMPIRICAL PROPAGATION" in ws_text
+    assert "3D RET OPTIMIZER" in ws_text
+    assert 'data-preset="dense"' in ws_text
+    assert 'data-preset="macro"' in ws_text
+    assert 'data-band="750"' in ws_text
+    assert 'data-target-dist="250"' in ws_text
+    assert "oh-watt-display" in ws_text
+
+
+
 
 
 

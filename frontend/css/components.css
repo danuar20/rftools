@@ -1777,6 +1777,195 @@ html[data-theme="dark"] .diagram-divider { stroke: #334155; }
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
+/* Sidebar Section Headers & Item Domain Badges */
+.sidebar__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin-bottom: 6px;
+}
+
+.sidebar__section-header .sidebar__section-title {
+  padding: 0;
+  margin-bottom: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.sidebar__section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  border-radius: 9999px;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-subtle);
+  line-height: 1;
+}
+
+.sidebar--collapsed .sidebar__section-header {
+  display: none;
+}
+
+.sidebar__link-badge {
+  margin-left: auto;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 1.5px 5.5px;
+  border-radius: var(--rounded-xs, 4px);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-subtle);
+  line-height: 1.1;
+  font-family: var(--font-mono, monospace);
+  transition: all 0.15s ease;
+}
+
+.sidebar__link-badge--primary {
+  background-color: rgba(2, 132, 199, 0.1);
+  color: var(--color-primary);
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+.sidebar__link-badge--success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.sidebar__link-badge--accent {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.sidebar__link-badge--info {
+  background-color: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.sidebar__link--active .sidebar__link-badge {
+  background-color: var(--color-primary);
+  color: var(--color-text-white, #ffffff);
+  border-color: var(--color-primary);
+}
+
+.sidebar--collapsed .sidebar__link-badge {
+  display: none;
+}
+
+/* Coverage Telemetry Helpers & Presets */
+.rf-cov-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.rf-cov-preset-pill {
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border-radius: var(--rounded-full);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rf-cov-preset-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(2, 132, 199, 0.06);
+}
+
+.rf-cov-preset-pill--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.rf-cov-fieldset {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-md);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background-color: var(--color-bg-surface);
+}
+
+.rf-cov-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.rf-watt-badge {
+  font-size: 0.72rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--rounded-xs, 4px);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+
+.rf-band-presets {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.rf-cov-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--rounded-full, 9999px);
+  background-color: rgba(2, 132, 199, 0.1);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  color: var(--color-primary, #0284c7);
+}
+
+.rf-cov-status-chip--pulse::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+
+
+
+
 
 
 

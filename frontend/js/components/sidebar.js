@@ -40,7 +40,10 @@ export class SidebarComponent {
       <nav class="sidebar__nav">
         <!-- Section: Overview -->
         <div>
-          <div class="sidebar__section-title">${state.t('nav_overview')}</div>
+          <div class="sidebar__section-header">
+            <span class="sidebar__section-title">${state.t('nav_overview')}</span>
+            <span class="sidebar__section-count">1</span>
+          </div>
           <ul class="sidebar__menu">
             <li>
               <a href="#dashboard" class="sidebar__link ${currentRoute === 'dashboard' ? 'sidebar__link--active' : ''}" title="${state.t('nav_dashboard')}">
@@ -48,6 +51,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/nav-dashboard.svg" alt="${state.t('nav_dashboard')}">
                 </span>
                 <span class="sidebar__link-text">${state.t('nav_dashboard')}</span>
+                <span class="sidebar__link-badge">HUB</span>
               </a>
             </li>
           </ul>
@@ -55,7 +59,10 @@ export class SidebarComponent {
 
         <!-- Section: KML & Visualization -->
         <div>
-          <div class="sidebar__section-title">${state.t('nav_kml')}</div>
+          <div class="sidebar__section-header">
+            <span class="sidebar__section-title">${state.t('nav_kml')}</span>
+            <span class="sidebar__section-count">2</span>
+          </div>
           <ul class="sidebar__menu">
             <li>
               <a href="#tool-excel-to-kml" class="sidebar__link ${currentRoute === 'tool-excel-to-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_excel_to_kml_title')}">
@@ -63,6 +70,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-excel-to-kml.svg" alt="Point KML">
                 </span>
                 <span class="sidebar__link-text">Excel &rarr; Point KML</span>
+                <span class="sidebar__link-badge">KML</span>
               </a>
             </li>
             <li>
@@ -71,6 +79,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-prb-kml.svg" alt="PRB KML">
                 </span>
                 <span class="sidebar__link-text">Excel &rarr; PRB 3D Sector</span>
+                <span class="sidebar__link-badge sidebar__link-badge--accent">3D</span>
               </a>
             </li>
           </ul>
@@ -78,7 +87,10 @@ export class SidebarComponent {
 
         <!-- Section: Network Topology & ISD -->
         <div>
-          <div class="sidebar__section-title">${state.t('nav_topology')}</div>
+          <div class="sidebar__section-header">
+            <span class="sidebar__section-title">${state.t('nav_topology')}</span>
+            <span class="sidebar__section-count">1</span>
+          </div>
           <ul class="sidebar__menu">
             <li>
               <a href="#tool-isd-calculator" class="sidebar__link ${currentRoute === 'tool-isd-calculator' ? 'sidebar__link--active' : ''}" title="${state.t('tool_isd_calculator_title')}">
@@ -86,6 +98,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-isd-calculator.svg" alt="ISD">
                 </span>
                 <span class="sidebar__link-text">ISD Calculator</span>
+                <span class="sidebar__link-badge">GEO</span>
               </a>
             </li>
           </ul>
@@ -93,7 +106,10 @@ export class SidebarComponent {
 
         <!-- Section: Coverage & Propagation -->
         <div>
-          <div class="sidebar__section-title">${state.t('nav_coverage')}</div>
+          <div class="sidebar__section-header">
+            <span class="sidebar__section-title">${state.t('nav_coverage')}</span>
+            <span class="sidebar__section-count">3</span>
+          </div>
           <ul class="sidebar__menu">
             <li>
               <a href="#tool-coverage-simulation" class="sidebar__link ${currentRoute === 'tool-coverage-simulation' ? 'sidebar__link--active' : ''}" title="${state.t('tool_coverage_simulation_title', 'Coverage Simulation')}">
@@ -101,7 +117,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-coverage-simulation.svg" alt="Coverage Simulation">
                 </span>
                 <span class="sidebar__link-text">Coverage Simulation</span>
-                <span class="sidebar__badge sidebar__badge--new">NEW</span>
+                <span class="sidebar__badge sidebar__badge--new sidebar__link-badge sidebar__link-badge--primary">NEW</span>
               </a>
             </li>
             <li>
@@ -110,7 +126,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-okumura-hata.svg" alt="Okumura-Hata">
                 </span>
                 <span class="sidebar__link-text">Okumura-Hata Model</span>
-                <span class="sidebar__badge sidebar__badge--new">NEW</span>
+                <span class="sidebar__badge sidebar__badge--new sidebar__link-badge sidebar__link-badge--success">NEW</span>
               </a>
             </li>
             <li>
@@ -119,7 +135,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-nettilt-3d.svg" alt="NetTilt 3D">
                 </span>
                 <span class="sidebar__link-text">NetTilt 3D</span>
-                <span class="sidebar__badge sidebar__badge--pro">3D</span>
+                <span class="sidebar__badge sidebar__badge--pro sidebar__link-badge sidebar__link-badge--accent">3D</span>
               </a>
             </li>
           </ul>
@@ -127,7 +143,10 @@ export class SidebarComponent {
 
         <!-- Section: Geospatial & Geohash Utilities -->
         <div>
-          <div class="sidebar__section-title">${state.t('nav_gis')}</div>
+          <div class="sidebar__section-header">
+            <span class="sidebar__section-title">${state.t('nav_gis')}</span>
+            <span class="sidebar__section-count">4</span>
+          </div>
           <ul class="sidebar__menu">
             <li>
               <a href="#tool-geohash-converter" class="sidebar__link ${currentRoute === 'tool-geohash-converter' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_converter_title', 'Geohash Converter')}">
@@ -135,6 +154,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-geohash-converter.svg" alt="Geohash Converter">
                 </span>
                 <span class="sidebar__link-text">${state.t('tool_geohash_converter_title', 'Geohash Converter')}</span>
+                <span class="sidebar__link-badge sidebar__link-badge--info">B32</span>
               </a>
             </li>
             <li>
@@ -143,6 +163,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-geohash-to-shp.svg" alt="Geohash to SHP">
                 </span>
                 <span class="sidebar__link-text">Geohash &rarr; Shapefile</span>
+                <span class="sidebar__link-badge">SHP</span>
               </a>
             </li>
             <li>
@@ -151,6 +172,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-geohash-to-latlon.svg" alt="Decoder">
                 </span>
                 <span class="sidebar__link-text">Geohash &rarr; Lat / Long</span>
+                <span class="sidebar__link-badge">DEC</span>
               </a>
             </li>
             <li>
@@ -159,6 +181,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-latlon-to-geohash.svg" alt="Encoder">
                 </span>
                 <span class="sidebar__link-text">Lat / Long &rarr; Geohash</span>
+                <span class="sidebar__link-badge">ENC</span>
               </a>
             </li>
           </ul>
