@@ -2551,6 +2551,255 @@ html[data-theme="light"] .cov-chart-area {
   flex-shrink: 0;
 }
 
+/* ==========================================================================
+   NetTilt 3D & Interactive Map UI Controls
+   ========================================================================== */
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 14px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--rounded-sm, 6px);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-export:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--color-bg-sunken);
+  padding: 4px;
+  border-radius: var(--rounded-md, 8px);
+  border: 1px solid var(--color-border-subtle);
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: var(--rounded-xs, 4px);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.tab-btn.active,
+.tab-btn--active {
+  background: var(--color-bg-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.08));
+}
+
+html[data-theme="dark"] .tab-btn.active,
+html[data-theme="dark"] .tab-btn--active {
+  background: rgba(30, 30, 58, 0.9);
+  color: #38bdf8;
+}
+
+/* Layer Control on Map Canvas */
+.layer-control {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+}
+
+.layer-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm, 6px);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.layer-popup {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm, 6px);
+  padding: 6px;
+  box-shadow: var(--shadow-md);
+  min-width: 120px;
+}
+
+.layer-popup button {
+  padding: 4px 8px;
+  font-size: 11px;
+  text-align: left;
+  border-radius: var(--rounded-xs, 4px);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.layer-popup button.active {
+  background: rgba(2, 132, 199, 0.1);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Beam Control Overlay */
+.beam-control {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-md, 8px);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .beam-control {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.beam-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.beam-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.beam-check .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.beam-check .dot.near { background: #10b981; }
+.beam-check .dot.center { background: #0284c7; }
+.beam-check .dot.far { background: #ef4444; }
+
+/* Status Indicator */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-sm, 6px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.status-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* 3D Canvas Controls & Legend */
+.three-control-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.three-control-panel button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-xs, 4px);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.three-control-panel button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.three-legend {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounded-sm, 6px);
+  padding: 6px 10px;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+html[data-theme="dark"] .three-legend {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+}
+
 
 
 
