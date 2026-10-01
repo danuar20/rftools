@@ -795,6 +795,79 @@ def test_sidebar_and_coverage_telemetry_visual_standards():
     assert "rf-metric-card--optimal" in res_ws.text
     assert "rf-metric-card--nominal" in res_ws.text
     assert "rf-diagram-hud" in res_ws.text
-    assert "cov-hud-readout" in res_ws.text
-    assert "oh-hud-readout" in res_ws.text
     assert "tilt-hud-readout" in res_ws.text
+
+
+def test_sidebar_collapsible_dropdowns_and_custom_scrollbar():
+    """Verify clean sidebar with collapsible dropdown sections, toggle chevrons, and sleek scrollbar."""
+    # 1. Sidebar JS component
+    res_sb = client.get("/static/js/components/sidebar.js")
+    assert res_sb.status_code == 200
+    sb_text = res_sb.text
+    assert "sidebar__chevron" in sb_text
+    assert "sidebar__chevron--open" in sb_text
+    assert "sidebar__submenu" in sb_text
+    assert "sidebar__submenu--collapsed" in sb_text
+    assert "sidebar_section_states" in sb_text
+
+    # 2. Components CSS scrollbar and dropdown styles
+    res_css = client.get("/static/css/components.css")
+    assert res_css.status_code == 200
+    css_text = res_css.text
+    assert "scrollbar-width: thin" in css_text
+    assert "::-webkit-scrollbar" in css_text
+    assert "::-webkit-scrollbar-thumb" in css_text
+    assert ".sidebar__chevron" in css_text
+    assert ".sidebar__submenu--collapsed" in css_text
+
+
+def test_coverage_simulation_two_column_layout_overhaul():
+    """Verify Coverage Simulation 2-column layout matching user's sample HTML."""
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+
+    # 2-column container & input panel
+    assert "content-area main-grid" in ws_text
+    assert "input-panel" in ws_text
+    assert "covCalcForm" in ws_text
+    assert "cov-slider-height" in ws_text
+    assert "cov-input-height" in ws_text
+    assert "cov-calc-btn" in ws_text
+    assert "formula-box" in ws_text
+
+    # Right results panel & side-by-side visualizers
+    assert "results-panel" in ws_text
+    assert "results-card" in ws_text
+    assert "cov-kpi-grid" in ws_text
+    assert "cov-side-chart" in ws_text
+    assert "cov-top-chart" in ws_text
+    assert "cov-zoom-in-btn" in ws_text
+    assert "cov-zoom-out-btn" in ws_text
+    assert "cov-hud-readout" in ws_text
+
+
+def test_okumura_hata_and_nettilt3d_two_column_layout_overhaul():
+    """Verify Okumura-Hata and NetTilt 3D 2-column structure matching user's sample HTML."""
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+
+    # Okumura-Hata
+    assert "ohCalcForm" in ws_text
+    assert "oh-calc-btn" in ws_text
+    assert "oh-kpi-grid" in ws_text
+    assert "confidence-bar" in ws_text
+    assert "Beam Distances" in ws_text
+    assert "oh-diagram-body" in ws_text
+    assert "oh-hud-readout" in ws_text
+
+    # NetTilt 3D
+    assert "tiltCalcForm" in ws_text
+    assert "tilt-total-tilt" in ws_text
+    assert "tilt-calc-btn" in ws_text
+    assert "tilt-autotune-btn" in ws_text
+    assert "tilt-kpi-grid" in ws_text
+    assert "tilt-diagram-body" in ws_text
+    assert "tilt-hud-readout" in ws_text
+

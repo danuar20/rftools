@@ -3157,34 +3157,25 @@ export class WorkspaceComponent {
           </div>
         </header>
 
-        <!-- QUICK SCENARIO PRESETS -->
-        <div class="rf-cov-presets">
-          <span class="rf-cov-presets-label">⚡ ${isId ? 'Preset Skenario' : 'Quick Presets'}:</span>
-          <button type="button" class="rf-cov-preset-pill" data-preset="dense">🏙️ Dense Urban (25m)</button>
-          <button type="button" class="rf-cov-preset-pill" data-preset="macro">🏢 Standard Macro (30m)</button>
-          <button type="button" class="rf-cov-preset-pill" data-preset="suburban">🏡 Suburban (45m)</button>
-          <button type="button" class="rf-cov-preset-pill" data-preset="rural">🌾 Rural Highway (60m)</button>
-        </div>
-
-        <!-- KPI METRIC CARDS -->
-        <div class="rf-coverage-grid" id="cov-kpi-grid">
-          ${this.renderCovKpiCards(d)}
-        </div>
-
-        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
-        <div class="workspace-split-grid">
-          <!-- LEFT: PARAMETERS & GEOMETRY TUNING -->
-          <section class="zone-card">
-            <div class="zone-header">
-              <span class="zone-title">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                ${isId ? 'Parameter Antena & Sudut Tilt' : 'Antenna Parameters & Tilt Angles'}
-              </span>
-              <span class="zone-badge">Reactive Inputs</span>
+        <!-- 2-COLUMN MAIN WORKSPACE -->
+        <div class="content-area main-grid">
+          <!-- LEFT: INPUT CONTROLS PANEL -->
+          <div class="input-panel">
+            <div class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+              ${isId ? 'Parameter Antena' : 'Antenna Parameters'}
             </div>
 
-            <div class="zone-body" style="padding: 14px;">
-              <!-- Fieldset 1: Tower & Site Infrastructure -->
+            <!-- QUICK SCENARIO PRESETS -->
+            <div class="rf-cov-presets" style="margin-bottom: 10px;">
+              <span class="rf-cov-presets-label">⚡ ${isId ? 'Preset Skenario' : 'Quick Presets'}:</span>
+              <button type="button" class="rf-cov-preset-pill" data-preset="dense">🏙️ Dense (25m)</button>
+              <button type="button" class="rf-cov-preset-pill" data-preset="macro">🏢 Macro (30m)</button>
+              <button type="button" class="rf-cov-preset-pill" data-preset="suburban">🏡 Suburban (45m)</button>
+              <button type="button" class="rf-cov-preset-pill" data-preset="rural">🌾 Rural (60m)</button>
+            </div>
+
+            <form id="covCalcForm" onsubmit="event.preventDefault();">
               <div class="rf-cov-fieldset">
                 <div class="rf-cov-legend">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="2"/><line x1="15" y1="22" x2="15" y2="2"/></svg>
@@ -3193,148 +3184,165 @@ export class WorkspaceComponent {
                 </div>
 
                 <!-- Antenna Height -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Tinggi Antena (AGL)' : 'Antenna Height (AGL)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-height" min="1" max="200" step="0.5" value="${d.h}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>${isId ? 'Tinggi Antena (AGL)' : 'Height (m)'}</span>
+                    <span id="hValLbl">${d.h}m</span>
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-height" min="1" max="150" step="0.5" value="${d.h}">
+                  <input type="range" class="f-range rf-cov-slider" id="cov-slider-height" min="5" max="100" step="1" value="${d.h}">
+                  <input type="number" class="f-input rf-cov-param-input" id="cov-input-height" min="5" max="100" step="1" value="${d.h}">
                 </div>
 
-                <!-- Ground Elevation -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Elevasi Permukaan Tanah (AMSL)' : 'Site Ground Elevation (AMSL)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-elev" min="0" max="1000" step="5" value="${d.elev}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
+                <div class="row-2">
+                  <div class="input-group">
+                    <div class="input-label"><span>${isId ? 'Frekuensi' : 'Freq (MHz)'}</span></div>
+                    <input type="number" class="f-input rf-cov-param-input" id="cov-input-freq" min="400" max="3800" step="50" value="${d.freq}">
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-elev" min="0" max="500" step="5" value="${d.elev}">
-                </div>
-
-                <!-- Carrier Frequency -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Frekuensi Carrier' : 'Carrier Frequency'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-freq" min="400" max="3800" step="50" value="${d.freq}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">MHz</span>
-                    </div>
+                  <div class="input-group">
+                    <div class="input-label"><span>${isId ? 'Elevasi' : 'Elev (m)'}</span></div>
+                    <input type="number" class="f-input rf-cov-param-input" id="cov-input-elev" min="0" max="1000" step="5" value="${d.elev}">
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-freq" min="700" max="3500" step="50" value="${d.freq}">
                 </div>
               </div>
 
-              <!-- Fieldset 2: Downtilt & Beamforming Geometry -->
-              <div class="rf-cov-fieldset" style="margin-bottom: 0;">
+              <div class="rf-cov-fieldset" style="margin-top: 10px;">
                 <div class="rf-cov-legend">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                  <span>${isId ? 'Geometri Downtilt & Beamforming' : 'Downtilt & Beamforming Geometry'}</span>
+                  <span>${isId ? 'Geometri Downtilt & Beam' : 'Downtilt & Beam Geometry'}</span>
                   <div class="rf-cov-legend-line"></div>
                 </div>
 
                 <!-- Mechanical Tilt -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      Mechanical Tilt
-                      <span class="rf-tilt-badge rf-tilt-badge--mech">Mech</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-mech" min="-15" max="25" step="0.5" value="${d.mech}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>Mech Tilt (°)</span>
+                    <span id="mechLbl">${d.mech}°</span>
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-mech" min="-10" max="20" step="0.5" value="${d.mech}">
+                  <input type="range" class="f-range rf-cov-slider" id="cov-slider-mech" min="-10" max="15" step="0.5" value="${d.mech}">
+                  <input type="number" class="f-input rf-cov-param-input" id="cov-input-mech" min="-10" max="15" step="0.5" value="${d.mech}">
                 </div>
 
                 <!-- Electrical Tilt -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      Electrical Tilt (RET)
-                      <span class="rf-tilt-badge rf-tilt-badge--elec">Elec</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-elec" min="0" max="16" step="0.5" value="${d.elec}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>Elec Tilt (°)</span>
+                    <span id="elecLbl">${d.elec}°</span>
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-elec" min="0" max="16" step="0.5" value="${d.elec}">
+                  <input type="range" class="f-range rf-cov-slider" id="cov-slider-elec" min="-10" max="15" step="0.5" value="${d.elec}">
+                  <input type="number" class="f-input rf-cov-param-input" id="cov-input-elec" min="-10" max="15" step="0.5" value="${d.elec}">
                 </div>
 
                 <!-- Vertical Beamwidth -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">Vertical Beamwidth (3dB)</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-vbw" min="2" max="30" step="0.5" value="${d.vbw}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>V Beamwidth (°)</span>
+                    <span id="vBWLab">${d.vbw}°</span>
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-vbw" min="2" max="25" step="0.5" value="${d.vbw}">
+                  <input type="range" class="f-range rf-cov-slider" id="cov-slider-vbw" min="3" max="30" step="0.5" value="${d.vbw}">
+                  <input type="number" class="f-input rf-cov-param-input" id="cov-input-vbw" min="3" max="30" step="0.5" value="${d.vbw}">
                 </div>
 
                 <!-- Horizontal Beamwidth -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">Horizontal Beamwidth (Azimuth 3dB)</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="cov-input-hbw" min="20" max="120" step="1" value="${d.hbw}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>H Beamwidth (°)</span>
+                    <span id="hBWLab">${d.hbw}°</span>
                   </div>
-                  <input type="range" class="rf-cov-slider" id="cov-slider-hbw" min="30" max="120" step="1" value="${d.hbw}">
+                  <input type="range" class="f-range rf-cov-slider" id="cov-slider-hbw" min="20" max="120" step="1" value="${d.hbw}">
+                  <input type="number" class="f-input rf-cov-param-input" id="cov-input-hbw" min="20" max="120" step="1" value="${d.hbw}">
+                </div>
+              </div>
+
+              <button type="button" class="btn-calc" id="cov-calc-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                Calculate Coverage
+              </button>
+
+              <div class="formula-box">
+                <strong>Formulas:</strong><br>
+                Total Tilt = Mech + Elec<br>
+                D<sub>center</sub> = H / tan(Tilt)<br>
+                D<sub>near</sub> = H / tan(Tilt + VBW/2)<br>
+                D<sub>far</sub> = H / tan(Tilt − VBW/2)
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: RESULTS & VISUALIZERS -->
+          <div class="results-panel">
+            <!-- KPI Row -->
+            <div class="results-card">
+              <div class="results-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Coverage Results
+              </div>
+              <div class="results-grid" id="cov-kpi-grid">
+                ${this.renderCovKpiCards(d)}
+              </div>
+            </div>
+
+            <!-- Side-by-Side Visualizers -->
+            <div class="viz-grid">
+              <!-- Side View: Elevation Profile -->
+              <div class="viz-card">
+                <div class="viz-title">
+                  <span>Side View — Vertical Profile</span>
+                  <div class="ctrl-btns" style="margin-left:auto; display:inline-flex;">
+                    <button type="button" class="ctrl-btn" id="cov-zoom-in-btn" title="Zoom In">+</button>
+                    <button type="button" class="ctrl-btn" id="cov-zoom-out-btn" title="Zoom Out">−</button>
+                    <button type="button" class="ctrl-btn" id="cov-reset-view-btn" title="Reset View">↺</button>
+                  </div>
+                </div>
+                <div class="chart-area" id="cov-side-chart">
+                  ${this.renderCovElevationSvg(d)}
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><div class="legend-line" style="background:#0284c7"></div><span>Center Beam</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#10b981"></div><span>Near Edge</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#ef4444"></div><span>Far Edge</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7; opacity:0.6"></div><span>Antenna</span></div>
+                </div>
+              </div>
+
+              <!-- Top View: Horizontal Coverage -->
+              <div class="viz-card">
+                <div class="viz-title">
+                  <span>Top View — Horizontal Coverage</span>
+                </div>
+                <div class="chart-area" id="cov-top-chart">
+                  ${this.renderCovFootprintSvg(d)}
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7"></div><span>Antenna</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#f59e0b"></div><span>Main Beam</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#10b981"></div><span>Near Zone</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7"></div><span>Medium Zone</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#ef4444"></div><span>Far Zone</span></div>
                 </div>
               </div>
             </div>
-          </section>
 
-          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
-          <section class="zone-card" style="display: flex; flex-direction: column;">
-            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
-              <div class="rf-coverage-canvas-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <span>📐</span> ${isId ? 'Visualisasi Cakupan & Geometri Radiasi' : 'Coverage & Radiation Geometry Visualizer'}
+            <!-- HUD Readout -->
+            <div class="rf-diagram-hud">
+              <div class="rf-diagram-hud__legend">
+                <span class="rf-diagram-hud__item">
+                  <span class="rf-diagram-hud__dot" style="background:#10b981;"></span>
+                  <span>Boresight Axis</span>
                 </span>
-                <div class="rf-cov-tabs" id="cov-tab-bar">
-                  <button type="button" class="rf-cov-tab-btn ${this.activeCovTab === 'elevation' ? 'rf-cov-tab-btn--active' : ''}" data-tab="elevation">
-                    ${isId ? 'Profil Elevasi (Samping)' : 'Elevation Profile (Side)'}
-                  </button>
-                  <button type="button" class="rf-cov-tab-btn ${this.activeCovTab === 'footprint' ? 'rf-cov-tab-btn--active' : ''}" data-tab="footprint">
-                    ${isId ? 'Jejak Sektor (Atas)' : 'Sector Footprint (Top)'}
-                  </button>
-                </div>
+                <span class="rf-diagram-hud__item">
+                  <span class="rf-diagram-hud__dot" style="background:#0284c7;"></span>
+                  <span>3dB Beam Cone</span>
+                </span>
+                <span class="rf-diagram-hud__item">
+                  <span class="rf-diagram-hud__dot" style="background:#f59e0b;"></span>
+                  <span>Inner/Outer Bounds</span>
+                </span>
               </div>
-
-              <div class="rf-coverage-canvas-body" id="cov-diagram-body">
-                ${this.activeCovTab === 'elevation' ? this.renderCovElevationSvg(d) : this.renderCovFootprintSvg(d)}
-              </div>
-              <div class="rf-diagram-hud">
-                <div class="rf-diagram-hud__legend">
-                  <span class="rf-diagram-hud__item">
-                    <span class="rf-diagram-hud__dot" style="background:#10b981;"></span>
-                    <span>Boresight Axis</span>
-                  </span>
-                  <span class="rf-diagram-hud__item">
-                    <span class="rf-diagram-hud__dot" style="background:#0284c7;"></span>
-                    <span>3dB Beam Cone</span>
-                  </span>
-                  <span class="rf-diagram-hud__item">
-                    <span class="rf-diagram-hud__dot" style="background:#f59e0b;"></span>
-                    <span>Inner/Outer Bounds</span>
-                  </span>
-                </div>
-                <div class="rf-diagram-hud__readout" id="cov-hud-readout">
-                  Center: ${d.centerDist.toFixed(1)}m | Width: ${d.coverageWidth.toFixed(1)}m | Area: ${d.coverageAreaHa.toFixed(2)} ha
-                </div>
+              <div class="rf-diagram-hud__readout" id="cov-hud-readout">
+                Center: ${d.centerDist.toFixed(1)}m | Width: ${d.coverageWidth.toFixed(1)}m | Area: ${d.coverageAreaHa.toFixed(2)} ha
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </div>
     `;
@@ -3345,58 +3353,58 @@ export class WorkspaceComponent {
   renderCovKpiCards(d) {
     const isId = state.lang === 'id';
     return `
-      <div class="rf-metric-card rf-metric-card--accent">
+      <div class="result-card rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Total Downtilt' : 'Total Downtilt'}</span>
-          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
+          <span class="rf-metric-card__label">${isId ? 'Total Downtilt' : 'Total Tilt'}</span>
+          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt.toFixed(1)}°</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-cov-tilt">${d.totalTilt.toFixed(1)}<span class="rf-metric-card__unit">°</span></div>
-        <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° Elec</div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-tilt">${d.totalTilt.toFixed(1)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="result-label rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° Elec</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--nominal">
+      <div class="result-card rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Jarak Boresight (Pusat)' : 'Boresight Center'}</span>
-          <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
-        </div>
-        <div class="rf-metric-card__value" id="kpi-cov-center">${d.centerDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
-        <div class="rf-metric-card__meta">Ground impact @ ${d.totalTilt.toFixed(1)}°</div>
-      </div>
-
-      <div class="rf-metric-card rf-metric-card--warning">
-        <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Batas Dekat (Near Edge)' : 'Near Beam Edge'}</span>
+          <span class="rf-metric-card__label">${isId ? 'Batas Dekat' : 'Near Distance'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">Inner</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-cov-near">${d.nearDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
-        <div class="rf-metric-card__meta">Upper 3dB boundary ray</div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-near">${d.nearDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-label rf-metric-card__meta">Upper 3dB ray</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Batas Jauh (Far Edge)' : 'Far Beam Edge'}</span>
+          <span class="rf-metric-card__label">${isId ? 'Jarak Pusat' : 'Center Distance'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
+        </div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-center">${d.centerDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-label rf-metric-card__meta">Ground impact</div>
+      </div>
+
+      <div class="result-card rf-metric-card rf-metric-card--nominal">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Batas Jauh' : 'Far Distance'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Outer</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-cov-far">${d.farDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
-        <div class="rf-metric-card__meta">Lower 3dB boundary ray</div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-far">${d.farDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-label rf-metric-card__meta">Lower 3dB ray</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--nominal">
+      <div class="result-card rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Lebar Sektor di Far Edge' : 'Beam Width @ Far Edge'}</span>
+          <span class="rf-metric-card__label">${isId ? 'Lebar Cakupan' : 'Coverage Width'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Spread</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-cov-width">${d.coverageWidth.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
-        <div class="rf-metric-card__meta">Azimuth 3dB span (${d.hbw}°)</div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-width">${d.coverageWidth.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-label rf-metric-card__meta">Azimuth span (${d.hbw}°)</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Estimasi Luas Cakupan' : 'Ground Coverage Area'}</span>
+          <span class="rf-metric-card__label">${isId ? 'Estimasi Luas' : 'Est. Area'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Footprint</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-cov-area">${d.coverageAreaHa.toFixed(2)}<span class="rf-metric-card__unit">ha</span></div>
-        <div class="rf-metric-card__meta">${d.coverageAreaKm2.toFixed(3)} km² footprint</div>
+        <div class="result-value rf-metric-card__value" id="kpi-cov-area">${d.coverageAreaHa.toFixed(2)}<span class="rf-metric-card__unit">ha</span></div>
+        <div class="result-label rf-metric-card__meta">${d.coverageAreaKm2.toFixed(3)} km²</div>
       </div>
     `;
   }
@@ -3590,6 +3598,38 @@ export class WorkspaceComponent {
       });
     });
 
+    // Calculate button
+    const calcBtn = this.container.querySelector('#cov-calc-btn');
+    if (calcBtn) {
+      calcBtn.addEventListener('click', () => {
+        this.refreshCovUi();
+        toast.success('Coverage calculated successfully');
+      });
+    }
+
+    // Zoom controls for Side View
+    const zoomInBtn = this.container.querySelector('#cov-zoom-in-btn');
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        this.covZoom = Math.min(2.5, (this.covZoom || 1) * 1.25);
+        this.refreshCovUi();
+      });
+    }
+    const zoomOutBtn = this.container.querySelector('#cov-zoom-out-btn');
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', () => {
+        this.covZoom = Math.max(0.5, (this.covZoom || 1) / 1.25);
+        this.refreshCovUi();
+      });
+    }
+    const resetViewBtn = this.container.querySelector('#cov-reset-view-btn');
+    if (resetViewBtn) {
+      resetViewBtn.addEventListener('click', () => {
+        this.covZoom = 1;
+        this.refreshCovUi();
+      });
+    }
+
     // Tabs
     const tabBtns = this.container.querySelectorAll('#cov-tab-bar .rf-cov-tab-btn');
     tabBtns.forEach(btn => {
@@ -3650,6 +3690,12 @@ export class WorkspaceComponent {
     const kpiGrid = this.container.querySelector('#cov-kpi-grid');
     if (kpiGrid) kpiGrid.innerHTML = this.renderCovKpiCards(d);
 
+    const sideChart = this.container.querySelector('#cov-side-chart');
+    if (sideChart) sideChart.innerHTML = this.renderCovElevationSvg(d);
+
+    const topChart = this.container.querySelector('#cov-top-chart');
+    if (topChart) topChart.innerHTML = this.renderCovFootprintSvg(d);
+
     const diagramBody = this.container.querySelector('#cov-diagram-body');
     if (diagramBody) {
       diagramBody.innerHTML = this.activeCovTab === 'elevation'
@@ -3661,6 +3707,17 @@ export class WorkspaceComponent {
     if (hudReadout) {
       hudReadout.textContent = `Center: ${d.centerDist.toFixed(1)}m | Width: ${d.coverageWidth.toFixed(1)}m | Area: ${d.coverageAreaHa.toFixed(2)} ha`;
     }
+
+    const hLbl = this.container.querySelector('#hValLbl');
+    if (hLbl) hLbl.textContent = `${d.h}m`;
+    const mechLbl = this.container.querySelector('#mechLbl');
+    if (mechLbl) mechLbl.textContent = `${d.mech}°`;
+    const elecLbl = this.container.querySelector('#elecLbl');
+    if (elecLbl) elecLbl.textContent = `${d.elec}°`;
+    const vbwLbl = this.container.querySelector('#vBWLab');
+    if (vbwLbl) vbwLbl.textContent = `${d.vbw}°`;
+    const hbwLbl = this.container.querySelector('#hBWLab');
+    if (hbwLbl) hbwLbl.textContent = `${d.hbw}°`;
   }
 
   // --- 2. OKUMURA-HATA PROPAGATION MODEL ---
@@ -3766,167 +3823,185 @@ export class WorkspaceComponent {
           </div>
         </header>
 
-        <!-- KPI METRIC CARDS -->
-        <div class="rf-coverage-grid" id="oh-kpi-grid">
-          ${this.renderOhKpiCards(d)}
-        </div>
+        <!-- 2-COLUMN MAIN WORKSPACE -->
+        <div class="content-area main-grid">
+          <!-- LEFT: INPUT CONTROLS PANEL -->
+          <div class="input-panel">
+            <form id="ohCalcForm" onsubmit="event.preventDefault();">
+              <div class="panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                ${isId ? 'Parameter Antena' : 'Antenna Parameters'}
+              </div>
 
-        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
-        <div class="workspace-split-grid">
-          <!-- LEFT: RF LINK BUDGET & MORPHOLOGY PARAMETERS -->
-          <section class="zone-card">
-            <div class="zone-header">
-              <span class="zone-title">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                ${isId ? 'Konfigurasi Link RF & Lingkungan' : 'RF Link Budget & Environment'}
-              </span>
-              <span class="zone-badge">${d.envLabel}</span>
-            </div>
-
-            <div class="zone-body" style="padding: 14px;">
-              <!-- Fieldset 1: Environment Morphology & Spectrum -->
-              <div class="rf-cov-fieldset">
-                <div class="rf-cov-legend">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  <span>${isId ? 'Morfologi Lingkungan & Spektrum' : 'Morphology & Carrier Spectrum'}</span>
-                  <div class="rf-cov-legend-line"></div>
+              <div class="row-2">
+                <div class="input-group">
+                  <div class="input-label"><span>${isId ? 'Tinggi (m)' : 'Height (m)'}</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-hb" min="10" max="100" step="1" value="${d.hb}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-hb" min="10" max="100" step="1" value="${d.hb}">
                 </div>
-
-                <!-- Environment Type Segmented Selector -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Tipe Lingkungan Propagasi' : 'Propagation Environment'}</span>
-                  </div>
-                  <div class="rf-env-selector" id="oh-env-selector">
-                    <button type="button" class="rf-env-option ${d.env === 'urban' ? 'rf-env-option--active' : ''}" data-env="urban">
-                      Urban (Kota)
-                    </button>
-                    <button type="button" class="rf-env-option ${d.env === 'suburban' ? 'rf-env-option--active' : ''}" data-env="suburban">
-                      Suburban
-                    </button>
-                    <button type="button" class="rf-env-option ${d.env === 'rural' ? 'rf-env-option--active' : ''}" data-env="rural">
-                      Rural (Terbuka)
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Carrier Frequency with Band Presets -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Frekuensi Carrier' : 'Carrier Frequency'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="oh-input-freq" min="150" max="2500" step="50" value="${d.f}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">MHz</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="oh-slider-freq" min="150" max="2100" step="50" value="${d.f}">
-                  <div class="rf-band-presets" id="oh-band-presets">
-                    <button type="button" class="rf-band-btn ${d.f === 750 ? 'rf-band-btn--active' : ''}" data-band="750">LTE 700</button>
-                    <button type="button" class="rf-band-btn ${d.f === 900 ? 'rf-band-btn--active' : ''}" data-band="900">GSM 900</button>
-                    <button type="button" class="rf-band-btn ${d.f === 1800 ? 'rf-band-btn--active' : ''}" data-band="1800">DCS 1800</button>
-                    <button type="button" class="rf-band-btn ${d.f === 2100 ? 'rf-band-btn--active' : ''}" data-band="2100">UMTS 2100</button>
-                  </div>
-                </div>
-
-                <!-- Base Station Antenna Height (hb) -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Tinggi Antena BS (hb)' : 'Base Station Height (hb)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="oh-input-hb" min="15" max="200" step="1" value="${d.hb}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="oh-slider-hb" min="20" max="150" step="1" value="${d.hb}">
-                </div>
-
-                <!-- Mobile Antenna Height (hm) -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Tinggi Antena Pengguna (hm)' : 'Mobile Height (hm)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="oh-input-hm" min="1" max="10" step="0.5" value="${d.hm}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="oh-slider-hm" min="1" max="10" step="0.5" value="${d.hm}">
+                <div class="input-group">
+                  <div class="input-label"><span>${isId ? 'Gain (dBi)' : 'Gain (dBi)'}</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-gain" min="0" max="25" step="0.5" value="${d.gain}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-gain" min="0" max="25" step="0.5" value="${d.gain}">
                 </div>
               </div>
 
-              <!-- Fieldset 2: Link Budget & Sensitivity -->
-              <div class="rf-cov-fieldset" style="margin-bottom: 0;">
-                <div class="rf-cov-legend">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                  <span>${isId ? 'Link Budget & Sensitivitas' : 'RF Link Budget & Sensitivity'}</span>
-                  <div class="rf-cov-legend-line"></div>
+              <div class="row-2" style="margin-top: 6px;">
+                <div class="input-group">
+                  <div class="input-label">
+                    <span>TX Power</span>
+                    <span class="rf-watt-badge" id="oh-watt-display">${txWatts.toFixed(1)} W</span>
+                  </div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-tx" min="20" max="50" step="1" value="${d.txPower}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-tx" min="20" max="50" step="1" value="${d.txPower}">
                 </div>
-
-                <!-- Transmitter Power (tx_power) with Live Watt Conversion -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      TX Power
-                      <span class="rf-watt-badge" id="oh-watt-display">${txWatts.toFixed(1)} W</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="oh-input-tx" min="20" max="55" step="1" value="${d.txPower}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">dBm</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="oh-slider-tx" min="30" max="50" step="1" value="${d.txPower}">
+                <div class="input-group">
+                  <div class="input-label"><span>Freq (MHz)</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-freq" min="700" max="2500" step="10" value="${d.f}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-freq" min="700" max="2500" step="10" value="${d.f}">
                 </div>
+              </div>
 
-                <!-- Antenna Gain & Cable Loss -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" class="rf-cov-param-row">
-                  <div>
-                    <div class="rf-cov-param-header">
-                      <span class="rf-cov-param-label">Antenna Gain</span>
-                      <input type="number" class="rf-cov-param-input" id="oh-input-gain" min="5" max="25" step="0.5" value="${d.gain}" style="width: 55px;">
-                    </div>
-                    <input type="range" class="rf-cov-slider" id="oh-slider-gain" min="10" max="24" step="0.5" value="${d.gain}">
-                  </div>
-                  <div>
-                    <div class="rf-cov-param-header">
-                      <span class="rf-cov-param-label">Cable Loss</span>
-                      <input type="number" class="rf-cov-param-input" id="oh-input-loss" min="0" max="10" step="0.5" value="${d.cableLoss}" style="width: 55px;">
-                    </div>
-                    <input type="range" class="rf-cov-slider" id="oh-slider-loss" min="0" max="8" step="0.5" value="${d.cableLoss}">
-                  </div>
+              <!-- Carrier Band Presets -->
+              <div class="rf-band-presets" id="oh-band-presets" style="margin: 8px 0;">
+                <button type="button" class="rf-band-btn ${d.f === 750 ? 'rf-band-btn--active' : ''}" data-band="750">LTE 700</button>
+                <button type="button" class="rf-band-btn ${d.f === 900 ? 'rf-band-btn--active' : ''}" data-band="900">GSM 900</button>
+                <button type="button" class="rf-band-btn ${d.f === 1800 ? 'rf-band-btn--active' : ''}" data-band="1800">DCS 1800</button>
+                <button type="button" class="rf-band-btn ${d.f === 2100 ? 'rf-band-btn--active' : ''}" data-band="2100">UMTS 2100</button>
+              </div>
+
+              <div class="row-2">
+                <div class="input-group">
+                  <div class="input-label"><span>Elec Tilt (°)</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-elec" min="0" max="15" step="0.5" value="${d.elec}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-elec" min="0" max="15" step="0.5" value="${d.elec}">
                 </div>
+                <div class="input-group">
+                  <div class="input-label"><span>Mech Tilt (°)</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-mech" min="0" max="15" step="0.5" value="${d.mech}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-mech" min="0" max="15" step="0.5" value="${d.mech}">
+                </div>
+              </div>
 
-                <!-- RX Sensitivity -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">RX Sensitivity Threshold</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="oh-input-rx" min="-130" max="-70" step="1" value="${d.rxSens}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">dBm</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="oh-slider-rx" min="-120" max="-80" step="1" value="${d.rxSens}">
+              <div class="row-2" style="margin-top: 6px;">
+                <div class="input-group">
+                  <div class="input-label"><span>V Beamwidth (°)</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-vbw" min="3" max="30" step="0.5" value="${d.vbw}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-vbw" min="3" max="30" step="0.5" value="${d.vbw}">
+                </div>
+                <div class="input-group">
+                  <div class="input-label"><span>H Beamwidth (°)</span></div>
+                  <input type="range" class="f-range rf-cov-slider" id="oh-slider-hbw" min="20" max="120" step="1" value="${d.hbw}">
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-hbw" min="20" max="120" step="1" value="${d.hbw}">
+                </div>
+              </div>
+
+              <div class="panel-title" style="margin-top: 14px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
+                ${isId ? 'Lingkungan & Penerima' : 'Environment & Receiver'}
+              </div>
+
+              <div class="input-group">
+                <div class="input-label"><span>${isId ? 'Tipe Lingkungan' : 'Environment Type'}</span></div>
+                <div class="rf-env-selector" id="oh-env-selector">
+                  <button type="button" class="rf-env-option ${d.env === 'urban' ? 'rf-env-option--active' : ''}" data-env="urban">Urban</button>
+                  <button type="button" class="rf-env-option ${d.env === 'suburban' ? 'rf-env-option--active' : ''}" data-env="suburban">Suburban</button>
+                  <button type="button" class="rf-env-option ${d.env === 'rural' ? 'rf-env-option--active' : ''}" data-env="rural">Rural</button>
+                </div>
+              </div>
+
+              <div class="row-2" style="margin-top: 6px;">
+                <div class="input-group">
+                  <div class="input-label"><span>RX Height (m)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-hm" min="1" max="10" step="0.1" value="${d.hm}">
+                </div>
+                <div class="input-group">
+                  <div class="input-label"><span>RX Sens (dBm)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="oh-input-rx" min="-120" max="-60" step="1" value="${d.rxSens}">
+                </div>
+              </div>
+
+              <div class="input-group" style="margin-top: 6px;">
+                <div class="input-label"><span>Cable Loss (dB)</span></div>
+                <input type="number" class="f-input rf-cov-param-input" id="oh-input-loss" min="0" max="10" step="0.5" value="${d.cableLoss}">
+              </div>
+
+              <button type="button" class="btn-calc" id="oh-calc-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                Calculate Coverage
+              </button>
+
+              <div class="formula-box info-box">
+                <strong>Okumura-Hata Model:</strong><br>
+                Path loss at 1km based on frequency, antenna heights, and environment type. Coverage radius derived from max allowable path loss.
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: RESULTS & VISUALIZERS -->
+          <div class="results-panel">
+            <!-- Coverage Results Card -->
+            <div class="results-card">
+              <div class="results-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Coverage Results
+              </div>
+              <div class="result-grid results-grid" id="oh-kpi-grid">
+                ${this.renderOhKpiCards(d)}
+              </div>
+
+              <!-- Confidence Meter -->
+              <div class="confidence-bar">
+                <div class="conf-label">
+                  <span>Model Confidence (${d.envLabel})</span>
+                  <span>${Math.round(d.confidence * 100)}%</span>
+                </div>
+                <div class="conf-track">
+                  <div class="conf-fill" style="width: ${Math.round(d.confidence * 100)}%"></div>
                 </div>
               </div>
             </div>
-          </section>
 
-          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
-          <section class="zone-card" style="display: flex; flex-direction: column;">
-            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
-              <div class="rf-coverage-canvas-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <span>📈</span> ${isId ? 'Kurva Redaman & Ambang Batas MAPL' : 'Path Loss Decay Curve & MAPL Threshold'}
-                </span>
+            <!-- Beam Distances Card -->
+            <div class="results-card">
+              <div class="results-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Beam Distances
+              </div>
+              <div class="result-grid results-grid">
+                <div class="result-card result-item rf-metric-card rf-metric-card--accent">
+                  <div class="result-value rf-metric-card__value">${d.totalTilt.toFixed(1)}<span class="result-unit rf-metric-card__unit">°</span></div>
+                  <div class="result-label rf-metric-card__label">Total Tilt</div>
+                </div>
+                <div class="result-card result-item rf-metric-card rf-metric-card--optimal">
+                  <div class="result-value rf-metric-card__value">${d.boresightDist.toFixed(0)}<span class="result-unit rf-metric-card__unit">m</span></div>
+                  <div class="result-label rf-metric-card__label">Boresight Dist</div>
+                </div>
+                <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
+                  <div class="result-value rf-metric-card__value">${(d.boresightDist * 0.6).toFixed(0)}<span class="result-unit rf-metric-card__unit">m</span></div>
+                  <div class="result-label rf-metric-card__label">Near Edge</div>
+                </div>
+                <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
+                  <div class="result-value rf-metric-card__value">${(d.boresightDist * 1.8).toFixed(0)}<span class="result-unit rf-metric-card__unit">m</span></div>
+                  <div class="result-label rf-metric-card__label">Far Edge</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visualizers Card -->
+            <div class="viz-card diagram-card">
+              <div class="viz-title diagram-title">
+                <span>${isId ? 'Visualisasi Redaman & Link Budget' : 'Path Loss & Link Budget'}</span>
                 <div class="rf-cov-tabs" id="oh-tab-bar">
                   <button type="button" class="rf-cov-tab-btn ${this.activeOhTab === 'curve' ? 'rf-cov-tab-btn--active' : ''}" data-tab="curve">
-                    ${isId ? 'Kurva Path Loss vs Jarak' : 'Path Loss Curve vs Distance'}
+                    ${isId ? 'Kurva Path Loss' : 'Path Loss Curve'}
                   </button>
                   <button type="button" class="rf-cov-tab-btn ${this.activeOhTab === 'budget' ? 'rf-cov-tab-btn--active' : ''}" data-tab="budget">
-                    ${isId ? 'Rincian Link Budget' : 'Link Budget Waterfall'}
+                    ${isId ? 'Rincian Budget' : 'Link Budget'}
                   </button>
                 </div>
               </div>
-
-              <div class="rf-coverage-canvas-body" id="oh-diagram-body">
+              <div class="chart-area canvas-wrap" id="oh-diagram-body">
                 ${this.activeOhTab === 'curve' ? this.renderOhCurveSvg(d) : this.renderOhBudgetSvg(d)}
               </div>
               <div class="rf-diagram-hud">
@@ -3949,7 +4024,7 @@ export class WorkspaceComponent {
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </div>
     `;
@@ -3960,60 +4035,60 @@ export class WorkspaceComponent {
   renderOhKpiCards(d) {
     const isId = state.lang === 'id';
     return `
-      <div class="rf-metric-card rf-metric-card--nominal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">EIRP Transmitter</span>
+          <span class="result-label rf-metric-card__label">EIRP Transmitter</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">RF Power</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-eirp">${d.eirp.toFixed(1)}<span class="rf-metric-card__unit">dBm</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-eirp">${d.eirp.toFixed(1)}<span class="result-unit rf-metric-card__unit">dBm</span></div>
         <div class="rf-metric-card__meta">${d.txPower} dBm + ${d.gain} dBi - ${d.cableLoss} dB</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--accent">
+      <div class="result-card result-item rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">Max Allowable Loss (MAPL)</span>
+          <span class="result-label rf-metric-card__label">Max Allowable Loss (MAPL)</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Budget</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-mapl">${d.maxPl.toFixed(1)}<span class="rf-metric-card__unit">dB</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-mapl">${d.maxPl.toFixed(1)}<span class="result-unit rf-metric-card__unit">dB</span></div>
         <div class="rf-metric-card__meta">EIRP - (${d.rxSens} dBm sensitivity)</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--warning">
+      <div class="result-card result-item rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">Path Loss @ 1 km (L1km)</span>
+          <span class="result-label rf-metric-card__label">Path Loss @ 1 km (L1km)</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">${d.env}</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-l1km">${d.L_1km.toFixed(1)}<span class="rf-metric-card__unit">dB</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-l1km">${d.L_1km.toFixed(1)}<span class="result-unit rf-metric-card__unit">dB</span></div>
         <div class="rf-metric-card__meta">Correction a(hm)=${d.a_hm.toFixed(2)} dB</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Radius Jangkauan Maks' : 'Max Coverage Radius'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Radius Jangkauan Maks' : 'Max Coverage Radius'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">R-Cov</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-rcov">${d.covRadiusKm.toFixed(3)}<span class="rf-metric-card__unit">km</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-rcov">${d.covRadiusKm.toFixed(3)}<span class="result-unit rf-metric-card__unit">km</span></div>
         <div class="rf-metric-card__meta">${(d.covRadiusKm * 1000).toFixed(0)} meters reach</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--nominal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Luas Area Sektor' : 'Sector Coverage Area'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Luas Area Sektor' : 'Sector Coverage Area'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Area</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-area">${d.sectorAreaKm2.toFixed(3)}<span class="rf-metric-card__unit">km²</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-area">${d.sectorAreaKm2.toFixed(3)}<span class="result-unit rf-metric-card__unit">km²</span></div>
         <div class="rf-metric-card__meta">${d.sectorAreaHa.toFixed(1)} ha (${d.hbw}° sector)</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Keandalan Model' : 'Model Confidence'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Keandalan Model' : 'Model Confidence'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">${Math.round(d.confidence * 100)}%</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-oh-conf">${(d.confidence * 100).toFixed(0)}<span class="rf-metric-card__unit">%</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-oh-conf">${(d.confidence * 100).toFixed(0)}<span class="result-unit rf-metric-card__unit">%</span></div>
         <div class="rf-metric-card__meta">${d.envLabel} morphology</div>
       </div>
-    `;
+        `;
   }
 
   renderOhCurveSvg(d) {
@@ -4181,6 +4256,15 @@ export class WorkspaceComponent {
         this.refreshOhUi();
       });
     });
+
+    // Calculate button
+    const calcBtn = this.container.querySelector('#oh-calc-btn');
+    if (calcBtn) {
+      calcBtn.addEventListener('click', () => {
+        this.refreshOhUi();
+        toast.success('Propagation calculations updated');
+      });
+    }
 
     // Actions
     const copyBtn = this.container.querySelector('#oh-copy-summary-btn');
@@ -4357,154 +4441,135 @@ export class WorkspaceComponent {
           </div>
         </header>
 
-        <!-- QUICK TARGET DISTANCE PRESETS -->
-        <div class="rf-cov-presets">
-          <span class="rf-cov-presets-label">🎯 ${isId ? 'Target Cepat' : 'Target Presets'}:</span>
-          <button type="button" class="rf-cov-preset-pill" data-target-dist="250">250m (Dense)</button>
-          <button type="button" class="rf-cov-preset-pill" data-target-dist="500">500m (Urban)</button>
-          <button type="button" class="rf-cov-preset-pill" data-target-dist="1000">1000m (Suburban)</button>
-          <button type="button" class="rf-cov-preset-pill" data-target-dist="2000">2000m (Rural)</button>
-        </div>
+        <!-- 2-COLUMN MAIN WORKSPACE -->
+        <div class="content-area main-grid">
+          <!-- LEFT: INPUT CONTROLS PANEL -->
+          <div class="input-panel">
+            <form id="tiltCalcForm" onsubmit="event.preventDefault();">
+              <div class="panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                ${isId ? 'Parameter Antena' : 'Antenna Parameters'}
+              </div>
 
-        <!-- KPI METRIC CARDS -->
-        <div class="rf-coverage-grid" id="tilt-kpi-grid">
-          ${this.renderTiltKpiCards(d)}
-        </div>
-
-        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
-        <div class="workspace-split-grid">
-          <!-- LEFT: PARAMETERS & GEOMETRY TUNING -->
-          <section class="zone-card">
-            <div class="zone-header">
-              <span class="zone-title">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                ${isId ? 'Geometri Menara & Target Jarak' : 'Tower & Target Geometry'}
-              </span>
-              <button class="rf-btn rf-btn-secondary" id="tilt-autotune-btn" style="padding: 3px 9px; font-size: 0.72rem;">
-                ⚡ Auto-Tune RET
-              </button>
-            </div>
-
-            <div class="zone-body" style="padding: 14px;">
-              <!-- Fieldset 1: Tower Site & Target Geometry -->
-              <div class="rf-cov-fieldset">
-                <div class="rf-cov-legend">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>
-                  <span>${isId ? 'Geometri Site & Target' : 'Site Geometry & Target'}</span>
-                  <div class="rf-cov-legend-line"></div>
+              <!-- Height -->
+              <div class="input-group">
+                <div class="input-label">
+                  <span>${isId ? 'Tinggi Menara (m)' : 'Height (m)'}</span>
+                  <span id="tilt-h-val">${d.towerH}m</span>
                 </div>
+                <input type="range" class="f-range rf-cov-slider" id="tilt-slider-height" min="10" max="100" step="1" value="${d.towerH}">
+                <input type="number" class="f-input rf-cov-param-input" id="tilt-input-height" min="10" max="150" step="1" value="${d.towerH}">
+              </div>
 
-                <!-- Target Coverage Distance -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      ${isId ? 'Target Jarak Cakupan' : 'Target Coverage Distance'}
-                      <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-target" min="50" max="3000" step="25" value="${d.targetDist}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-target" min="50" max="2000" step="25" value="${d.targetDist}">
+              <!-- Mech & Elec Tilt -->
+              <div class="row-2">
+                <div class="input-group">
+                  <div class="input-label"><span>Mech Tilt (°)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="tilt-input-mech" min="-5" max="15" step="0.5" value="${d.mech}">
                 </div>
-
-                <!-- Tower Antenna Height -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Tinggi Menara (H)' : 'Tower Antenna Height (H)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-height" min="10" max="150" step="1" value="${d.towerH}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-height" min="10" max="100" step="1" value="${d.towerH}">
-                </div>
-
-                <!-- Terrain Elevation Delta (ΔH) -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">${isId ? 'Beda Elevasi Kontur (ΔH)' : 'Terrain Elevation Delta (ΔH)'}</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-deltah" min="-50" max="50" step="1" value="${d.deltaH}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-deltah" min="-30" max="30" step="1" value="${d.deltaH}">
+                <div class="input-group">
+                  <div class="input-label"><span>Elec Tilt (°)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="tilt-input-elec" min="0" max="14" step="0.5" value="${d.elec}">
                 </div>
               </div>
 
-              <!-- Fieldset 2: Downtilt Configuration & Tuning -->
-              <div class="rf-cov-fieldset" style="margin-bottom: 0;">
-                <div class="rf-cov-legend">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  <span>${isId ? 'Konfigurasi Downtilt' : 'Downtilt Configuration'}</span>
-                  <div class="rf-cov-legend-line"></div>
-                </div>
+              <!-- Total Tilt Display Card -->
+              <div class="result-card result-item rf-metric-card rf-metric-card--accent" style="margin: 6px 0; padding: 8px;">
+                <div class="result-value rf-metric-card__value" id="tilt-total-tilt">${d.totalTilt.toFixed(1)}°</div>
+                <div class="result-label rf-metric-card__label">Total Tilt (Mech + Elec)</div>
+              </div>
 
-                <!-- Mechanical Tilt -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      Mechanical Downtilt
-                      <span class="rf-tilt-badge rf-tilt-badge--mech">Mech</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-mech" min="-5" max="15" step="0.5" value="${d.mech}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-mech" min="-5" max="12" step="0.5" value="${d.mech}">
-                </div>
+              <div class="panel-title" style="margin-top: 10px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>
+                ${isId ? 'Geometri Target & Kontur' : 'Target & Contour Geometry'}
+              </div>
 
-                <!-- Electrical Tilt -->
-                <div class="rf-cov-param-row">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">
-                      Electrical Downtilt (RET)
-                      <span class="rf-tilt-badge rf-tilt-badge--elec">Elec</span>
-                    </span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-elec" min="0" max="14" step="0.5" value="${d.elec}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-elec" min="0" max="14" step="0.5" value="${d.elec}">
-                </div>
+              <!-- QUICK TARGET DISTANCE PRESETS -->
+              <div class="rf-cov-presets" style="margin-bottom: 8px;">
+                <span class="rf-cov-presets-label">🎯 ${isId ? 'Target' : 'Target'}:</span>
+                <button type="button" class="rf-cov-preset-pill ${d.targetDist === 250 ? 'rf-cov-preset-pill--active' : ''}" data-target-dist="250">250m</button>
+                <button type="button" class="rf-cov-preset-pill ${d.targetDist === 500 ? 'rf-cov-preset-pill--active' : ''}" data-target-dist="500">500m</button>
+                <button type="button" class="rf-cov-preset-pill ${d.targetDist === 1000 ? 'rf-cov-preset-pill--active' : ''}" data-target-dist="1000">1000m</button>
+                <button type="button" class="rf-cov-preset-pill ${d.targetDist === 2000 ? 'rf-cov-preset-pill--active' : ''}" data-target-dist="2000">2000m</button>
+              </div>
 
-                <!-- Vertical Beamwidth -->
-                <div class="rf-cov-param-row" style="margin-bottom: 0;">
-                  <div class="rf-cov-param-header">
-                    <span class="rf-cov-param-label">Vertical Beamwidth (3dB)</span>
-                    <div class="rf-cov-param-value-wrap">
-                      <input type="number" class="rf-cov-param-input" id="tilt-input-vbw" min="2" max="20" step="0.5" value="${d.vbw}">
-                      <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
-                    </div>
-                  </div>
-                  <input type="range" class="rf-cov-slider" id="tilt-slider-vbw" min="3" max="16" step="0.5" value="${d.vbw}">
+              <!-- Target Distance -->
+              <div class="input-group">
+                <div class="input-label">
+                  <span>${isId ? 'Target Jarak (m)' : 'Target Dist (m)'}</span>
+                  <span id="tilt-target-val">${d.targetDist}m</span>
+                </div>
+                <input type="range" class="f-range rf-cov-slider" id="tilt-slider-target" min="50" max="2000" step="25" value="${d.targetDist}">
+                <input type="number" class="f-input rf-cov-param-input" id="tilt-input-target" min="50" max="3000" step="25" value="${d.targetDist}">
+              </div>
+
+              <!-- Elevation Delta -->
+              <div class="input-group">
+                <div class="input-label"><span>${isId ? 'Beda Kontur ΔH (m)' : 'Elevation Delta ΔH (m)'}</span></div>
+                <input type="range" class="f-range rf-cov-slider" id="tilt-slider-deltah" min="-30" max="30" step="1" value="${d.deltaH}">
+                <input type="number" class="f-input rf-cov-param-input" id="tilt-input-deltah" min="-50" max="50" step="1" value="${d.deltaH}">
+              </div>
+
+              <!-- Beamwidths -->
+              <div class="row-2">
+                <div class="input-group">
+                  <div class="input-label"><span>H-Beam (°)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="tilt-input-hbw" min="20" max="120" step="1" value="${d.hbw || 65}">
+                </div>
+                <div class="input-group">
+                  <div class="input-label"><span>V-Beam (°)</span></div>
+                  <input type="number" class="f-input rf-cov-param-input" id="tilt-input-vbw" min="2" max="20" step="0.5" value="${d.vbw}">
                 </div>
               </div>
-            </div>
-          </section>
 
-          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
-          <section class="zone-card" style="display: flex; flex-direction: column;">
-            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
-              <div class="rf-coverage-canvas-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <span>📡</span> ${isId ? 'Geometri Visualisasi NetTilt 3D' : 'NetTilt 3D Radiation Geometry'}
-                </span>
+              <!-- Action buttons -->
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button type="button" class="btn-calc" id="tilt-calc-btn" style="flex: 1; margin-top: 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                  Calculate Tilt
+                </button>
+                <button type="button" class="rf-btn rf-btn-secondary" id="tilt-autotune-btn" style="white-space: nowrap; padding: 8px 12px; font-size: 11px;">
+                  ⚡ Auto-Tune RET
+                </button>
+              </div>
+
+              <div class="formula-box formula-info">
+                <div class="formula-title"><strong>Reference Formulas:</strong></div>
+                <strong>Total Tilt (θ)</strong> = Mech Tilt + Elec Tilt<br>
+                <strong>Center Dist</strong> = Height / tan(θ)<br>
+                <strong>Near Edge</strong> = Height / tan(θ + ½ V-Beam)<br>
+                <strong>Far Edge</strong> = Height / tan(θ − ½ V-Beam)
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: RESULTS & VISUALIZERS -->
+          <div class="results-panel">
+            <!-- KPI Cards Row -->
+            <div class="results-card">
+              <div class="results-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Optimization Scorecards
+              </div>
+              <div class="results-grid" id="tilt-kpi-grid">
+                ${this.renderTiltKpiCards(d)}
+              </div>
+            </div>
+
+            <!-- Visualizers Card -->
+            <div class="viz-card">
+              <div class="viz-title">
+                <span>${isId ? 'Geometri Visualisasi NetTilt 3D' : 'NetTilt 3D Radiation Geometry'}</span>
                 <div class="rf-cov-tabs" id="tilt-tab-bar">
                   <button type="button" class="rf-cov-tab-btn ${this.activeTiltTab === 'perspective' ? 'rf-cov-tab-btn--active' : ''}" data-tab="perspective">
-                    ${isId ? 'Perspektif 3D Balok Radiasi' : '3D Perspective Beam'}
+                    ${isId ? 'Perspektif 3D' : '3D Perspective'}
                   </button>
                   <button type="button" class="rf-cov-tab-btn ${this.activeTiltTab === 'gauge' ? 'rf-cov-tab-btn--active' : ''}" data-tab="gauge">
-                    ${isId ? 'Meteran Deviasi Sudut' : 'Tilt Deviation Gauge'}
+                    ${isId ? 'Meteran Deviasi' : 'Deviation Gauge'}
                   </button>
                 </div>
               </div>
-
-              <div class="rf-coverage-canvas-body" id="tilt-diagram-body">
+              <div class="chart-area canvas-wrap" id="tilt-diagram-body">
                 ${this.activeTiltTab === 'perspective' ? this.renderTiltPerspectiveSvg(d) : this.renderTiltGaugeSvg(d)}
               </div>
               <div class="rf-diagram-hud">
@@ -4527,7 +4592,7 @@ export class WorkspaceComponent {
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </div>
     `;
@@ -4545,60 +4610,60 @@ export class WorkspaceComponent {
       : (d.alignStatus === 'over' ? 'rf-metric-card--critical' : 'rf-metric-card--warning');
 
     return `
-      <div class="rf-metric-card rf-metric-card--accent">
+      <div class="result-card result-item rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Total Net Tilt' : 'Total Net Tilt'}</span>
-          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Total Net Tilt' : 'Total Net Tilt'}</span>
+          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt.toFixed(1)}°</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-tilt-total">${d.totalTilt.toFixed(1)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-tilt-total">${d.totalTilt.toFixed(1)}<span class="result-unit rf-metric-card__unit">°</span></div>
         <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° RET</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Sudut Optimum Target' : 'Optimum Target Tilt'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Sudut Optimum Target' : 'Optimum Target Tilt'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Calculated</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-tilt-opt">${d.optTiltDeg.toFixed(2)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-tilt-opt">${d.optTiltDeg.toFixed(2)}<span class="result-unit rf-metric-card__unit">°</span></div>
         <div class="rf-metric-card__meta">For ${d.targetDist}m @ H=${d.effHeight}m</div>
       </div>
 
-      <div class="rf-metric-card ${statusCardClass}">
+      <div class="result-card result-item rf-metric-card ${statusCardClass}">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Status Keselarasan' : 'Alignment Status'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Status Keselarasan' : 'Alignment Status'}</span>
           <span class="rf-coverage-chip ${statusClass}">${d.alignStatus.toUpperCase()}</span>
         </div>
-        <div class="rf-metric-card__value" style="font-size: 1.05rem;" id="kpi-tilt-status">${d.alignLabel}</div>
+        <div class="result-value rf-metric-card__value" style="font-size: 1.05rem;" id="kpi-tilt-status">${d.alignLabel}</div>
         <div class="rf-metric-card__meta">Delta: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}°</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--nominal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Titik Jatuh Boresight' : 'Boresight Ground Hit'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Titik Jatuh Boresight' : 'Boresight Ground Hit'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Center</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-tilt-boresight">${d.boresightDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-tilt-boresight">${d.boresightDist.toFixed(1)}<span class="result-unit rf-metric-card__unit">m</span></div>
         <div class="rf-metric-card__meta">Target is @ ${d.targetDist}m</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--warning">
+      <div class="result-card result-item rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">Inner & Outer 3dB</span>
+          <span class="result-label rf-metric-card__label">Inner & Outer 3dB</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">Span</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-tilt-innerouter">${d.innerDist.toFixed(0)} / ${d.outerDist.toFixed(0)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-tilt-innerouter">${d.innerDist.toFixed(0)} / ${d.outerDist.toFixed(0)}<span class="result-unit rf-metric-card__unit">m</span></div>
         <div class="rf-metric-card__meta">Near: ${d.innerDist.toFixed(0)}m, Far: ${d.outerDist.toFixed(0)}m</div>
       </div>
 
-      <div class="rf-metric-card rf-metric-card--optimal">
+      <div class="result-card result-item rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
-          <span class="rf-metric-card__label">${isId ? 'Panjang Jejak Radiasi' : 'Ground Footprint Depth'}</span>
+          <span class="result-label rf-metric-card__label">${isId ? 'Panjang Jejak Radiasi' : 'Ground Footprint Depth'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Coverage</span>
         </div>
-        <div class="rf-metric-card__value" id="kpi-tilt-footprint">${d.footprintLength.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="result-value rf-metric-card__value" id="kpi-tilt-footprint">${d.footprintLength.toFixed(1)}<span class="result-unit rf-metric-card__unit">m</span></div>
         <div class="rf-metric-card__meta">Continuous 3dB zone</div>
       </div>
-    `;
+        `;
   }
 
   renderTiltPerspectiveSvg(d) {
@@ -4790,6 +4855,15 @@ export class WorkspaceComponent {
       });
     });
 
+    // Calculate button
+    const calcBtn = this.container.querySelector('#tilt-calc-btn');
+    if (calcBtn) {
+      calcBtn.addEventListener('click', () => {
+        this.refreshTiltUi();
+        toast.success('NetTilt 3D calculations updated');
+      });
+    }
+
     // Actions
     const copyBtn = this.container.querySelector('#tilt-copy-summary-btn');
     if (copyBtn) {
@@ -4850,6 +4924,15 @@ export class WorkspaceComponent {
     if (hudReadout) {
       hudReadout.textContent = `Optimum: ${d.optTiltDeg.toFixed(2)}° | Deviation: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}° | Hit: ${d.boresightDist.toFixed(1)}m`;
     }
+
+    const totalTiltEl = this.container.querySelector('#tilt-total-tilt');
+    if (totalTiltEl) totalTiltEl.textContent = `${d.totalTilt.toFixed(1)}°`;
+
+    const hValEl = this.container.querySelector('#tilt-h-val');
+    if (hValEl) hValEl.textContent = `${d.towerH}m`;
+
+    const targetValEl = this.container.querySelector('#tilt-target-val');
+    if (targetValEl) targetValEl.textContent = `${d.targetDist}m`;
   }
 
 }
