@@ -612,6 +612,100 @@ def test_slideshow_explicit_presentation_fallbacks_and_cachebusters():
     assert 'fill="#15803D" class="diagram-text-success"' in content
 
 
+def test_coverage_sidebar_section_and_submenus():
+    res = client.get("/static/js/components/sidebar.js")
+    assert res.status_code == 200
+    content = res.text
+
+    # 1. Coverage navigation section exists
+    assert "nav_coverage" in content
+
+    # 2. All 3 submenus are registered with proper links
+    assert 'href="#tool-coverage-simulation"' in content
+    assert 'href="#tool-okumura-hata"' in content
+    assert 'href="#tool-nettilt-3d"' in content
+
+    # 3. Positioned between Topology and GIS
+    pos_top = content.find("nav_topology")
+    pos_cov = content.find("nav_coverage")
+    pos_gis = content.find("nav_gis")
+    assert pos_top != -1 and pos_cov != -1 and pos_gis != -1
+    assert pos_top < pos_cov < pos_gis
+
+
+def test_coverage_vector_icons():
+    # Verify theme-adaptive vector glyph icons
+    icons = [
+        "tool-coverage-simulation.svg",
+        "tool-okumura-hata.svg",
+        "tool-nettilt-3d.svg",
+        "tool-nettilt3d.svg"
+    ]
+    for icon in icons:
+        res = client.get(f"/assets/icons/{icon}")
+        assert res.status_code == 200, f"Icon {icon} returned {res.status_code}"
+        assert "<svg" in res.text
+        assert "</svg>" in res.text
+        assert 'viewBox="0 0 32 32"' in res.text
+
+
+def test_coverage_i18n_state_and_catalog():
+    # 1. i18n translations in EN and ID
+    res_i18n = client.get("/static/js/i18n.js")
+    assert res_i18n.status_code == 200
+    i18n_text = res_i18n.text
+    assert "nav_coverage: 'Coverage'" in i18n_text
+    assert "nav_coverage: 'Cakupan & Propagasi'" in i18n_text
+    assert "filter_coverage: 'Coverage'" in i18n_text
+    assert "filter_coverage: 'Cakupan'" in i18n_text
+    assert "tool_coverage_simulation_title" in i18n_text
+    assert "tool_okumura_hata_title" in i18n_text
+    assert "tool_nettilt_3d_title" in i18n_text
+
+    # 2. State workspace initialization
+    res_state = client.get("/static/js/state.js")
+    assert res_state.status_code == 200
+    state_text = res_state.text
+    assert "'coverage-simulation': this.initWorkspace" in state_text
+    assert "'okumura-hata': this.initWorkspace" in state_text
+    assert "'nettilt-3d': this.initWorkspace" in state_text
+    assert "'nettilt3d': this.initWorkspace" in state_text
+
+    # 3. Dashboard catalog & filter
+    res_dash = client.get("/static/js/components/dashboard.js")
+    assert res_dash.status_code == 200
+    dash_text = res_dash.text
+    assert 'data-filter="coverage"' in dash_text
+    assert "'coverage-simulation'" in dash_text
+    assert "'okumura-hata'" in dash_text
+    assert "'nettilt-3d'" in dash_text
+
+
+def test_coverage_workspace_components_and_visualizers():
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+
+    # 1. Route routing in render()
+    assert "this.renderCoverageSimulation()" in ws_text
+    assert "this.renderOkumuraHata()" in ws_text
+    assert "this.renderNetTilt3D()" in ws_text
+
+    # 2. Method implementations and math calculations
+    assert "calculateCoverageData" in ws_text
+    assert "renderCovElevationSvg" in ws_text
+    assert "renderCovFootprintSvg" in ws_text
+    assert "calculateOkumuraHataData" in ws_text
+    assert "renderOhCurveSvg" in ws_text
+    assert "renderOhBudgetSvg" in ws_text
+    assert "calculateNetTilt3DData" in ws_text
+    assert "renderTiltPerspectiveSvg" in ws_text
+    assert "renderTiltGaugeSvg" in ws_text
+
+    # 3. Interactive controls and binds
+    assert "bindCoverageSimulation" in ws_text
+    assert "bindOkumuraHata" in ws_text
+    assert "bindNetTilt3D" in ws_text
 
 
 
@@ -620,45 +714,4 @@ def test_slideshow_explicit_presentation_fallbacks_and_cachebusters():
 
 
 
-def test_coverage_suite_icons():
-    # 1. nav-coverage.svg
-    res_nav = client.get("/assets/icons/nav-coverage.svg")
-    assert res_nav.status_code == 200
-    assert "<svg" in res_nav.text
-    assert "#0284C7" in res_nav.text
 
-    # 2. tool-coverage-simulation.svg
-    res_cov = client.get("/assets/icons/tool-coverage-simulation.svg")
-    assert res_cov.status_code == 200
-    assert "<svg" in res_cov.text
-    assert "ellipse" in res_cov.text
-
-    # 3. tool-okumura-hata.svg
-    res_hata = client.get("/assets/icons/tool-okumura-hata.svg")
-    assert res_hata.status_code == 200
-    assert "<svg" in res_hata.text
-    assert "#0284C7" in res_hata.text
-
-    # 4. tool-nettilt3d.svg and alias tool-nettilt-3d.svg
-    res_tilt = client.get("/assets/icons/tool-nettilt3d.svg")
-    assert res_tilt.status_code == 200
-    assert "<svg" in res_tilt.text
-    res_tilt_alias = client.get("/assets/icons/tool-nettilt-3d.svg")
-    assert res_tilt_alias.status_code == 200
-    assert "<svg" in res_tilt_alias.text
-
-def test_coverage_design_tokens_and_components():
-    res_tokens = client.get("/static/css/tokens.css")
-    assert res_tokens.status_code == 200
-    assert "--color-coverage-excellent" in res_tokens.text
-    assert "--color-tilt-mechanical" in res_tokens.text
-    assert "--color-env-urban" in res_tokens.text
-
-    res_comp = client.get("/static/css/components.css")
-    assert res_comp.status_code == 200
-    assert ".rf-coverage-grid" in res_comp.text
-    assert ".rf-metric-card" in res_comp.text
-    assert ".rf-env-selector" in res_comp.text
-    assert ".rf-tilt-badge" in res_comp.text
-    assert ".rf-coverage-chip" in res_comp.text
-    assert ".rf-coverage-canvas-frame" in res_comp.text

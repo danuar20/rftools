@@ -581,6 +581,9 @@ export class DashboardComponent {
           <button class="filter-pill ${this.activeFilter === 'topology' ? 'filter-pill--active' : ''}" data-filter="topology">
             ${state.t('filter_topology', 'Topology & Distance')}
           </button>
+          <button class="filter-pill ${this.activeFilter === 'coverage' ? 'filter-pill--active' : ''}" data-filter="coverage">
+            ${state.t('filter_coverage', 'Coverage')}
+          </button>
           <button class="filter-pill ${this.activeFilter === 'gis' ? 'filter-pill--active' : ''}" data-filter="gis">
             ${state.t('filter_gis', 'Geospatial & Geohash')}
           </button>
@@ -745,6 +748,42 @@ export class DashboardComponent {
         icon: 'tool-isd-calculator.svg',
         tags: ['EPSG:4326', 'Dual-Sheet (.xlsx)'],
         sample_template_id: 'isd_a'
+      },
+      {
+        id: 'coverage-simulation',
+        title: isId ? 'Simulasi Cakupan Antena' : 'Coverage Simulation',
+        category: isId ? 'CAKUPAN & PROPAGASI' : 'COVERAGE & PROPAGATION',
+        category_id: 'coverage',
+        description: isId
+          ? 'Hitung proyeksi jejak cakupan antena RF, batas berkas radiasi (near/center/far), dan luas area jangkauan di tanah.'
+          : 'Calculate RF antenna down-tilt coverage footprint, beam edges (near/center/far), and ground coverage area.',
+        icon: 'tool-coverage-simulation.svg',
+        tags: ['Antenna Down-tilt', 'Beam Footprint', 'RF Geometry'],
+        sample_template_id: null
+      },
+      {
+        id: 'okumura-hata',
+        title: isId ? 'Model Propagasi Okumura-Hata' : 'Okumura-Hata Model',
+        category: isId ? 'CAKUPAN & PROPAGASI' : 'COVERAGE & PROPAGATION',
+        category_id: 'coverage',
+        description: isId
+          ? 'Model redaman propagasi empiris Okumura-Hata untuk lingkungan Urban, Suburban, dan Rural dengan estimasi radius berbasis MAPL.'
+          : 'Empirical propagation loss modeling for Urban, Suburban, and Rural environments with MAPL-based coverage radius estimation.',
+        icon: 'tool-okumura-hata.svg',
+        tags: ['Empirical Propagation', 'MAPL Link Budget', '150-1500 MHz'],
+        sample_template_id: null
+      },
+      {
+        id: 'nettilt-3d',
+        title: isId ? 'NetTilt 3D' : 'NetTilt 3D',
+        category: isId ? 'CAKUPAN & PROPAGASI' : 'COVERAGE & PROPAGATION',
+        category_id: 'coverage',
+        description: isId
+          ? 'Optimalisasi sudut tilt antena 3D, kalkulasi titik jatuh boresight ke tanah, dan analisis elevasi medan kontur.'
+          : '3D antenna downtilt optimization, ground boresight impact distance, and effective height terrain geometry.',
+        icon: 'tool-nettilt-3d.svg',
+        tags: ['3D Downtilt', 'Boresight Ground Impact', 'Optimum Tilt Angle'],
+        sample_template_id: null
       },
       {
         id: 'geohash-converter',

@@ -25,13 +25,14 @@ export const translations = {
     nav_tools: 'Tools Dictionary',
     nav_kml: 'KML & Visualization',
     nav_topology: 'Topology & Distance',
+    nav_coverage: 'Coverage',
     nav_gis: 'Geospatial & Geohash',
     nav_about: 'About',
 
     // Hero & Stats
     hero_title: 'RF Engineering Suite',
     hero_subtitle: 'High-precision RF planning, 3D antenna visualization, and geospatial analysis.',
-    stat_engines_value: '6 Engines',
+    stat_engines_value: '9 Engines',
     stat_engines_label: 'Calculation Modules',
     stat_crs_value: 'EPSG:4326',
     stat_crs_label: 'WGS84 Geodetic Standard',
@@ -39,9 +40,10 @@ export const translations = {
     stat_verified_label: 'Verified Algorithms',
 
     // Dashboard Filters
-    filter_all: 'All Tools (7)',
+    filter_all: 'All Tools (10)',
     filter_kml: 'KML & Visualization',
     filter_topology: 'Topology & Distance',
+    filter_coverage: 'Coverage',
     filter_gis: 'Geospatial & Geohash',
     search_tools_input: 'Filter tools by name or keyword...',
     no_tools_found: 'No tools match your filter or search.',
@@ -104,6 +106,17 @@ export const translations = {
     tool_isd_calculator_title: 'Inter-Site Distance (ISD) Calculator',
     tool_isd_calculator_desc: 'Calculate high-precision geodesic Haversine distances between site datasets and identify N-nearest neighbors.',
 
+    tool_coverage_simulation_title: 'Coverage Simulation',
+    tool_coverage_simulation_desc: 'Calculate RF antenna down-tilt coverage footprint, beam edges, and ground coverage area.',
+
+    tool_okumura_hata_title: 'Okumura-Hata Model',
+    tool_okumura_hata_desc: 'Empirical propagation loss model and maximum allowable path loss (MAPL) coverage radius estimation.',
+
+    tool_nettilt_3d_title: 'NetTilt 3D',
+    tool_nettilt_3d_desc: '3D antenna downtilt optimization, boresight ground impact, and vertical radiation geometry.',
+    tool_nettilt3d_title: 'NetTilt 3D',
+    tool_nettilt3d_desc: '3D antenna downtilt optimization, boresight ground impact, and vertical radiation geometry.',
+
     tool_geohash_converter_title: 'Geohash Converter',
     tool_geohash_converter_desc: 'Instant bidirectional conversion between GeoHash strings and Lat, Lng coordinates inspired by geohash.co.',
 
@@ -147,13 +160,14 @@ export const translations = {
     nav_tools: 'Kamus Alat',
     nav_kml: 'KML & Visualisasi',
     nav_topology: 'Topologi & Jarak',
+    nav_coverage: 'Cakupan & Propagasi',
     nav_gis: 'Geospasial & Geohash',
     nav_about: 'Tentang',
 
     // Hero & Stats
     hero_title: 'Suite Rekayasa RF',
     hero_subtitle: 'Perencanaan RF presisi tinggi, visualisasi antena 3D, dan analisis geospasial.',
-    stat_engines_value: '6 Modul',
+    stat_engines_value: '9 Modul',
     stat_engines_label: 'Mesin Perhitungan',
     stat_crs_value: 'EPSG:4326',
     stat_crs_label: 'Standar Geodesi WGS84',
@@ -161,9 +175,10 @@ export const translations = {
     stat_verified_label: 'Algoritma Terverifikasi',
 
     // Dashboard Filters
-    filter_all: 'Semua Alat (7)',
+    filter_all: 'Semua Alat (10)',
     filter_kml: 'KML & Visualisasi',
     filter_topology: 'Topologi & Jarak',
+    filter_coverage: 'Cakupan',
     filter_gis: 'Geospasial & Geohash',
     search_tools_input: 'Cari alat berdasarkan nama atau kata kunci...',
     no_tools_found: 'Tidak ada alat yang sesuai dengan pencarian.',
@@ -225,6 +240,17 @@ export const translations = {
 
     tool_isd_calculator_title: 'Kalkulator Jarak Antar Site (ISD)',
     tool_isd_calculator_desc: 'Hitung jarak geodesik Haversine presisi tinggi antar site dan tentukan N-tetangga terdekat.',
+
+    tool_coverage_simulation_title: 'Simulasi Cakupan Antena',
+    tool_coverage_simulation_desc: 'Hitung proyeksi jejak cakupan antena RF, batas berkas radiasi, dan estimasi luas cakupan di tanah.',
+
+    tool_okumura_hata_title: 'Model Propagasi Okumura-Hata',
+    tool_okumura_hata_desc: 'Model redaman propagasi empiris dan estimasi radius jangkauan berbasis MAPL (Maximum Allowable Path Loss).',
+
+    tool_nettilt_3d_title: 'NetTilt 3D',
+    tool_nettilt_3d_desc: 'Optimalisasi tilt antena 3D, titik jatuh boresight ke permukaan tanah, dan geometri radiasi vertikal.',
+    tool_nettilt3d_title: 'NetTilt 3D',
+    tool_nettilt3d_desc: 'Optimalisasi tilt antena 3D, titik jatuh boresight ke permukaan tanah, dan geometri radiasi vertikal.',
 
     tool_geohash_converter_title: 'Konverter Geohash',
     tool_geohash_converter_desc: 'Konversi dua arah instan antara kode string GeoHash dan koordinat Lat, Lng terinspirasi dari geohash.co.',

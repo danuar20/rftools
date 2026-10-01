@@ -20,12 +20,21 @@ export class WorkspaceComponent {
   constructor(container, toolId) {
     this.container = container;
     this.toolId = toolId;
-    this.ws = state.workspaces[toolId];
+    this.ws = state.workspaces[toolId] || (toolId === 'nettilt3d' ? state.workspaces['nettilt-3d'] : null);
+    if (!this.ws) {
+      this.ws = state.initWorkspace ? state.initWorkspace(toolId, {}) : { params: {} };
+    }
     this.activeSheetTab = 'result'; // For ISD dual sheet preview
+    this.activeCovTab = 'elevation'; // For coverage simulation tab
+    this.activeOhTab = 'curve'; // For Okumura Hata tab
+    this.activeTiltTab = 'perspective'; // For NetTilt 3D tab
     this.render();
 
     this.unsubscribe = state.subscribe((event) => {
-      if (state.route !== `tool-${this.toolId}`) return;
+      const isRouteMatch = state.route === `tool-${this.toolId}` ||
+        (this.toolId === 'nettilt3d' && state.route === 'tool-nettilt-3d') ||
+        (this.toolId === 'nettilt-3d' && state.route === 'tool-nettilt3d');
+      if (!isRouteMatch) return;
       if (event === 'language-change' || event === 'theme-change') {
         this.render();
       }
@@ -65,6 +74,38 @@ export class WorkspaceComponent {
         sample_template_id: 'isd_a',
         outputExt: 'xlsx'
       },
+      'coverage-simulation': {
+        title: state.t('tool_coverage_simulation_title', 'Coverage Simulation'),
+        category: state.t('nav_coverage', 'Coverage'),
+        icon: 'tool-coverage-simulation.svg',
+        description: state.t('tool_coverage_simulation_desc', 'Calculate RF antenna down-tilt coverage footprint, beam edges, and ground coverage area.'),
+        sample_template_id: null,
+        outputExt: 'json'
+      },
+      'okumura-hata': {
+        title: state.t('tool_okumura_hata_title', 'Okumura-Hata Model'),
+        category: state.t('nav_coverage', 'Coverage'),
+        icon: 'tool-okumura-hata.svg',
+        description: state.t('tool_okumura_hata_desc', 'Empirical propagation loss model and maximum allowable path loss (MAPL) coverage radius estimation.'),
+        sample_template_id: null,
+        outputExt: 'json'
+      },
+      'nettilt-3d': {
+        title: state.t('tool_nettilt_3d_title', 'NetTilt 3D'),
+        category: state.t('nav_coverage', 'Coverage'),
+        icon: 'tool-nettilt-3d.svg',
+        description: state.t('tool_nettilt_3d_desc', '3D antenna downtilt optimization, boresight ground impact, and vertical radiation geometry.'),
+        sample_template_id: null,
+        outputExt: 'json'
+      },
+      'nettilt3d': {
+        title: state.t('tool_nettilt3d_title', 'NetTilt 3D'),
+        category: state.t('nav_coverage', 'Coverage'),
+        icon: 'tool-nettilt-3d.svg',
+        description: state.t('tool_nettilt3d_desc', '3D antenna downtilt optimization, boresight ground impact, and vertical radiation geometry.'),
+        sample_template_id: null,
+        outputExt: 'json'
+      },
       'geohash-to-shp': {
         title: state.t('tool_geohash_to_shp_title'),
         category: state.t('nav_gis'),
@@ -103,9 +144,24 @@ export class WorkspaceComponent {
   }
 
   render() {
-    if (state.route !== `tool-${this.toolId}`) return;
+    const isMatchingRoute = state.route === `tool-${this.toolId}` ||
+      (this.toolId === 'nettilt3d' && state.route === 'tool-nettilt-3d') ||
+      (this.toolId === 'nettilt-3d' && state.route === 'tool-nettilt3d');
+    if (!isMatchingRoute) return;
     if (this.toolId === 'geohash-converter') {
       this.renderGeohashConverter();
+      return;
+    }
+    if (this.toolId === 'coverage-simulation') {
+      this.renderCoverageSimulation();
+      return;
+    }
+    if (this.toolId === 'okumura-hata') {
+      this.renderOkumuraHata();
+      return;
+    }
+    if (this.toolId === 'nettilt-3d' || this.toolId === 'nettilt3d') {
+      this.renderNetTilt3D();
       return;
     }
     const meta = this.getToolMeta();
@@ -2997,4 +3053,1586 @@ export class WorkspaceComponent {
     // 7. Initial bind for neighbor buttons
     bindNeighborButtons();
   }
+
+  // =========================================================================
+  // COVERAGE & PROPAGATION ENGINEERING WORKSPACES
+  // =========================================================================
+
+  copyToClipboard(text, msg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        toast.success(msg || state.t('toast_copied', 'Copied to clipboard!'));
+      }).catch(() => {
+        toast.info(text);
+      });
+    } else {
+      toast.info(text);
+    }
+  }
+
+  // --- 1. COVERAGE SIMULATION ---
+  calculateCoverageData(params) {
+    const p = params || {};
+    const h = Math.max(1, parseFloat(p.antenna_height) || 30.0);
+    const mech = parseFloat(p.mechanical_tilt) !== undefined && !isNaN(parseFloat(p.mechanical_tilt)) ? parseFloat(p.mechanical_tilt) : 3.0;
+    const elec = parseFloat(p.electrical_tilt) !== undefined && !isNaN(parseFloat(p.electrical_tilt)) ? parseFloat(p.electrical_tilt) : 6.0;
+    const vbw = Math.max(1, parseFloat(p.v_beamwidth) || 10.0);
+    const hbw = Math.max(1, parseFloat(p.h_beamwidth) || 65.0);
+    const freq = parseFloat(p.frequency) || 2100.0;
+    const elev = parseFloat(p.elevation) || 0.0;
+
+    const totalTilt = Math.round((mech + elec) * 100) / 100;
+    const totalTiltRad = Math.abs(totalTilt) * Math.PI / 180;
+    const halfV = vbw / 2;
+    const halfH = hbw / 2;
+
+    let centerDist = 0;
+    if (Math.abs(totalTilt) > 0.01 && Math.abs(totalTilt) < 89) {
+      centerDist = Math.round((h / Math.tan(totalTiltRad)) * 100) / 100;
+    } else if (Math.abs(totalTilt) >= 89) {
+      centerDist = Math.round((h / Math.tan(89 * Math.PI / 180)) * 100) / 100;
+    }
+
+    const nearAngle = totalTilt + halfV;
+    let nearDist = 0;
+    if (nearAngle > 0 && nearAngle < 90) {
+      nearDist = Math.round((h / Math.tan(nearAngle * Math.PI / 180)) * 100) / 100;
+    }
+
+    const farAngle = Math.abs(totalTilt) - halfV;
+    let farDist = 0;
+    if (farAngle > 0) {
+      farDist = Math.round((h / Math.tan(farAngle * Math.PI / 180)) * 100) / 100;
+    } else {
+      farDist = Math.round((h / Math.tan(0.1 * Math.PI / 180)) * 100) / 100;
+    }
+
+    const coverageWidth = Math.round((2 * farDist * Math.tan(halfH * Math.PI / 180)) * 100) / 100;
+    const avgWidth = centerDist > 0 ? 2 * centerDist * Math.tan(halfH * Math.PI / 180) : 0;
+    const depth = Math.max(0, farDist - nearDist);
+    const coverageAreaHa = Math.round(((coverageWidth + avgWidth) / 2 * depth / 10000) * 100) / 100;
+    const coverageAreaKm2 = Math.round((coverageAreaHa / 100) * 1000) / 1000;
+
+    return {
+      h, mech, elec, vbw, hbw, freq, elev,
+      totalTilt, nearDist, centerDist, farDist,
+      coverageWidth, depth, coverageAreaHa, coverageAreaKm2
+    };
+  }
+
+  renderCoverageSimulation() {
+    const meta = this.getToolMeta();
+    const p = this.ws.params || {};
+    const d = this.calculateCoverageData(p);
+    const isId = state.lang === 'id';
+
+    this.container.innerHTML = `
+      <div class="workspace-container">
+        <!-- WORKSPACE TOOLBAR HEADER -->
+        <header class="workspace-header-bar">
+          <div class="workspace-title-group">
+            <div class="workspace-icon-box">
+              <img src="/assets/icons/tool-coverage-simulation.svg" alt="${meta.title}">
+            </div>
+            <div>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                <h1 class="workspace-title">${meta.title}</h1>
+                <span class="zone-badge">CRS EPSG:4326</span>
+                <span class="zone-badge" style="background: rgba(2, 132, 199, 0.1); color: var(--color-primary); border-color: rgba(2, 132, 199, 0.25);">Coverage Engine</span>
+              </div>
+              <p class="workspace-desc">${meta.description}</p>
+            </div>
+          </div>
+
+          <div class="workspace-header-actions">
+            <button class="rf-btn rf-btn-secondary" id="cov-copy-summary-btn" title="Copy calculated summary to clipboard">
+              <span>📋 ${state.t('btn_copy', 'Copy')} Summary</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="cov-export-btn" title="Export calculation data as JSON">
+              <span>💾 Export JSON</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="cov-reset-btn" title="Reset parameters to standard defaults">
+              <span>🔄 ${state.t('btn_reset', 'Reset')}</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- KPI METRIC CARDS -->
+        <div class="rf-coverage-grid" id="cov-kpi-grid">
+          ${this.renderCovKpiCards(d)}
+        </div>
+
+        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
+        <div class="workspace-split-grid">
+          <!-- LEFT: PARAMETERS & GEOMETRY TUNING -->
+          <section class="zone-card">
+            <div class="zone-header">
+              <span class="zone-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                ${isId ? 'Parameter Antena & Sudut Tilt' : 'Antenna Parameters & Tilt Angles'}
+              </span>
+              <span class="zone-badge">Reactive Inputs</span>
+            </div>
+
+            <div class="zone-body" style="padding: 16px;">
+              <!-- Antenna Height -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Tinggi Antena (AGL)' : 'Antenna Height (AGL)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-height" min="1" max="200" step="0.5" value="${d.h}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-height" min="1" max="150" step="0.5" value="${d.h}">
+              </div>
+
+              <!-- Mechanical Tilt -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">
+                    Mechanical Tilt
+                    <span class="rf-tilt-badge rf-tilt-badge--mech">Mech</span>
+                  </span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-mech" min="-15" max="25" step="0.5" value="${d.mech}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-mech" min="-10" max="20" step="0.5" value="${d.mech}">
+              </div>
+
+              <!-- Electrical Tilt -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">
+                    Electrical Tilt (RET)
+                    <span class="rf-tilt-badge rf-tilt-badge--elec">Elec</span>
+                  </span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-elec" min="0" max="16" step="0.5" value="${d.elec}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-elec" min="0" max="16" step="0.5" value="${d.elec}">
+              </div>
+
+              <!-- Vertical Beamwidth -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">Vertical Beamwidth (3dB)</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-vbw" min="2" max="30" step="0.5" value="${d.vbw}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-vbw" min="2" max="25" step="0.5" value="${d.vbw}">
+              </div>
+
+              <!-- Horizontal Beamwidth -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">Horizontal Beamwidth (Azimuth 3dB)</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-hbw" min="20" max="120" step="1" value="${d.hbw}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-hbw" min="30" max="120" step="1" value="${d.hbw}">
+              </div>
+
+              <!-- Carrier Frequency -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Frekuensi Carrier' : 'Carrier Frequency'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-freq" min="400" max="3800" step="50" value="${d.freq}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">MHz</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-freq" min="700" max="3500" step="50" value="${d.freq}">
+              </div>
+
+              <!-- Ground Elevation -->
+              <div class="rf-cov-param-row" style="margin-bottom: 0;">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Elevasi Permukaan Tanah (AMSL)' : 'Site Ground Elevation (AMSL)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="cov-input-elev" min="0" max="1000" step="5" value="${d.elev}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="cov-slider-elev" min="0" max="500" step="5" value="${d.elev}">
+              </div>
+            </div>
+          </section>
+
+          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
+          <section class="zone-card" style="display: flex; flex-direction: column;">
+            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
+              <div class="rf-coverage-canvas-header">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span>📐</span> ${isId ? 'Visualisasi Cakupan & Geometri Radiasi' : 'Coverage & Radiation Geometry Visualizer'}
+                </span>
+                <div class="rf-cov-tabs" id="cov-tab-bar">
+                  <button type="button" class="rf-cov-tab-btn ${this.activeCovTab === 'elevation' ? 'rf-cov-tab-btn--active' : ''}" data-tab="elevation">
+                    ${isId ? 'Profil Elevasi (Samping)' : 'Elevation Profile (Side)'}
+                  </button>
+                  <button type="button" class="rf-cov-tab-btn ${this.activeCovTab === 'footprint' ? 'rf-cov-tab-btn--active' : ''}" data-tab="footprint">
+                    ${isId ? 'Jejak Sektor (Atas)' : 'Sector Footprint (Top)'}
+                  </button>
+                </div>
+              </div>
+
+              <div class="rf-coverage-canvas-body" id="cov-diagram-body">
+                ${this.activeCovTab === 'elevation' ? this.renderCovElevationSvg(d) : this.renderCovFootprintSvg(d)}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+
+    this.bindCoverageSimulation();
+  }
+
+  renderCovKpiCards(d) {
+    const isId = state.lang === 'id';
+    return `
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Total Downtilt' : 'Total Downtilt'}</span>
+          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-tilt">${d.totalTilt.toFixed(1)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° Elec</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Jarak Boresight (Pusat)' : 'Boresight Center'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-center">${d.centerDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Ground impact @ ${d.totalTilt.toFixed(1)}°</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Batas Dekat (Near Edge)' : 'Near Beam Edge'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--fair">Inner</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-near">${d.nearDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Upper 3dB boundary ray</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Batas Jauh (Far Edge)' : 'Far Beam Edge'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--excellent">Outer</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-far">${d.farDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Lower 3dB boundary ray</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Lebar Sektor di Far Edge' : 'Beam Width @ Far Edge'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Spread</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-width">${d.coverageWidth.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Azimuth 3dB span (${d.hbw}°)</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Estimasi Luas Cakupan' : 'Ground Coverage Area'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--excellent">Footprint</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-cov-area">${d.coverageAreaHa.toFixed(2)}<span class="rf-metric-card__unit">ha</span></div>
+        <div class="rf-metric-card__meta">${d.coverageAreaKm2.toFixed(3)} km² footprint</div>
+      </div>
+    `;
+  }
+
+  renderCovElevationSvg(d) {
+    const maxD = Math.max(d.farDist * 1.15, d.centerDist * 1.3, 100);
+    const scaleX = (dist) => 70 + Math.min(410, (dist / maxD) * 410);
+
+    const xNear = scaleX(d.nearDist);
+    const xCenter = scaleX(d.centerDist);
+    const xFar = scaleX(d.farDist);
+    const yGround = 210;
+    const yAntenna = 65;
+    const xTower = 70;
+
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- Ground Horizon Grid Line -->
+        <line x1="30" y1="${yGround}" x2="495" y2="${yGround}" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.8" stroke-linecap="round"/>
+        <text x="495" y="${yGround + 15}" fill="#64748B" class="diagram-text-muted" font-size="8.5" text-anchor="end">Ground Plane (0m)</text>
+
+        <!-- Shaded Beam Footprint Sector Polygon -->
+        <polygon points="${xTower},${yAntenna} ${xNear},${yGround} ${xFar},${yGround}" fill="#0284C7" fill-opacity="0.12" stroke="#0284C7" stroke-opacity="0.25" stroke-width="1"/>
+
+        <!-- Ground Footprint Span Bar -->
+        <line x1="${xNear}" y1="${yGround}" x2="${xFar}" y2="${yGround}" stroke="#10B981" stroke-width="3.5" stroke-linecap="round"/>
+
+        <!-- Beam Projection Rays -->
+        <!-- Near Ray (Upper 3dB) -->
+        <line x1="${xTower}" y1="${yAntenna}" x2="${xNear}" y2="${yGround}" stroke="#0284C7" stroke-width="1.6" stroke-dasharray="3 3"/>
+        <!-- Center Boresight Ray -->
+        <line x1="${xTower}" y1="${yAntenna}" x2="${xCenter}" y2="${yGround}" stroke="#10B981" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- Far Ray (Lower 3dB) -->
+        <line x1="${xTower}" y1="${yAntenna}" x2="${xFar}" y2="${yGround}" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round"/>
+
+        <!-- Ground Ray Hit Nodes -->
+        <circle cx="${xNear}" cy="${yGround}" r="3.5" fill="#0284C7"/>
+        <circle cx="${xCenter}" cy="${yGround}" r="4.5" fill="#10B981"/>
+        <circle cx="${xFar}" cy="${yGround}" r="3.5" fill="#0284C7"/>
+
+        <!-- Distance Callout Labels on Ground -->
+        <g transform="translate(${xNear}, ${yGround + 18})">
+          <rect x="-24" y="-2" width="48" height="15" rx="3" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" stroke-width="1"/>
+          <text x="0" y="9" fill="#0284C7" font-size="7.5" font-weight="bold" font-family="monospace" text-anchor="middle">${d.nearDist.toFixed(0)}m Near</text>
+        </g>
+        <g transform="translate(${xCenter}, ${yGround + 36})">
+          <rect x="-30" y="-2" width="60" height="16" rx="3" fill="#10B981" fill-opacity="0.15" stroke="#10B981" stroke-width="1"/>
+          <text x="0" y="9.5" fill="#047857" class="diagram-text-success" font-size="8" font-weight="bold" font-family="monospace" text-anchor="middle">${d.centerDist.toFixed(0)}m Center</text>
+        </g>
+        <g transform="translate(${xFar}, ${yGround + 18})">
+          <rect x="-24" y="-2" width="48" height="15" rx="3" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" stroke-width="1"/>
+          <text x="0" y="9" fill="#0284C7" font-size="7.5" font-weight="bold" font-family="monospace" text-anchor="middle">${d.farDist.toFixed(0)}m Far</text>
+        </g>
+
+        <!-- Tower Mast Structure -->
+        <path d="${xTower - 14} ${yGround} L ${xTower} ${yAntenna} L ${xTower + 14} ${yGround}" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="${xTower - 10}" y1="175" x2="${xTower + 10}" y2="175" stroke="#0284C7" stroke-width="1.2"/>
+        <line x1="${xTower - 7}" y1="135" x2="${xTower + 7}" y2="135" stroke="#0284C7" stroke-width="1.2"/>
+        <line x1="${xTower - 4}" y1="95" x2="${xTower + 4}" y2="95" stroke="#0284C7" stroke-width="1.2"/>
+
+        <!-- Tower Height Label -->
+        <line x1="38" y1="${yAntenna}" x2="38" y2="${yGround}" stroke="#64748B" stroke-width="1.2" stroke-dasharray="2 2"/>
+        <path d="M 35 ${yAntenna + 4} L 38 ${yAntenna} L 41 ${yAntenna + 4} M 35 ${yGround - 4} L 38 ${yGround} L 41 ${yGround - 4}" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/>
+        <text x="32" y="${(yAntenna + yGround) / 2 + 4}" fill="#0F172A" class="diagram-text-title" font-size="8" font-family="monospace" font-weight="bold" text-anchor="end">H=${d.h}m</text>
+
+        <!-- Antenna Panel on Mast (Rotated by Downtilt) -->
+        <g transform="translate(${xTower}, ${yAntenna}) rotate(${Math.min(45, Math.max(-15, d.totalTilt))})">
+          <rect x="-3" y="-12" width="6" height="24" rx="2" fill="#0284C7" stroke="#0369A1" stroke-width="1.2"/>
+          <line x1="0" y1="0" x2="22" y2="0" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+        <circle cx="${xTower}" cy="${yAntenna}" r="3" fill="#10B981"/>
+
+        <!-- Downtilt Badge Card in Top Left -->
+        <g transform="translate(100, 20)">
+          <rect width="180" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.08))"/>
+          <text x="12" y="18" fill="#0F172A" class="diagram-text-title" font-size="8.5" font-weight="bold" font-family="sans-serif">
+            Net Downtilt: <tspan fill="#0284C7">${d.totalTilt.toFixed(1)}°</tspan> (${d.mech}°M + ${d.elec}°E)
+          </text>
+        </g>
+      </svg>
+    `;
+  }
+
+  renderCovFootprintSvg(d) {
+    const cx = 260;
+    const cy = 240;
+    const maxR = 190;
+    const maxDist = Math.max(d.farDist * 1.15, d.centerDist * 1.3, 100);
+
+    const rNear = Math.max(15, (d.nearDist / maxDist) * maxR);
+    const rCenter = Math.max(25, (d.centerDist / maxDist) * maxR);
+    const rFar = Math.max(35, Math.min(maxR, (d.farDist / maxDist) * maxR));
+
+    const halfAngleRad = (d.hbw / 2) * (Math.PI / 180);
+    const aLeft = -Math.PI / 2 - halfAngleRad;
+    const aRight = -Math.PI / 2 + halfAngleRad;
+
+    const pNearL = { x: cx + rNear * Math.cos(aLeft), y: cy + rNear * Math.sin(aLeft) };
+    const pNearR = { x: cx + rNear * Math.cos(aRight), y: cy + rNear * Math.sin(aRight) };
+    const pFarL = { x: cx + rFar * Math.cos(aLeft), y: cy + rFar * Math.sin(aLeft) };
+    const pFarR = { x: cx + rFar * Math.cos(aRight), y: cy + rFar * Math.sin(aRight) };
+
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- Radar Range Rings -->
+        <circle cx="${cx}" cy="${cy}" r="${maxR * 0.33}" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+        <circle cx="${cx}" cy="${cy}" r="${maxR * 0.66}" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+        <circle cx="${cx}" cy="${cy}" r="${maxR}" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+
+        <!-- Azimuth Radial Guides -->
+        <line x1="${cx}" y1="${cy}" x2="${cx}" y2="30" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+        <text x="${cx}" y="24" fill="#64748B" class="diagram-text-muted" font-size="8" text-anchor="middle">0° (Boresight Azimuth)</text>
+
+        <!-- Sector Fan Fill -->
+        <path d="M ${pNearL.x} ${pNearL.y} A ${rNear} ${rNear} 0 0 1 ${pNearR.x} ${pNearR.y} L ${pFarR.x} ${pFarR.y} A ${rFar} ${rFar} 0 0 0 ${pFarL.x} ${pFarL.y} Z" fill="#0284C7" fill-opacity="0.15" stroke="#0284C7" stroke-width="1.5"/>
+
+        <!-- Center Boresight Arc -->
+        <path d="M ${cx + rCenter * Math.cos(aLeft)} ${cy + rCenter * Math.sin(aLeft)} A ${rCenter} ${rCenter} 0 0 1 ${cx + rCenter * Math.cos(aRight)} ${cy + rCenter * Math.sin(aRight)}" fill="none" stroke="#10B981" stroke-width="2" stroke-dasharray="3 3"/>
+
+        <!-- Center Radial Ray -->
+        <line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - rFar}" stroke="#10B981" stroke-width="1.8"/>
+        <circle cx="${cx}" cy="${cy - rCenter}" r="3.5" fill="#10B981"/>
+
+        <!-- Antenna Site Node -->
+        <circle cx="${cx}" cy="${cy}" r="5" fill="#0284C7"/>
+        <circle cx="${cx}" cy="${cy}" r="10" fill="none" stroke="#0284C7" stroke-width="1.2" opacity="0.6"/>
+        <text x="${cx}" y="${cy + 18}" fill="#0F172A" class="diagram-text-title" font-size="8" font-family="monospace" font-weight="bold" text-anchor="middle">Site Antenna Origin</text>
+
+        <!-- Coverage Width Callout Line -->
+        <line x1="${pFarL.x}" y1="${pFarL.y - 10}" x2="${pFarR.x}" y2="${pFarR.y - 10}" stroke="#0284C7" stroke-width="1.2"/>
+        <path d="M ${pFarL.x + 3} ${pFarL.y - 13} L ${pFarL.x} ${pFarL.y - 10} L ${pFarL.x + 3} ${pFarL.y - 7} M ${pFarR.x - 3} ${pFarR.y - 13} L ${pFarR.x} ${pFarR.y - 10} L ${pFarR.x - 3} ${pFarR.y - 7}" stroke="#0284C7" stroke-width="1.2" stroke-linecap="round"/>
+        <text x="${cx}" y="${pFarL.y - 16}" fill="#0284C7" font-size="8" font-family="monospace" font-weight="bold" text-anchor="middle">Width: ${d.coverageWidth.toFixed(0)}m (${d.hbw}° HBW)</text>
+
+        <!-- Area Tag Badge -->
+        <g transform="translate(20, 20)">
+          <rect width="160" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.08))"/>
+          <text x="10" y="18" fill="#0F172A" class="diagram-text-title" font-size="8.5" font-weight="bold" font-family="sans-serif">
+            Area: <tspan fill="#10B981">${d.coverageAreaHa.toFixed(2)} ha</tspan> (${d.coverageAreaKm2.toFixed(3)} km²)
+          </text>
+        </g>
+      </svg>
+    `;
+  }
+
+  bindCoverageSimulation() {
+    const bindPair = (inputId, sliderId, key) => {
+      const input = this.container.querySelector(inputId);
+      const slider = this.container.querySelector(sliderId);
+      if (!input || !slider) return;
+
+      const update = (val) => {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          this.ws.params[key] = num;
+          input.value = num;
+          slider.value = num;
+          this.refreshCovUi();
+        }
+      };
+
+      input.addEventListener('input', (e) => update(e.target.value));
+      slider.addEventListener('input', (e) => update(e.target.value));
+    };
+
+    bindPair('#cov-input-height', '#cov-slider-height', 'antenna_height');
+    bindPair('#cov-input-mech', '#cov-slider-mech', 'mechanical_tilt');
+    bindPair('#cov-input-elec', '#cov-slider-elec', 'electrical_tilt');
+    bindPair('#cov-input-vbw', '#cov-slider-vbw', 'v_beamwidth');
+    bindPair('#cov-input-hbw', '#cov-slider-hbw', 'h_beamwidth');
+    bindPair('#cov-input-freq', '#cov-slider-freq', 'frequency');
+    bindPair('#cov-input-elev', '#cov-slider-elev', 'elevation');
+
+    // Tabs
+    const tabBtns = this.container.querySelectorAll('#cov-tab-bar .rf-cov-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        tabBtns.forEach(b => b.classList.remove('rf-cov-tab-btn--active'));
+        btn.classList.add('rf-cov-tab-btn--active');
+        this.activeCovTab = btn.dataset.tab;
+        this.refreshCovUi();
+      });
+    });
+
+    // Actions
+    const copyBtn = this.container.querySelector('#cov-copy-summary-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const d = this.calculateCoverageData(this.ws.params);
+        const text = `RF Coverage Simulation Results:
+- Antenna Height: ${d.h}m AGL
+- Tilt: ${d.totalTilt}° (${d.mech}° Mech + ${d.elec}° Elec)
+- Beamwidth: ${d.vbw}° Vert, ${d.hbw}° Horiz
+- Boresight Ground Hit: ${d.centerDist.toFixed(1)}m
+- Near Edge: ${d.nearDist.toFixed(1)}m | Far Edge: ${d.farDist.toFixed(1)}m
+- Coverage Width: ${d.coverageWidth.toFixed(1)}m
+- Ground Area: ${d.coverageAreaHa.toFixed(2)} ha (${d.coverageAreaKm2.toFixed(3)} km²)`;
+        this.copyToClipboard(text, 'Coverage summary copied to clipboard!');
+      });
+    }
+
+    const exportBtn = this.container.querySelector('#cov-export-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const d = this.calculateCoverageData(this.ws.params);
+        const json = JSON.stringify(d, null, 2);
+        this.copyToClipboard(json, 'Calculation JSON copied to clipboard!');
+      });
+    }
+
+    const resetBtn = this.container.querySelector('#cov-reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.ws.params = {
+          antenna_height: 30.0,
+          mechanical_tilt: 3.0,
+          electrical_tilt: 6.0,
+          v_beamwidth: 10.0,
+          h_beamwidth: 65.0,
+          frequency: 2100.0,
+          elevation: 0.0
+        };
+        this.renderCoverageSimulation();
+        toast.info('Coverage parameters reset to defaults');
+      });
+    }
+  }
+
+  refreshCovUi() {
+    const d = this.calculateCoverageData(this.ws.params);
+    const kpiGrid = this.container.querySelector('#cov-kpi-grid');
+    if (kpiGrid) kpiGrid.innerHTML = this.renderCovKpiCards(d);
+
+    const diagramBody = this.container.querySelector('#cov-diagram-body');
+    if (diagramBody) {
+      diagramBody.innerHTML = this.activeCovTab === 'elevation'
+        ? this.renderCovElevationSvg(d)
+        : this.renderCovFootprintSvg(d);
+    }
+  }
+
+  // --- 2. OKUMURA-HATA PROPAGATION MODEL ---
+  calculateOkumuraHataData(params) {
+    const p = params || {};
+    const f = Math.max(150, Math.min(2500, parseFloat(p.frequency) || 2100.0));
+    const hb = Math.max(10, Math.min(300, parseFloat(p.hb) || 30.0));
+    const hm = Math.max(1, Math.min(20, parseFloat(p.hm) || 1.5));
+    const env = p.env_type || 'urban';
+    const txPower = parseFloat(p.tx_power) !== undefined && !isNaN(parseFloat(p.tx_power)) ? parseFloat(p.tx_power) : 43.0;
+    const gain = parseFloat(p.gain) !== undefined && !isNaN(parseFloat(p.gain)) ? parseFloat(p.gain) : 18.0;
+    const cableLoss = parseFloat(p.cable_loss) !== undefined && !isNaN(parseFloat(p.cable_loss)) ? parseFloat(p.cable_loss) : 2.0;
+    const rxSens = parseFloat(p.rx_sensitivity) !== undefined && !isNaN(parseFloat(p.rx_sensitivity)) ? parseFloat(p.rx_sensitivity) : -102.0;
+    const mech = parseFloat(p.mech_tilt) || 3.0;
+    const elec = parseFloat(p.elec_tilt) || 6.0;
+    const vbw = parseFloat(p.v_beamwidth) || 10.0;
+    const hbw = parseFloat(p.h_beamwidth) || 65.0;
+
+    let a_hm = (1.1 * Math.log10(f) - 0.7) * hm - (1.56 * Math.log10(f) - 0.8);
+    let L_1km = 0;
+    let confidence = 0.85;
+    let envLabel = "Urban";
+
+    if (env === 'urban') {
+      if (f <= 300) {
+        a_hm = 8.29 * Math.pow(Math.log10(1.54 * f), 2) - 1.1;
+      } else {
+        a_hm = 3.2 * Math.pow(Math.log10(11.75 * hm), 2) - 4.97;
+      }
+      const L_u = 69.55 + 26.16 * Math.log10(f) - 13.82 * Math.log10(hb) - a_hm;
+      L_1km = L_u + 26.16 * Math.log10(f) - 65.55;
+      confidence = 0.85;
+      envLabel = "Urban (Large City)";
+    } else if (env === 'suburban') {
+      const L_u = 69.55 + 26.16 * Math.log10(f) - 13.82 * Math.log10(hb) - a_hm;
+      const L_sub = L_u - 2 * Math.pow(Math.log10(f / 28), 2) - 5.4;
+      L_1km = L_sub + 26.16 * Math.log10(f) - 65.55;
+      confidence = 0.80;
+      envLabel = "Suburban";
+    } else {
+      const L_u = 69.55 + 26.16 * Math.log10(f) - 13.82 * Math.log10(hb) - a_hm;
+      const L_rur = L_u - 4.78 * Math.pow(Math.log10(f), 2) + 18.33 * Math.log10(f) - 40.94;
+      L_1km = L_rur + 26.16 * Math.log10(f) - 65.55;
+      confidence = 0.75;
+      envLabel = "Rural (Open Area)";
+    }
+
+    const eirp = Math.round((txPower + gain - cableLoss) * 100) / 100;
+    const maxPl = Math.round((eirp - rxSens) * 100) / 100;
+
+    const exponent = (maxPl - L_1km) / 35.2;
+    const covRadiusKm = exponent > 0 ? Math.round(Math.pow(10, exponent) * 1000) / 1000 : 0.05;
+    const sectorAreaKm2 = Math.round(((hbw / 360) * Math.PI * Math.pow(covRadiusKm, 2)) * 1000) / 1000;
+    const sectorAreaHa = Math.round(sectorAreaKm2 * 100 * 100) / 100;
+
+    const totalTilt = Math.round((elec + mech) * 100) / 100;
+    const totalTiltRad = totalTilt * Math.PI / 180;
+    const boresightDist = Math.abs(totalTilt) > 0.5 ? Math.round((hb / Math.tan(Math.abs(totalTiltRad))) * 10) / 10 : covRadiusKm * 1000;
+
+    return {
+      f, hb, hm, env, txPower, gain, cableLoss, rxSens,
+      mech, elec, vbw, hbw, totalTilt, a_hm: Math.round(a_hm * 100) / 100,
+      L_1km: Math.round(L_1km * 100) / 100,
+      confidence, envLabel, eirp, maxPl, covRadiusKm, sectorAreaKm2, sectorAreaHa, boresightDist
+    };
+  }
+
+  renderOkumuraHata() {
+    const meta = this.getToolMeta();
+    const p = this.ws.params || {};
+    const d = this.calculateOkumuraHataData(p);
+    const isId = state.lang === 'id';
+
+    this.container.innerHTML = `
+      <div class="workspace-container">
+        <!-- WORKSPACE TOOLBAR HEADER -->
+        <header class="workspace-header-bar">
+          <div class="workspace-title-group">
+            <div class="workspace-icon-box">
+              <img src="/assets/icons/tool-okumura-hata.svg" alt="${meta.title}">
+            </div>
+            <div>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                <h1 class="workspace-title">${meta.title}</h1>
+                <span class="zone-badge">150–2100 MHz</span>
+                <span class="zone-badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); border-color: rgba(16, 185, 129, 0.25);">Empirical Model</span>
+              </div>
+              <p class="workspace-desc">${meta.description}</p>
+            </div>
+          </div>
+
+          <div class="workspace-header-actions">
+            <button class="rf-btn rf-btn-secondary" id="oh-copy-summary-btn" title="Copy calculated summary to clipboard">
+              <span>📋 ${state.t('btn_copy', 'Copy')} Summary</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="oh-export-btn" title="Export calculation data as JSON">
+              <span>💾 Export JSON</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="oh-reset-btn" title="Reset parameters to standard defaults">
+              <span>🔄 ${state.t('btn_reset', 'Reset')}</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- KPI METRIC CARDS -->
+        <div class="rf-coverage-grid" id="oh-kpi-grid">
+          ${this.renderOhKpiCards(d)}
+        </div>
+
+        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
+        <div class="workspace-split-grid">
+          <!-- LEFT: RF LINK BUDGET & MORPHOLOGY PARAMETERS -->
+          <section class="zone-card">
+            <div class="zone-header">
+              <span class="zone-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                ${isId ? 'Konfigurasi Link RF & Lingkungan' : 'RF Link Budget & Environment'}
+              </span>
+              <span class="zone-badge">${d.envLabel}</span>
+            </div>
+
+            <div class="zone-body" style="padding: 16px;">
+              <!-- Environment Type Segmented Selector -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Tipe Lingkungan Propagasi' : 'Propagation Environment'}</span>
+                </div>
+                <div class="rf-env-selector" id="oh-env-selector">
+                  <button type="button" class="rf-env-option ${d.env === 'urban' ? 'rf-env-option--active' : ''}" data-env="urban">
+                    Urban (Kota Besar)
+                  </button>
+                  <button type="button" class="rf-env-option ${d.env === 'suburban' ? 'rf-env-option--active' : ''}" data-env="suburban">
+                    Suburban (Pinggiran)
+                  </button>
+                  <button type="button" class="rf-env-option ${d.env === 'rural' ? 'rf-env-option--active' : ''}" data-env="rural">
+                    Rural (Terbuka)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Carrier Frequency -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Frekuensi Carrier' : 'Carrier Frequency'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="oh-input-freq" min="150" max="2500" step="50" value="${d.f}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">MHz</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="oh-slider-freq" min="150" max="2100" step="50" value="${d.f}">
+              </div>
+
+              <!-- Base Station Antenna Height (hb) -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Tinggi Antena BS (hb)' : 'Base Station Height (hb)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="oh-input-hb" min="15" max="200" step="1" value="${d.hb}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="oh-slider-hb" min="20" max="150" step="1" value="${d.hb}">
+              </div>
+
+              <!-- Mobile Antenna Height (hm) -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Tinggi Antena Pengguna (hm)' : 'Mobile Height (hm)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="oh-input-hm" min="1" max="10" step="0.5" value="${d.hm}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="oh-slider-hm" min="1" max="10" step="0.5" value="${d.hm}">
+              </div>
+
+              <!-- Transmitter Power (tx_power) -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">TX Power (${(Math.pow(10, (d.txPower - 30)/10)).toFixed(1)}W)</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="oh-input-tx" min="20" max="55" step="1" value="${d.txPower}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">dBm</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="oh-slider-tx" min="30" max="50" step="1" value="${d.txPower}">
+              </div>
+
+              <!-- Antenna Gain & Cable Loss -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" class="rf-cov-param-row">
+                <div>
+                  <div class="rf-cov-param-header">
+                    <span class="rf-cov-param-label">Gain</span>
+                    <input type="number" class="rf-cov-param-input" id="oh-input-gain" min="5" max="25" step="0.5" value="${d.gain}" style="width: 55px;">
+                  </div>
+                  <input type="range" class="rf-cov-slider" id="oh-slider-gain" min="10" max="24" step="0.5" value="${d.gain}">
+                </div>
+                <div>
+                  <div class="rf-cov-param-header">
+                    <span class="rf-cov-param-label">Loss</span>
+                    <input type="number" class="rf-cov-param-input" id="oh-input-loss" min="0" max="10" step="0.5" value="${d.cableLoss}" style="width: 55px;">
+                  </div>
+                  <input type="range" class="rf-cov-slider" id="oh-slider-loss" min="0" max="8" step="0.5" value="${d.cableLoss}">
+                </div>
+              </div>
+
+              <!-- RX Sensitivity -->
+              <div class="rf-cov-param-row" style="margin-bottom: 0;">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">RX Sensitivity Threshold</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="oh-input-rx" min="-130" max="-70" step="1" value="${d.rxSens}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">dBm</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="oh-slider-rx" min="-120" max="-80" step="1" value="${d.rxSens}">
+              </div>
+            </div>
+          </section>
+
+          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
+          <section class="zone-card" style="display: flex; flex-direction: column;">
+            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
+              <div class="rf-coverage-canvas-header">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span>📈</span> ${isId ? 'Kurva Redaman & Ambang Batas MAPL' : 'Path Loss Decay Curve & MAPL Threshold'}
+                </span>
+                <div class="rf-cov-tabs" id="oh-tab-bar">
+                  <button type="button" class="rf-cov-tab-btn ${this.activeOhTab === 'curve' ? 'rf-cov-tab-btn--active' : ''}" data-tab="curve">
+                    ${isId ? 'Kurva Path Loss vs Jarak' : 'Path Loss Curve vs Distance'}
+                  </button>
+                  <button type="button" class="rf-cov-tab-btn ${this.activeOhTab === 'budget' ? 'rf-cov-tab-btn--active' : ''}" data-tab="budget">
+                    ${isId ? 'Rincian Link Budget' : 'Link Budget Waterfall'}
+                  </button>
+                </div>
+              </div>
+
+              <div class="rf-coverage-canvas-body" id="oh-diagram-body">
+                ${this.activeOhTab === 'curve' ? this.renderOhCurveSvg(d) : this.renderOhBudgetSvg(d)}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+
+    this.bindOkumuraHata();
+  }
+
+  renderOhKpiCards(d) {
+    const isId = state.lang === 'id';
+    return `
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">EIRP Transmitter</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">RF Power</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-eirp">${d.eirp.toFixed(1)}<span class="rf-metric-card__unit">dBm</span></div>
+        <div class="rf-metric-card__meta">${d.txPower} dBm + ${d.gain} dBi - ${d.cableLoss} dB</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">Max Allowable Loss (MAPL)</span>
+          <span class="rf-coverage-chip rf-coverage-chip--excellent">Budget</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-mapl">${d.maxPl.toFixed(1)}<span class="rf-metric-card__unit">dB</span></div>
+        <div class="rf-metric-card__meta">EIRP - (${d.rxSens} dBm sensitivity)</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">Path Loss @ 1 km (L1km)</span>
+          <span class="rf-coverage-chip rf-coverage-chip--fair">${d.env}</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-l1km">${d.L_1km.toFixed(1)}<span class="rf-metric-card__unit">dB</span></div>
+        <div class="rf-metric-card__meta">Correction a(hm)=${d.a_hm.toFixed(2)} dB</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Radius Jangkauan Maks' : 'Max Coverage Radius'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--excellent">R-Cov</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-rcov">${d.covRadiusKm.toFixed(3)}<span class="rf-metric-card__unit">km</span></div>
+        <div class="rf-metric-card__meta">${(d.covRadiusKm * 1000).toFixed(0)} meters reach</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Luas Area Sektor' : 'Sector Coverage Area'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Area</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-area">${d.sectorAreaKm2.toFixed(3)}<span class="rf-metric-card__unit">km²</span></div>
+        <div class="rf-metric-card__meta">${d.sectorAreaHa.toFixed(1)} ha (${d.hbw}° sector)</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Keandalan Model' : 'Model Confidence'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">${Math.round(d.confidence * 100)}%</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-oh-conf">${(d.confidence * 100).toFixed(0)}<span class="rf-metric-card__unit">%</span></div>
+        <div class="rf-metric-card__meta">${d.envLabel} morphology</div>
+      </div>
+    `;
+  }
+
+  renderOhCurveSvg(d) {
+    const maxDistKm = Math.max(5, Math.min(20, d.covRadiusKm * 1.5));
+    const minLoss = Math.floor(d.L_1km - 15);
+    const maxLoss = Math.ceil(d.maxPl + 15);
+
+    const scaleX = (distKm) => 60 + Math.min(420, (distKm / maxDistKm) * 420);
+    const scaleY = (lossDb) => 220 - ((lossDb - minLoss) / (maxLoss - minLoss)) * 170;
+
+    // Generate Path Loss curve points: L(d) = L_1km + 35.2 * log10(d)
+    const points = [];
+    const steps = 30;
+    for (let i = 1; i <= steps; i++) {
+      const dist = (i / steps) * maxDistKm;
+      const loss = d.L_1km + 35.2 * Math.log10(Math.max(0.1, dist));
+      const px = scaleX(dist);
+      const py = scaleY(loss);
+      points.push(`${px.toFixed(1)},${py.toFixed(1)}`);
+    }
+
+    const maplY = scaleY(d.maxPl);
+    const rX = scaleX(d.covRadiusKm);
+
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- Axes -->
+        <line x1="60" y1="50" x2="60" y2="220" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.5"/>
+        <line x1="60" y1="220" x2="490" y2="220" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.5"/>
+
+        <!-- Grid Lines & Tick Labels -->
+        <line x1="60" y1="50" x2="490" y2="50" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+        <line x1="60" y1="135" x2="490" y2="135" stroke="#E2E8F0" class="diagram-grid" stroke-dasharray="2 2"/>
+        
+        <text x="52" y="54" fill="#64748B" class="diagram-text-muted" font-size="8" text-anchor="end">${maxLoss}dB</text>
+        <text x="52" y="139" fill="#64748B" class="diagram-text-muted" font-size="8" text-anchor="end">${Math.round((minLoss + maxLoss)/2)}dB</text>
+        <text x="52" y="224" fill="#64748B" class="diagram-text-muted" font-size="8" text-anchor="end">${minLoss}dB</text>
+
+        <text x="490" y="235" fill="#64748B" class="diagram-text-muted" font-size="8" text-anchor="end">${maxDistKm.toFixed(1)} km</text>
+        <text x="60" y="235" fill="#64748B" class="diagram-text-muted" font-size="8">0 km</text>
+
+        <!-- MAPL Threshold Horizontal Line (Red/Danger) -->
+        <line x1="60" y1="${maplY}" x2="490" y2="${maplY}" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="4 3"/>
+        <text x="490" y="${maplY - 5}" fill="#EF4444" font-size="8" font-weight="bold" font-family="monospace" text-anchor="end">MAPL: ${d.maxPl} dB</text>
+
+        <!-- Path Loss Decay Curve (Emerald/Primary) -->
+        <polyline points="${points.join(' ')}" fill="none" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- Intersection Point (R-Cov) -->
+        <line x1="${rX}" y1="${maplY}" x2="${rX}" y2="220" stroke="#10B981" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <circle cx="${rX}" cy="${maplY}" r="5" fill="#10B981"/>
+        <circle cx="${rX}" cy="${maplY}" r="9" fill="none" stroke="#10B981" stroke-width="1.5" opacity="0.6"/>
+
+        <!-- Coverage Intercept Badge -->
+        <g transform="translate(${Math.min(390, rX + 10)}, ${Math.min(180, maplY + 10)})">
+          <rect width="115" height="30" rx="4" fill="#FFFFFF" stroke="#10B981" class="diagram-panel" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.1))"/>
+          <text x="8" y="14" fill="#047857" class="diagram-text-success" font-size="8" font-weight="bold">Coverage Limit</text>
+          <text x="8" y="25" fill="#0F172A" class="diagram-text-title" font-size="8" font-family="monospace">R = ${d.covRadiusKm.toFixed(3)} km</text>
+        </g>
+      </svg>
+    `;
+  }
+
+  renderOhBudgetSvg(d) {
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- Waterfall Link Budget Steps -->
+        <g transform="translate(40, 30)">
+          <!-- Step 1: TX Power -->
+          <rect x="0" y="20" width="65" height="150" rx="4" fill="#0284C7" fill-opacity="0.85"/>
+          <text x="32" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">TX Power</text>
+          <text x="32" y="100" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">+${d.txPower} dBm</text>
+
+          <!-- Step 2: Antenna Gain -->
+          <rect x="75" y="60" width="65" height="70" rx="4" fill="#10B981" fill-opacity="0.85"/>
+          <text x="107" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">+ Gain</text>
+          <text x="107" y="100" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">+${d.gain} dBi</text>
+
+          <!-- Step 3: Cable Loss -->
+          <rect x="150" y="80" width="65" height="30" rx="4" fill="#F59E0B" fill-opacity="0.85"/>
+          <text x="182" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">- Cable Loss</text>
+          <text x="182" y="98" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="monospace" text-anchor="middle">-${d.cableLoss} dB</text>
+
+          <!-- Step 4: Total EIRP -->
+          <rect x="225" y="20" width="70" height="170" rx="4" fill="#6366F1" fill-opacity="0.9"/>
+          <text x="260" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">= EIRP</text>
+          <text x="260" y="105" fill="#FFFFFF" font-size="9" font-weight="bold" font-family="monospace" text-anchor="middle">${d.eirp} dBm</text>
+
+          <!-- Step 5: MAPL Path Loss -->
+          <rect x="305" y="20" width="70" height="170" rx="4" fill="#EF4444" fill-opacity="0.85"/>
+          <text x="340" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">- Max Loss</text>
+          <text x="340" y="105" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="middle">${d.maxPl} dB</text>
+
+          <!-- Step 6: RX Sensitivity -->
+          <rect x="385" y="160" width="65" height="40" rx="4" fill="#0284C7" fill-opacity="0.5"/>
+          <text x="417" y="15" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold" text-anchor="middle">= RX Sens</text>
+          <text x="417" y="185" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="monospace" text-anchor="middle">${d.rxSens} dBm</text>
+        </g>
+      </svg>
+    `;
+  }
+
+  bindOkumuraHata() {
+    const bindPair = (inputId, sliderId, key) => {
+      const input = this.container.querySelector(inputId);
+      const slider = this.container.querySelector(sliderId);
+      if (!input || !slider) return;
+
+      const update = (val) => {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          this.ws.params[key] = num;
+          input.value = num;
+          slider.value = num;
+          this.refreshOhUi();
+        }
+      };
+
+      input.addEventListener('input', (e) => update(e.target.value));
+      slider.addEventListener('input', (e) => update(e.target.value));
+    };
+
+    bindPair('#oh-input-freq', '#oh-slider-freq', 'frequency');
+    bindPair('#oh-input-hb', '#oh-slider-hb', 'hb');
+    bindPair('#oh-input-hm', '#oh-slider-hm', 'hm');
+    bindPair('#oh-input-tx', '#oh-slider-tx', 'tx_power');
+    bindPair('#oh-input-gain', '#oh-slider-gain', 'gain');
+    bindPair('#oh-input-loss', '#oh-slider-loss', 'cable_loss');
+    bindPair('#oh-input-rx', '#oh-slider-rx', 'rx_sensitivity');
+
+    // Environment Selector
+    const envOptions = this.container.querySelectorAll('#oh-env-selector .rf-env-option');
+    envOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        envOptions.forEach(o => o.classList.remove('rf-env-option--active'));
+        opt.classList.add('rf-env-option--active');
+        this.ws.params.env_type = opt.dataset.env;
+        this.refreshOhUi();
+      });
+    });
+
+    // Tab buttons
+    const tabBtns = this.container.querySelectorAll('#oh-tab-bar .rf-cov-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('rf-cov-tab-btn--active'));
+        btn.classList.add('rf-cov-tab-btn--active');
+        this.activeOhTab = btn.dataset.tab;
+        this.refreshOhUi();
+      });
+    });
+
+    // Actions
+    const copyBtn = this.container.querySelector('#oh-copy-summary-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const d = this.calculateOkumuraHataData(this.ws.params);
+        const text = `Okumura-Hata Propagation Model Results:
+- Frequency: ${d.f} MHz | Environment: ${d.envLabel}
+- Base Station: ${d.hb}m | Mobile: ${d.hm}m
+- EIRP: ${d.eirp} dBm (TX: ${d.txPower} dBm, Gain: ${d.gain} dBi, Loss: ${d.cableLoss} dB)
+- MAPL: ${d.maxPl} dB (Sensitivity: ${d.rxSens} dBm)
+- Path Loss @ 1 km: ${d.L_1km} dB
+- Max Coverage Radius: ${d.covRadiusKm.toFixed(3)} km (${(d.covRadiusKm * 1000).toFixed(0)}m)
+- Sector Coverage Area: ${d.sectorAreaKm2.toFixed(3)} km² (${d.sectorAreaHa.toFixed(1)} ha)
+- Model Confidence: ${(d.confidence * 100).toFixed(0)}%`;
+        this.copyToClipboard(text, 'Okumura-Hata summary copied to clipboard!');
+      });
+    }
+
+    const exportBtn = this.container.querySelector('#oh-export-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const d = this.calculateOkumuraHataData(this.ws.params);
+        this.copyToClipboard(JSON.stringify(d, null, 2), 'Calculation JSON copied to clipboard!');
+      });
+    }
+
+    const resetBtn = this.container.querySelector('#oh-reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.ws.params = {
+          frequency: 2100.0,
+          hb: 30.0,
+          hm: 1.5,
+          tx_power: 43.0,
+          gain: 18.0,
+          cable_loss: 2.0,
+          rx_sensitivity: -102.0,
+          mech_tilt: 3.0,
+          elec_tilt: 6.0,
+          v_beamwidth: 10.0,
+          h_beamwidth: 65.0,
+          env_type: 'urban'
+        };
+        this.renderOkumuraHata();
+        toast.info('Okumura-Hata parameters reset to defaults');
+      });
+    }
+  }
+
+  refreshOhUi() {
+    const d = this.calculateOkumuraHataData(this.ws.params);
+    const kpiGrid = this.container.querySelector('#oh-kpi-grid');
+    if (kpiGrid) kpiGrid.innerHTML = this.renderOhKpiCards(d);
+
+    const diagramBody = this.container.querySelector('#oh-diagram-body');
+    if (diagramBody) {
+      diagramBody.innerHTML = this.activeOhTab === 'curve'
+        ? this.renderOhCurveSvg(d)
+        : this.renderOhBudgetSvg(d);
+    }
+  }
+
+  // --- 3. NETTILT 3D OPTIMIZER ---
+  calculateNetTilt3DData(params) {
+    const p = params || {};
+    const towerH = Math.max(5, parseFloat(p.tower_height) || 35.0);
+    const userH = Math.max(0, parseFloat(p.user_height) || 1.5);
+    const deltaH = parseFloat(p.delta_h) || 0.0;
+    const targetDist = Math.max(20, parseFloat(p.target_distance) || 500.0);
+    const mech = parseFloat(p.mechanical_tilt) !== undefined && !isNaN(parseFloat(p.mechanical_tilt)) ? parseFloat(p.mechanical_tilt) : 2.0;
+    const elec = parseFloat(p.electrical_tilt) !== undefined && !isNaN(parseFloat(p.electrical_tilt)) ? parseFloat(p.electrical_tilt) : 4.0;
+    const vbw = Math.max(1, parseFloat(p.v_beamwidth) || 8.0);
+    const hbw = Math.max(1, parseFloat(p.h_beamwidth) || 65.0);
+
+    const effHeight = Math.max(1, (towerH - userH) - deltaH);
+    const totalTilt = Math.round((mech + elec) * 100) / 100;
+    const totalTiltRad = totalTilt * Math.PI / 180;
+
+    const optTiltRad = Math.atan(effHeight / targetDist);
+    const optTiltDeg = Math.round((optTiltRad * 180 / Math.PI) * 100) / 100;
+    const tiltDelta = Math.round((totalTilt - optTiltDeg) * 100) / 100;
+
+    let alignStatus = 'optimal';
+    let alignLabel = 'Optimal Alignment';
+    if (Math.abs(tiltDelta) <= 0.4) {
+      alignStatus = 'optimal';
+      alignLabel = 'Optimal Alignment (±0.4°)';
+    } else if (tiltDelta > 0.4) {
+      alignStatus = 'over';
+      alignLabel = `Over-tilted (+${tiltDelta.toFixed(1)}° Down)`;
+    } else {
+      alignStatus = 'under';
+      alignLabel = `Under-tilted (${tiltDelta.toFixed(1)}° Up)`;
+    }
+
+    let boresightDist = 0;
+    if (totalTilt > 0.05) {
+      boresightDist = Math.round((effHeight / Math.tan(totalTiltRad)) * 10) / 10;
+    } else {
+      boresightDist = 9999;
+    }
+
+    const halfV = vbw / 2;
+    const innerAngle = totalTilt + halfV;
+    let innerDist = 0;
+    if (innerAngle > 0 && innerAngle < 90) {
+      innerDist = Math.round((effHeight / Math.tan(innerAngle * Math.PI / 180)) * 10) / 10;
+    }
+
+    const outerAngle = totalTilt - halfV;
+    let outerDist = 0;
+    if (outerAngle > 0.05) {
+      outerDist = Math.round((effHeight / Math.tan(outerAngle * Math.PI / 180)) * 10) / 10;
+    } else {
+      outerDist = Math.round((effHeight / Math.tan(0.05 * Math.PI / 180)) * 10) / 10;
+    }
+
+    const footprintLength = Math.max(0, Math.round((outerDist - innerDist) * 10) / 10);
+
+    return {
+      towerH, userH, deltaH, targetDist, mech, elec, vbw, hbw,
+      effHeight: Math.round(effHeight * 10) / 10,
+      totalTilt, optTiltDeg, tiltDelta, alignStatus, alignLabel,
+      boresightDist, innerDist, outerDist, footprintLength
+    };
+  }
+
+  renderNetTilt3D() {
+    const meta = this.getToolMeta();
+    const p = this.ws.params || {};
+    const d = this.calculateNetTilt3DData(p);
+    const isId = state.lang === 'id';
+
+    this.container.innerHTML = `
+      <div class="workspace-container">
+        <!-- WORKSPACE TOOLBAR HEADER -->
+        <header class="workspace-header-bar">
+          <div class="workspace-title-group">
+            <div class="workspace-icon-box">
+              <img src="/assets/icons/tool-nettilt-3d.svg" alt="${meta.title}">
+            </div>
+            <div>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                <h1 class="workspace-title">${meta.title}</h1>
+                <span class="zone-badge">3D Geometry</span>
+                <span class="zone-badge" style="background: rgba(99, 102, 241, 0.1); color: #6366F1; border-color: rgba(99, 102, 241, 0.25);">Tilt Optimizer</span>
+              </div>
+              <p class="workspace-desc">${meta.description}</p>
+            </div>
+          </div>
+
+          <div class="workspace-header-actions">
+            <button class="rf-btn rf-btn-secondary" id="tilt-copy-summary-btn" title="Copy calculated summary to clipboard">
+              <span>📋 ${state.t('btn_copy', 'Copy')} Summary</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="tilt-export-btn" title="Export calculation data as JSON">
+              <span>💾 Export JSON</span>
+            </button>
+            <button class="rf-btn rf-btn-ghost" id="tilt-reset-btn" title="Reset parameters to standard defaults">
+              <span>🔄 ${state.t('btn_reset', 'Reset')}</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- KPI METRIC CARDS -->
+        <div class="rf-coverage-grid" id="tilt-kpi-grid">
+          ${this.renderTiltKpiCards(d)}
+        </div>
+
+        <!-- MAIN SPLIT WORKSPACE: PARAMETERS vs VISUALIZER -->
+        <div class="workspace-split-grid">
+          <!-- LEFT: PARAMETERS & GEOMETRY TUNING -->
+          <section class="zone-card">
+            <div class="zone-header">
+              <span class="zone-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                ${isId ? 'Geometri Menara & Target Jarak' : 'Tower & Target Geometry'}
+              </span>
+              <button class="rf-btn rf-btn-secondary" id="tilt-autotune-btn" style="padding: 3px 9px; font-size: 0.72rem;">
+                ⚡ Auto-Tune RET
+              </button>
+            </div>
+
+            <div class="zone-body" style="padding: 16px;">
+              <!-- Target Coverage Distance -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">
+                    ${isId ? 'Target Jarak Cakupan' : 'Target Coverage Distance'}
+                    <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
+                  </span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-target" min="50" max="3000" step="25" value="${d.targetDist}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-target" min="50" max="2000" step="25" value="${d.targetDist}">
+              </div>
+
+              <!-- Tower Antenna Height -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Tinggi Menara (H)' : 'Tower Antenna Height (H)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-height" min="10" max="150" step="1" value="${d.towerH}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-height" min="10" max="100" step="1" value="${d.towerH}">
+              </div>
+
+              <!-- Mechanical Tilt -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">
+                    Mechanical Downtilt
+                    <span class="rf-tilt-badge rf-tilt-badge--mech">Mech</span>
+                  </span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-mech" min="-5" max="15" step="0.5" value="${d.mech}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-mech" min="-5" max="12" step="0.5" value="${d.mech}">
+              </div>
+
+              <!-- Electrical Tilt -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">
+                    Electrical Downtilt (RET)
+                    <span class="rf-tilt-badge rf-tilt-badge--elec">Elec</span>
+                  </span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-elec" min="0" max="14" step="0.5" value="${d.elec}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-elec" min="0" max="14" step="0.5" value="${d.elec}">
+              </div>
+
+              <!-- Vertical Beamwidth -->
+              <div class="rf-cov-param-row">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">Vertical Beamwidth (3dB)</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-vbw" min="2" max="20" step="0.5" value="${d.vbw}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">°</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-vbw" min="3" max="16" step="0.5" value="${d.vbw}">
+              </div>
+
+              <!-- Terrain Elevation Delta (ΔH) -->
+              <div class="rf-cov-param-row" style="margin-bottom: 0;">
+                <div class="rf-cov-param-header">
+                  <span class="rf-cov-param-label">${isId ? 'Beda Elevasi Kontur (ΔH)' : 'Terrain Elevation Delta (ΔH)'}</span>
+                  <div class="rf-cov-param-value-wrap">
+                    <input type="number" class="rf-cov-param-input" id="tilt-input-deltah" min="-50" max="50" step="1" value="${d.deltaH}">
+                    <span style="font-size: 0.75rem; color: var(--color-text-secondary);">m</span>
+                  </div>
+                </div>
+                <input type="range" class="rf-cov-slider" id="tilt-slider-deltah" min="-30" max="30" step="1" value="${d.deltaH}">
+              </div>
+            </div>
+          </section>
+
+          <!-- RIGHT: INTERACTIVE DIAGRAM VISUALIZER -->
+          <section class="zone-card" style="display: flex; flex-direction: column;">
+            <div class="rf-coverage-canvas-frame" style="flex: 1; min-height: 420px;">
+              <div class="rf-coverage-canvas-header">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span>📡</span> ${isId ? 'Geometri Visualisasi NetTilt 3D' : 'NetTilt 3D Radiation Geometry'}
+                </span>
+                <div class="rf-cov-tabs" id="tilt-tab-bar">
+                  <button type="button" class="rf-cov-tab-btn ${this.activeTiltTab === 'perspective' ? 'rf-cov-tab-btn--active' : ''}" data-tab="perspective">
+                    ${isId ? 'Perspektif 3D Balok Radiasi' : '3D Perspective Beam'}
+                  </button>
+                  <button type="button" class="rf-cov-tab-btn ${this.activeTiltTab === 'gauge' ? 'rf-cov-tab-btn--active' : ''}" data-tab="gauge">
+                    ${isId ? 'Meteran Deviasi Sudut' : 'Tilt Deviation Gauge'}
+                  </button>
+                </div>
+              </div>
+
+              <div class="rf-coverage-canvas-body" id="tilt-diagram-body">
+                ${this.activeTiltTab === 'perspective' ? this.renderTiltPerspectiveSvg(d) : this.renderTiltGaugeSvg(d)}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+
+    this.bindNetTilt3D();
+  }
+
+  renderTiltKpiCards(d) {
+    const isId = state.lang === 'id';
+    const statusClass = d.alignStatus === 'optimal'
+      ? 'rf-coverage-chip--excellent'
+      : (d.alignStatus === 'over' ? 'rf-coverage-chip--bad' : 'rf-coverage-chip--fair');
+
+    return `
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Total Net Tilt' : 'Total Net Tilt'}</span>
+          <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-tilt-total">${d.totalTilt.toFixed(1)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° RET</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Sudut Optimum Target' : 'Optimum Target Tilt'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Calculated</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-tilt-opt">${d.optTiltDeg.toFixed(2)}<span class="rf-metric-card__unit">°</span></div>
+        <div class="rf-metric-card__meta">For ${d.targetDist}m @ H=${d.effHeight}m</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Status Keselarasan' : 'Alignment Status'}</span>
+          <span class="rf-coverage-chip ${statusClass}">${d.alignStatus.toUpperCase()}</span>
+        </div>
+        <div class="rf-metric-card__value" style="font-size: 1.05rem;" id="kpi-tilt-status">${d.alignLabel}</div>
+        <div class="rf-metric-card__meta">Delta: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}°</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Titik Jatuh Boresight' : 'Boresight Ground Hit'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--good">Center</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-tilt-boresight">${d.boresightDist.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Target is @ ${d.targetDist}m</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">Inner & Outer 3dB</span>
+          <span class="rf-coverage-chip rf-coverage-chip--fair">Span</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-tilt-innerouter">${d.innerDist.toFixed(0)} / ${d.outerDist.toFixed(0)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Near: ${d.innerDist.toFixed(0)}m, Far: ${d.outerDist.toFixed(0)}m</div>
+      </div>
+
+      <div class="rf-metric-card">
+        <div class="rf-metric-card__header">
+          <span class="rf-metric-card__label">${isId ? 'Panjang Jejak Radiasi' : 'Ground Footprint Depth'}</span>
+          <span class="rf-coverage-chip rf-coverage-chip--excellent">Coverage</span>
+        </div>
+        <div class="rf-metric-card__value" id="kpi-tilt-footprint">${d.footprintLength.toFixed(1)}<span class="rf-metric-card__unit">m</span></div>
+        <div class="rf-metric-card__meta">Continuous 3dB zone</div>
+      </div>
+    `;
+  }
+
+  renderTiltPerspectiveSvg(d) {
+    const maxD = Math.max(d.targetDist * 1.35, d.outerDist * 1.1, 400);
+    const scaleX = (dist) => 80 + Math.min(380, (dist / maxD) * 380);
+
+    const xTarget = scaleX(d.targetDist);
+    const xBoresight = scaleX(Math.min(maxD, d.boresightDist));
+    const xInner = scaleX(d.innerDist);
+    const xOuter = scaleX(Math.min(maxD, d.outerDist));
+
+    const yGround = 210;
+    const yTower = 60;
+    const xTower = 80;
+
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- 3D Perspective Ground Plane Mesh -->
+        <polygon points="40,240 160,180 480,180 480,240" fill="#0284C7" fill-opacity="0.04" stroke="#E2E8F0" class="diagram-grid" stroke-width="1"/>
+        <line x1="40" y1="${yGround}" x2="480" y2="${yGround}" stroke="#E2E8F0" class="diagram-grid" stroke-width="1.8"/>
+
+        <!-- 3D Ground Footprint Ellipse Between Inner and Outer -->
+        <ellipse cx="${(xInner + xOuter) / 2}" cy="${yGround}" rx="${Math.max(10, (xOuter - xInner) / 2)}" ry="12" fill="#0284C7" fill-opacity="0.14" stroke="#0284C7" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+        <!-- 3D Beam Cone Envelope -->
+        <polygon points="${xTower},${yTower} ${xInner},${yGround} ${xOuter},${yGround}" fill="#6366F1" fill-opacity="0.08" stroke="#6366F1" stroke-opacity="0.25" stroke-width="1"/>
+
+        <!-- Boresight Ray (Solid Line) -->
+        <line x1="${xTower}" y1="${yTower}" x2="${xBoresight}" y2="${yGround}" stroke="#10B981" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="${xBoresight}" cy="${yGround}" r="4.5" fill="#10B981"/>
+
+        <!-- Target Pin Marker -->
+        <g transform="translate(${xTarget}, ${yGround})">
+          <line x1="0" y1="0" x2="0" y2="-28" stroke="#EF4444" stroke-width="1.8"/>
+          <circle cx="0" cy="-28" r="4.5" fill="#EF4444"/>
+          <rect x="-24" y="-44" width="48" height="14" rx="2" fill="#FFFFFF" stroke="#EF4444" stroke-width="1"/>
+          <text x="0" y="-34" fill="#EF4444" font-size="7" font-weight="bold" font-family="monospace" text-anchor="middle">Target ${d.targetDist}m</text>
+        </g>
+
+        <!-- Antenna Tower Structure -->
+        <path d="${xTower - 12} ${yGround} L ${xTower} ${yTower} L ${xTower + 12} ${yGround}" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="${xTower - 8}" y1="165" x2="${xTower + 8}" y2="165" stroke="#0284C7" stroke-width="1.2"/>
+        <line x1="${xTower - 5}" y1="115" x2="${xTower + 5}" y2="115" stroke="#0284C7" stroke-width="1.2"/>
+
+        <!-- Antenna Panel Rotated by Tilt -->
+        <g transform="translate(${xTower}, ${yTower}) rotate(${Math.min(45, Math.max(-10, d.totalTilt))})">
+          <rect x="-3" y="-12" width="6" height="24" rx="2" fill="#0284C7" stroke="#0369A1" stroke-width="1.2"/>
+          <line x1="0" y1="0" x2="24" y2="0" stroke="#10B981" stroke-width="1.6" stroke-linecap="round"/>
+        </g>
+        <circle cx="${xTower}" cy="${yTower}" r="3" fill="#10B981"/>
+
+        <!-- Info Badge in Top Left -->
+        <g transform="translate(110, 20)">
+          <rect width="210" height="32" rx="4" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 1px 4px rgba(0,0,0,0.08))"/>
+          <text x="12" y="16" fill="#0F172A" class="diagram-text-title" font-size="8" font-weight="bold">
+            Total Tilt: <tspan fill="#6366F1">${d.totalTilt}°</tspan> | Optimum: <tspan fill="#10B981">${d.optTiltDeg.toFixed(1)}°</tspan>
+          </text>
+          <text x="12" y="27" fill="${d.alignStatus === 'optimal' ? '#10B981' : '#EF4444'}" font-size="7.5" font-weight="bold">
+            ${d.alignLabel}
+          </text>
+        </g>
+      </svg>
+    `;
+  }
+
+  renderTiltGaugeSvg(d) {
+    const cx = 260;
+    const cy = 200;
+    const r = 115;
+    // Map tilt angles (0 deg to 15 deg) to gauge arc from -140 deg to -40 deg (180 deg span)
+    const angleToRad = (tilt) => {
+      const clamped = Math.max(0, Math.min(15, tilt));
+      const normalized = clamped / 15; // 0 to 1
+      const deg = 180 + normalized * 180; // 180 (left) to 360 (right)
+      return deg * (Math.PI / 180);
+    };
+
+    const optRad = angleToRad(d.optTiltDeg);
+    const curRad = angleToRad(d.totalTilt);
+
+    // Needle coords
+    const needleLen = 95;
+    const nx = cx + needleLen * Math.cos(curRad);
+    const ny = cy + needleLen * Math.sin(curRad);
+
+    return `
+      <svg viewBox="0 0 520 270" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" class="rf-coverage-svg">
+        <!-- Gauge Outer Arc Track -->
+        <path d="M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="#E2E8F0" class="diagram-grid" stroke-width="16" stroke-linecap="round"/>
+
+        <!-- Colored Sectors on Gauge -->
+        <!-- Optimal Target Zone (Emerald) -->
+        <path d="M ${cx + (r) * Math.cos(angleToRad(Math.max(0, d.optTiltDeg - 0.7)))} ${cy + (r) * Math.sin(angleToRad(Math.max(0, d.optTiltDeg - 0.7)))} A ${r} ${r} 0 0 1 ${cx + (r) * Math.cos(angleToRad(Math.min(15, d.optTiltDeg + 0.7)))} ${cy + (r) * Math.sin(angleToRad(Math.min(15, d.optTiltDeg + 0.7)))}" fill="none" stroke="#10B981" stroke-width="16"/>
+
+        <!-- Target Marker Line -->
+        <line x1="${cx + (r - 12) * Math.cos(optRad)}" y1="${cy + (r - 12) * Math.sin(optRad)}" x2="${cx + (r + 12) * Math.cos(optRad)}" y2="${cy + (r + 12) * Math.sin(optRad)}" stroke="#047857" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Gauge Pivot and Needle -->
+        <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="${cy}" r="9" fill="#0F172A"/>
+        <circle cx="${cx}" cy="${cy}" r="4" fill="#EF4444"/>
+
+        <!-- Gauge Dial Labels -->
+        <text x="${cx - r - 8}" y="${cy + 15}" fill="#64748B" class="diagram-text-muted" font-size="8.5" text-anchor="middle">0°</text>
+        <text x="${cx}" y="${cy - r - 8}" fill="#64748B" class="diagram-text-muted" font-size="8.5" text-anchor="middle">7.5°</text>
+        <text x="${cx + r + 8}" y="${cy + 15}" fill="#64748B" class="diagram-text-muted" font-size="8.5" text-anchor="middle">15°</text>
+
+        <!-- Digital Readout Center Card -->
+        <g transform="translate(185, 205)">
+          <rect width="150" height="42" rx="5" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.08))"/>
+          <text x="75" y="18" fill="#64748B" class="diagram-text-muted" font-size="7.5" font-weight="bold" text-anchor="middle">CURRENT TILT vs OPTIMUM</text>
+          <text x="75" y="34" fill="#0F172A" class="diagram-text-title" font-size="11" font-weight="bold" font-family="monospace" text-anchor="middle">
+            <tspan fill="#EF4444">${d.totalTilt}°</tspan> / <tspan fill="#10B981">${d.optTiltDeg}°</tspan>
+          </text>
+        </g>
+      </svg>
+    `;
+  }
+
+  bindNetTilt3D() {
+    const bindPair = (inputId, sliderId, key) => {
+      const input = this.container.querySelector(inputId);
+      const slider = this.container.querySelector(sliderId);
+      if (!input || !slider) return;
+
+      const update = (val) => {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          this.ws.params[key] = num;
+          input.value = num;
+          slider.value = num;
+          this.refreshTiltUi();
+        }
+      };
+
+      input.addEventListener('input', (e) => update(e.target.value));
+      slider.addEventListener('input', (e) => update(e.target.value));
+    };
+
+    bindPair('#tilt-input-target', '#tilt-slider-target', 'target_distance');
+    bindPair('#tilt-input-height', '#tilt-slider-height', 'tower_height');
+    bindPair('#tilt-input-mech', '#tilt-slider-mech', 'mechanical_tilt');
+    bindPair('#tilt-input-elec', '#tilt-slider-elec', 'electrical_tilt');
+    bindPair('#tilt-input-vbw', '#tilt-slider-vbw', 'v_beamwidth');
+    bindPair('#tilt-input-deltah', '#tilt-slider-deltah', 'delta_h');
+
+    // Auto-tune button
+    const autoTuneBtn = this.container.querySelector('#tilt-autotune-btn');
+    if (autoTuneBtn) {
+      autoTuneBtn.addEventListener('click', () => {
+        const d = this.calculateNetTilt3DData(this.ws.params);
+        // Desired electrical tilt = optTiltDeg - mech
+        const targetElec = Math.max(0, Math.min(14, Math.round((d.optTiltDeg - d.mech) * 2) / 2));
+        this.ws.params.electrical_tilt = targetElec;
+        const elecInput = this.container.querySelector('#tilt-input-elec');
+        const elecSlider = this.container.querySelector('#tilt-slider-elec');
+        if (elecInput) elecInput.value = targetElec;
+        if (elecSlider) elecSlider.value = targetElec;
+        this.refreshTiltUi();
+        toast.success(`Aligned electrical tilt to ${targetElec}° (Total tilt: ${(d.mech + targetElec).toFixed(1)}°)`);
+      });
+    }
+
+    // Tabs
+    const tabBtns = this.container.querySelectorAll('#tilt-tab-bar .rf-cov-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('rf-cov-tab-btn--active'));
+        btn.classList.add('rf-cov-tab-btn--active');
+        this.activeTiltTab = btn.dataset.tab;
+        this.refreshTiltUi();
+      });
+    });
+
+    // Actions
+    const copyBtn = this.container.querySelector('#tilt-copy-summary-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const d = this.calculateNetTilt3DData(this.ws.params);
+        const text = `NetTilt 3D Optimization Results:
+- Target Distance: ${d.targetDist}m | Effective Height: ${d.effHeight}m
+- Total Tilt: ${d.totalTilt}° (${d.mech}° Mech + ${d.elec}° RET)
+- Calculated Optimum Tilt: ${d.optTiltDeg}°
+- Alignment Status: ${d.alignLabel} (Delta: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta}°)
+- Boresight Ground Impact: ${d.boresightDist.toFixed(1)}m
+- Inner/Outer 3dB Edges: ${d.innerDist.toFixed(1)}m - ${d.outerDist.toFixed(1)}m
+- Continuous Footprint Depth: ${d.footprintLength.toFixed(1)}m`;
+        this.copyToClipboard(text, 'NetTilt 3D summary copied to clipboard!');
+      });
+    }
+
+    const exportBtn = this.container.querySelector('#tilt-export-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const d = this.calculateNetTilt3DData(this.ws.params);
+        this.copyToClipboard(JSON.stringify(d, null, 2), 'Calculation JSON copied to clipboard!');
+      });
+    }
+
+    const resetBtn = this.container.querySelector('#tilt-reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.ws.params = {
+          tower_height: 35.0,
+          user_height: 1.5,
+          delta_h: 0.0,
+          target_distance: 500.0,
+          mechanical_tilt: 2.0,
+          electrical_tilt: 4.0,
+          v_beamwidth: 8.0,
+          h_beamwidth: 65.0
+        };
+        this.renderNetTilt3D();
+        toast.info('NetTilt 3D parameters reset to defaults');
+      });
+    }
+  }
+
+  refreshTiltUi() {
+    const d = this.calculateNetTilt3DData(this.ws.params);
+    const kpiGrid = this.container.querySelector('#tilt-kpi-grid');
+    if (kpiGrid) kpiGrid.innerHTML = this.renderTiltKpiCards(d);
+
+    const diagramBody = this.container.querySelector('#tilt-diagram-body');
+    if (diagramBody) {
+      diagramBody.innerHTML = this.activeTiltTab === 'perspective'
+        ? this.renderTiltPerspectiveSvg(d)
+        : this.renderTiltGaugeSvg(d);
+    }
+  }
+
 }

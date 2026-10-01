@@ -209,4 +209,44 @@ export class ApiService {
 
     return await res.json();
   }
+
+  /**
+   * Coverage Simulation calculation endpoint
+   */
+  static async calculateCoverage(params) {
+    const res = await fetch(`${API_BASE}/api/v1/coverage/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) throw new Error('Coverage simulation request failed');
+    return await res.json();
+  }
+
+  /**
+   * Okumura-Hata propagation calculation endpoint
+   */
+  static async calculateOkumuraHata(params) {
+    const res = await fetch(`${API_BASE}/api/v1/okumura-hata/calculate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) throw new Error('Okumura-Hata request failed');
+    return await res.json();
+  }
+
+  /**
+   * NetTilt 3D calculation endpoint
+   */
+  static async calculateNetTilt3D(params) {
+    const res = await fetch(`${API_BASE}/api/v1/nettilt-3d/calculate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) throw new Error('NetTilt 3D request failed');
+    return await res.json();
+  }
 }
+

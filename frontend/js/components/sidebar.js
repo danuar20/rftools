@@ -91,6 +91,37 @@ export class SidebarComponent {
           </ul>
         </div>
 
+        <!-- Section: Coverage & Propagation -->
+        <div>
+          <div class="sidebar__section-title">${state.t('nav_coverage')}</div>
+          <ul class="sidebar__menu">
+            <li>
+              <a href="#tool-coverage-simulation" class="sidebar__link ${currentRoute === 'tool-coverage-simulation' ? 'sidebar__link--active' : ''}" title="${state.t('tool_coverage_simulation_title', 'Coverage Simulation')}">
+                <span class="sidebar__link-icon">
+                  <img src="/assets/icons/tool-coverage-simulation.svg" alt="Coverage Simulation">
+                </span>
+                <span class="sidebar__link-text">Coverage Simulation</span>
+              </a>
+            </li>
+            <li>
+              <a href="#tool-okumura-hata" class="sidebar__link ${currentRoute === 'tool-okumura-hata' ? 'sidebar__link--active' : ''}" title="${state.t('tool_okumura_hata_title', 'Okumura-Hata Model')}">
+                <span class="sidebar__link-icon">
+                  <img src="/assets/icons/tool-okumura-hata.svg" alt="Okumura-Hata">
+                </span>
+                <span class="sidebar__link-text">Okumura-Hata Model</span>
+              </a>
+            </li>
+            <li>
+              <a href="#tool-nettilt-3d" class="sidebar__link ${(currentRoute === 'tool-nettilt-3d' || currentRoute === 'tool-nettilt3d') ? 'sidebar__link--active' : ''}" title="${state.t('tool_nettilt_3d_title', 'NetTilt 3D')}">
+                <span class="sidebar__link-icon">
+                  <img src="/assets/icons/tool-nettilt-3d.svg" alt="NetTilt 3D">
+                </span>
+                <span class="sidebar__link-text">NetTilt 3D</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
         <!-- Section: Geospatial & Geohash Utilities -->
         <div>
           <div class="sidebar__section-title">${state.t('nav_gis')}</div>

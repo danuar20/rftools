@@ -92,6 +92,49 @@ export class AppState {
         latitude: -6.175392,
         longitude: 106.827153,
         precision: 7
+      }),
+      'coverage-simulation': this.initWorkspace('coverage-simulation', {
+        antenna_height: 30.0,
+        mechanical_tilt: 3.0,
+        electrical_tilt: 6.0,
+        v_beamwidth: 10.0,
+        h_beamwidth: 65.0,
+        frequency: 2100.0,
+        elevation: 0.0
+      }),
+      'okumura-hata': this.initWorkspace('okumura-hata', {
+        frequency: 2100.0,
+        hb: 30.0,
+        hm: 1.5,
+        tx_power: 43.0,
+        gain: 18.0,
+        cable_loss: 2.0,
+        rx_sensitivity: -102.0,
+        elec_tilt: 6.0,
+        mech_tilt: 3.0,
+        v_beamwidth: 10.0,
+        h_beamwidth: 65.0,
+        env_type: 'urban'
+      }),
+      'nettilt-3d': this.initWorkspace('nettilt-3d', {
+        tower_height: 35.0,
+        user_height: 1.5,
+        delta_h: 0.0,
+        target_distance: 500.0,
+        mechanical_tilt: 2.0,
+        electrical_tilt: 4.0,
+        v_beamwidth: 8.0,
+        h_beamwidth: 65.0
+      }),
+      'nettilt3d': this.initWorkspace('nettilt3d', {
+        tower_height: 35.0,
+        user_height: 1.5,
+        delta_h: 0.0,
+        target_distance: 500.0,
+        mechanical_tilt: 2.0,
+        electrical_tilt: 4.0,
+        v_beamwidth: 8.0,
+        h_beamwidth: 65.0
       })
     };
 
