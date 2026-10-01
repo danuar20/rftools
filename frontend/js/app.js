@@ -52,6 +52,10 @@ class App {
         this.renderRoute(data);
       } else if (event === 'language-change') {
         this.renderRoute(state.route);
+      } else if (event === 'sidebar-toggle') {
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 260);
       }
     });
 

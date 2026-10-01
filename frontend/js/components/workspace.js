@@ -4437,6 +4437,80 @@ export class WorkspaceComponent {
     const farEl = this.container.querySelector('#oh-far-edge');
     if (farEl) farEl.textContent = (d.boresightDist * 2.265).toFixed(2);
   }
+
+  calculateNetTilt3DData(params) {
+    const p = params || {};
+    const towerH = Math.max(1, parseFloat(p.tower_height !== undefined ? p.tower_height : (p.antenna_height !== undefined ? p.antenna_height : 30.0)));
+    const deltaH = parseFloat(p.delta_h !== undefined ? p.delta_h : 0.0) || 0.0;
+    const effHeight = Math.max(1, towerH - deltaH);
+    const mech = parseFloat(p.mechanical_tilt !== undefined ? p.mechanical_tilt : 3.0);
+    const elec = parseFloat(p.electrical_tilt !== undefined ? p.electrical_tilt : 6.0);
+    const totalTilt = Math.round((mech + elec) * 100) / 100;
+    const azimuth = parseFloat(p.azimuth !== undefined ? p.azimuth : 0.0) || 0.0;
+    const hbw = Math.max(1, parseFloat(p.h_beamwidth !== undefined ? p.h_beamwidth : 65.0));
+    const vbw = Math.max(1, parseFloat(p.v_beamwidth !== undefined ? p.v_beamwidth : 10.0));
+    const targetDist = Math.max(10, parseFloat(p.target_distance !== undefined ? p.target_distance : 500.0));
+    const lat = parseFloat(p.lat !== undefined ? p.lat : -6.2);
+    const lon = parseFloat(p.lon !== undefined ? p.lon : 106.8);
+    const siteName = p.site_name || p.siteName || 'Site_001';
+
+    // Optimum target tilt
+    const optTiltDeg = Math.round((Math.atan(effHeight / targetDist) * 180 / Math.PI) * 100) / 100;
+    const tiltDelta = Math.round((totalTilt - optTiltDeg) * 10) / 10;
+
+    let alignStatus = 'optimal';
+    let alignLabel = 'OPTIMAL ALIGNMENT';
+    if (tiltDelta > 1.0) {
+      alignStatus = 'over';
+      alignLabel = 'OVER-TILTED (UNDERSHOOT)';
+    } else if (tiltDelta < -1.0) {
+      alignStatus = 'under';
+      alignLabel = 'UNDER-TILTED (OVERSHOOT)';
+    }
+
+    // Ground distances
+    const totalTiltRad = Math.abs(totalTilt) * Math.PI / 180;
+    const boresightDist = totalTilt > 0.1
+      ? Math.round((effHeight / Math.tan(totalTiltRad)) * 100) / 100
+      : 9999.0;
+
+    const nearAngle = (totalTilt + vbw / 2) * Math.PI / 180;
+    const innerDist = nearAngle > 0.01 && nearAngle < Math.PI / 2
+      ? Math.round((effHeight / Math.tan(nearAngle)) * 100) / 100
+      : 0.0;
+
+    const farAngle = (totalTilt - vbw / 2) * Math.PI / 180;
+    const outerDist = farAngle > 0.01
+      ? Math.round((effHeight / Math.tan(farAngle)) * 100) / 100
+      : Math.round(boresightDist * 2.265 * 100) / 100;
+
+    const footprintLength = Math.max(0, Math.round((outerDist - innerDist) * 100) / 100);
+
+    return {
+      towerH,
+      effHeight,
+      deltaH,
+      mech,
+      elec,
+      totalTilt,
+      azimuth,
+      hbw,
+      vbw,
+      targetDist,
+      lat,
+      lon,
+      siteName,
+      optTiltDeg,
+      tiltDelta,
+      alignStatus,
+      alignLabel,
+      boresightDist,
+      innerDist,
+      outerDist,
+      footprintLength
+    };
+  }
+
   renderNetTilt3D() {
     const meta = this.getToolMeta();
     const p = this.ws.params || {};
@@ -4885,11 +4959,15 @@ export class WorkspaceComponent {
           c.classList.toggle('active', c.id === tabId);
         });
 
-        if (tabId === 'mapTab' && this.leafletMapInstance) {
-          setTimeout(() => {
-            this.leafletMapInstance.invalidateSize();
-            this.updateMapSectors();
-          }, 100);
+        if (tabId === 'mapTab') {
+          if (this.leafletMapInstance) {
+            setTimeout(() => {
+              this.leafletMapInstance.invalidateSize();
+              this.updateMapSectors();
+            }, 100);
+          } else {
+            this.initNetTiltLeafletMap();
+          }
         } else if (tabId === 'visualTab') {
           this.refreshTiltUi();
         }
@@ -5011,6 +5089,17 @@ export class WorkspaceComponent {
 
         this.siteMarker = L.marker([lat, lon], { icon: towerIcon }).addTo(map);
         this.updateMapSectors();
+
+        requestAnimationFrame(() => {
+          if (this.leafletMapInstance) {
+            this.leafletMapInstance.invalidateSize();
+          }
+        });
+        setTimeout(() => {
+          if (this.leafletMapInstance) {
+            this.leafletMapInstance.invalidateSize();
+          }
+        }, 150);
       } catch (err) {
         console.warn('Leaflet map init warning:', err);
       }

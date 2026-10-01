@@ -938,3 +938,71 @@ def test_exact_reference_screenshots_adaptation():
     assert "chkFar" in ws_text
 
 
+def test_coverage_workspace_grid_and_leaflet_css():
+    """Verify 2-column grid breakpoint and Leaflet Map explicit container dimensions."""
+    res_css = client.get("/static/css/components.css")
+    assert res_css.status_code == 200
+    css_text = res_css.text
+
+    # 1. 2-column grid with 310px and minmax(0, 1fr)
+    assert "grid-template-columns: 310px minmax(0, 1fr);" in css_text
+    assert "@media (max-width: 800px)" in css_text
+
+    # 2. Leaflet Map container dimensions & tab-section
+    assert "#leafletMap" in css_text
+    assert "height: 520px;" in css_text
+    assert "min-height: 520px;" in css_text
+    assert ".tab-section" in css_text
+    assert ".tab-content.active" in css_text
+
+
+def test_nettilt3d_calculation_and_leaflet_map_fix():
+    """Verify NetTilt 3D calculation engine and Leaflet map invalidation logic."""
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+
+    # 1. calculateNetTilt3DData method exists
+    assert "calculateNetTilt3DData(params)" in ws_text or "calculateNetTilt3DData(" in ws_text
+    assert "optTiltDeg" in ws_text
+    assert "boresightDist" in ws_text
+    assert "innerDist" in ws_text
+    assert "outerDist" in ws_text
+
+    # 2. Leaflet invalidation calls on mount and tab switch
+    assert "invalidateSize()" in ws_text
+    assert "initNetTiltLeafletMap()" in ws_text
+    assert "updateMapSectors()" in ws_text
+
+
+def test_professional_sidebar_refinements_and_collapse():
+    """Verify clean, professional sidebar menu, vector icons, floating tooltips, and collapse behavior."""
+    # 1. Sidebar JS markup
+    res_sb = client.get("/static/js/components/sidebar.js")
+    assert res_sb.status_code == 200
+    sb_text = res_sb.text
+
+    assert 'data-tooltip="Excel → Point KML"' in sb_text
+    assert 'data-tooltip="ISD Calculator"' in sb_text
+    assert 'data-tooltip="Coverage Simulation"' in sb_text
+    assert 'sidebar__toggle-kbd' in sb_text
+    assert 'Ctrl+B' in sb_text
+    # Panel toggle SVG icon paths
+    assert 'M7.5 2.5V17.5' in sb_text
+    assert 'M13.5 8L11 10.5L13.5 13' in sb_text
+
+    # 2. Components CSS floating tooltips & active collapsed border
+    res_css = client.get("/static/css/components.css")
+    assert res_css.status_code == 200
+    css_text = res_css.text
+
+    assert ".sidebar--collapsed .sidebar__link[data-tooltip]::after" in css_text
+    assert ".sidebar--collapsed .sidebar__link--active" in css_text
+    assert "border-left: 3.5px solid #0284c7" in css_text
+    assert ".sidebar__toggle-kbd" in css_text
+
+    # 3. App JS sidebar toggle resize trigger
+    res_app = client.get("/static/js/app.js")
+    assert res_app.status_code == 200
+    assert "sidebar-toggle" in res_app.text
+    assert "dispatchEvent(new Event('resize'))" in res_app.text

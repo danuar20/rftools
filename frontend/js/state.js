@@ -12,7 +12,13 @@ export class AppState {
     this.route = this.getHashRoute();
     this.tools = [];
     this.health = { ok: false, latency: 0, engines: {}, port: 5005 };
-    this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
+    const urlParams = typeof window !== 'undefined' && window.location ? new URLSearchParams(window.location.search) : null;
+    const urlCollapsed = urlParams ? urlParams.get('collapsed') : null;
+    if (urlCollapsed !== null) {
+      this.sidebarCollapsed = urlCollapsed === 'true' || urlCollapsed === '1';
+    } else {
+      this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
+    }
 
     // Theme & Language
     this.theme = localStorage.getItem('rf_tools_theme') || 'light';
@@ -212,6 +218,12 @@ export class AppState {
 
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+    localStorage.setItem('rf_sidebar_collapsed', String(this.sidebarCollapsed));
+    this.emit('sidebar-toggle', this.sidebarCollapsed);
+  }
+
+  setSidebarCollapsed(collapsed) {
+    this.sidebarCollapsed = Boolean(collapsed);
     localStorage.setItem('rf_sidebar_collapsed', String(this.sidebarCollapsed));
     this.emit('sidebar-toggle', this.sidebarCollapsed);
   }
