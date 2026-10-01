@@ -871,3 +871,70 @@ def test_okumura_hata_and_nettilt3d_two_column_layout_overhaul():
     assert "tilt-diagram-body" in ws_text
     assert "tilt-hud-readout" in ws_text
 
+
+def test_exact_reference_screenshots_adaptation():
+    """Verify adaptation to user's exact reference screenshots (ref_sidebar, ref_cov, ref_hata, ref_tilt)."""
+    # 1. Sidebar Navigation (ref_sidebar/image.png)
+    res_sb = client.get("/static/js/components/sidebar.js")
+    assert res_sb.status_code == 200
+    sb_text = res_sb.text
+    assert "sidebar__accordion-btn" in sb_text
+    assert "sidebar__sub-bullet" in sb_text
+    assert "• Coverage Simulation" in sb_text or ("sidebar__sub-bullet" in sb_text and "Coverage Simulation" in sb_text)
+    assert "• Okumura-Hata Model" in sb_text or ("sidebar__sub-bullet" in sb_text and "Okumura-Hata Model" in sb_text)
+    assert "• NetTilt 3D" in sb_text or ("sidebar__sub-bullet" in sb_text and "NetTilt 3D" in sb_text)
+
+    # 2. Coverage Simulation (ref_cov/image.png)
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    ws_text = res_ws.text
+    assert "results-grid--6" in ws_text
+    assert "TOTAL TILT" in ws_text
+    assert "NEAR DISTANCE" in ws_text
+    assert "CENTER DISTANCE" in ws_text
+    assert "FAR DISTANCE" in ws_text
+    assert "COVERAGE WIDTH" in ws_text
+    assert "EST. AREA" in ws_text
+    assert "Side View — Vertical Profile" in ws_text
+    assert "Top View — Horizontal Coverage" in ws_text
+
+    # 3. Okumura-Hata (ref_hata/image.png)
+    assert "EIRP" in ws_text
+    assert "MAX PATH LOSS" in ws_text
+    assert "COVERAGE RADIUS" in ws_text
+    assert "SECTOR AREA" in ws_text
+    assert "Model Confidence" in ws_text
+    assert "BORESIGHT DIST" in ws_text
+    assert "NEAR EDGE" in ws_text
+    assert "FAR EDGE" in ws_text
+    assert "2D Top-Down Sector Coverage" in ws_text
+    assert "sectorCanvas" in ws_text
+    assert "Inner Zone (Upper Beam Edge)" in ws_text
+    assert "Center Zone (Boresight)" in ws_text
+    assert "Outer Zone (Lower Beam Edge)" in ws_text
+
+    # 4. NetTilt 3D (ref_tilt/image.png)
+    assert "ANTENNA PARAMETERS" in ws_text
+    assert "HEIGHT (M)" in ws_text
+    assert "MECH TILT" in ws_text
+    assert "ELEC TILT" in ws_text
+    assert "AZIMUTH (°)" in ws_text
+    assert "H BEAMWIDTH" in ws_text
+    assert "V BEAMWIDTH" in ws_text
+    assert "SITE LOCATION" in ws_text
+    assert "LATITUDE" in ws_text
+    assert "LONGITUDE" in ws_text
+    assert "SITE NAME" in ws_text
+    assert "Update Map" in ws_text
+    assert "Download KML" in ws_text
+    assert "REFERENCE FORMULAS" in ws_text
+    assert "Map View" in ws_text
+    assert "3D Antenna Visualization" in ws_text
+    assert "Coverage Estimation" in ws_text
+    assert "leafletMap" in ws_text
+    assert "Coverage Beams" in ws_text
+    assert "chkNear" in ws_text
+    assert "chkCenter" in ws_text
+    assert "chkFar" in ws_text
+
+

@@ -1,7 +1,10 @@
 /**
  * Collapsible Left Navigation Sidebar Component
- * Features clean dropdown navigation toggles with persistent state
- * Theme-adaptive icons and clutter-free links
+ * Matches attachments/ref_sidebar/image.png exactly:
+ * - Accordion dropdown parent items with chevron toggles (> / v)
+ * - Indented bulleted sub-items (e.g. • Coverage Simulation, • Okumura-Hata Model, • NetTilt 3D)
+ * - Clean layout without floating numbers or unstyled badges
+ * - Sleek theme-adaptive thin scrollbar
  */
 
 import { state } from '../state.js';
@@ -66,9 +69,10 @@ export class SidebarComponent {
     const secCoverageOpen = isSecOpen('coverage', ['tool-coverage-simulation', 'tool-okumura-hata', 'tool-nettilt-3d', 'tool-nettilt3d']);
     const secGisOpen = isSecOpen('gis', ['tool-geohash-converter', 'tool-geohash-to-shp', 'tool-geohash-to-latlon', 'tool-latlon-to-geohash']);
 
+    // Chevron toggle SVG (> when closed, rotates 90deg to v when open)
     const renderChevron = (isOpen) => `
-      <svg class="sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 9 12 15 18 9"></polyline>
+      <svg class="sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
     `;
 
@@ -91,11 +95,8 @@ export class SidebarComponent {
       <nav class="sidebar__nav">
         <!-- Section: Overview -->
         <div class="sidebar__section" data-section="overview">
-          <button type="button" class="sidebar__section-header" data-section="overview" aria-expanded="${secOverviewOpen}">
-            <span class="sidebar__section-title">${state.t('nav_overview')}</span>
-            ${renderChevron(secOverviewOpen)}
-          </button>
-          <ul class="sidebar__menu sidebar__submenu ${secOverviewOpen ? '' : 'sidebar__submenu--collapsed'}" id="submenu-overview">
+          <div class="sidebar__section-label">${state.t('nav_overview')}</div>
+          <ul class="sidebar__menu">
             <li>
               <a href="#dashboard" class="sidebar__link ${currentRoute === 'dashboard' ? 'sidebar__link--active' : ''}" title="${state.t('nav_dashboard')}">
                 <span class="sidebar__link-icon">
@@ -109,24 +110,25 @@ export class SidebarComponent {
 
         <!-- Section: KML & Visualization -->
         <div class="sidebar__section" data-section="kml">
-          <button type="button" class="sidebar__section-header" data-section="kml" aria-expanded="${secKmlOpen}">
-            <span class="sidebar__section-title">${state.t('nav_kml')}</span>
+          <button type="button" class="sidebar__section-header sidebar__accordion-btn ${secKmlOpen ? 'sidebar__accordion-btn--open' : ''}" data-section="kml" aria-expanded="${secKmlOpen}">
+            <span class="sidebar__section-left">
+              <span class="sidebar__link-icon">
+                <img src="/assets/icons/tool-excel-to-kml.svg" alt="${state.t('nav_kml')}">
+              </span>
+              <span class="sidebar__section-title">${state.t('nav_kml')}</span>
+            </span>
             ${renderChevron(secKmlOpen)}
           </button>
           <ul class="sidebar__menu sidebar__submenu ${secKmlOpen ? '' : 'sidebar__submenu--collapsed'}" id="submenu-kml">
             <li>
-              <a href="#tool-excel-to-kml" class="sidebar__link ${currentRoute === 'tool-excel-to-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_excel_to_kml_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-excel-to-kml.svg" alt="Point KML">
-                </span>
+              <a href="#tool-excel-to-kml" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-excel-to-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_excel_to_kml_title')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">Excel &rarr; Point KML</span>
               </a>
             </li>
             <li>
-              <a href="#tool-prb-kml" class="sidebar__link ${currentRoute === 'tool-prb-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_prb_kml_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-prb-kml.svg" alt="PRB KML">
-                </span>
+              <a href="#tool-prb-kml" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-prb-kml' ? 'sidebar__link--active' : ''}" title="${state.t('tool_prb_kml_title')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">Excel &rarr; PRB 3D Sector</span>
               </a>
             </li>
@@ -135,16 +137,19 @@ export class SidebarComponent {
 
         <!-- Section: Network Topology & ISD -->
         <div class="sidebar__section" data-section="topology">
-          <button type="button" class="sidebar__section-header" data-section="topology" aria-expanded="${secTopologyOpen}">
-            <span class="sidebar__section-title">${state.t('nav_topology')}</span>
+          <button type="button" class="sidebar__section-header sidebar__accordion-btn ${secTopologyOpen ? 'sidebar__accordion-btn--open' : ''}" data-section="topology" aria-expanded="${secTopologyOpen}">
+            <span class="sidebar__section-left">
+              <span class="sidebar__link-icon">
+                <img src="/assets/icons/tool-isd-calculator.svg" alt="${state.t('nav_topology')}">
+              </span>
+              <span class="sidebar__section-title">${state.t('nav_topology')}</span>
+            </span>
             ${renderChevron(secTopologyOpen)}
           </button>
           <ul class="sidebar__menu sidebar__submenu ${secTopologyOpen ? '' : 'sidebar__submenu--collapsed'}" id="submenu-topology">
             <li>
-              <a href="#tool-isd-calculator" class="sidebar__link ${currentRoute === 'tool-isd-calculator' ? 'sidebar__link--active' : ''}" title="${state.t('tool_isd_calculator_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-isd-calculator.svg" alt="ISD">
-                </span>
+              <a href="#tool-isd-calculator" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-isd-calculator' ? 'sidebar__link--active' : ''}" title="${state.t('tool_isd_calculator_title')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">ISD Calculator</span>
               </a>
             </li>
@@ -153,111 +158,106 @@ export class SidebarComponent {
 
         <!-- Section: Coverage & Propagation -->
         <div class="sidebar__section" data-section="coverage">
-          <button type="button" class="sidebar__section-header" data-section="coverage" aria-expanded="${secCoverageOpen}">
-            <span class="sidebar__section-title">${state.t('nav_coverage')}</span>
+          <button type="button" class="sidebar__section-header sidebar__accordion-btn ${secCoverageOpen ? 'sidebar__accordion-btn--open' : ''} ${(['tool-coverage-simulation', 'tool-okumura-hata', 'tool-nettilt-3d', 'tool-nettilt3d'].includes(currentRoute)) ? 'sidebar__accordion-btn--active' : ''}" data-section="coverage" aria-expanded="${secCoverageOpen}">
+            <span class="sidebar__section-left">
+              <span class="sidebar__link-icon">
+                <img src="/assets/icons/tool-coverage-simulation.svg" alt="${state.t('nav_coverage')}">
+              </span>
+              <span class="sidebar__section-title">${state.t('nav_coverage')}</span>
+            </span>
             ${renderChevron(secCoverageOpen)}
           </button>
           <ul class="sidebar__menu sidebar__submenu ${secCoverageOpen ? '' : 'sidebar__submenu--collapsed'}" id="submenu-coverage">
             <li>
-              <a href="#tool-coverage-simulation" class="sidebar__link ${currentRoute === 'tool-coverage-simulation' ? 'sidebar__link--active' : ''}" title="${state.t('tool_coverage_simulation_title', 'Coverage Simulation')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-coverage-simulation.svg" alt="Coverage Simulation">
-                </span>
+              <a href="#tool-coverage-simulation" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-coverage-simulation' ? 'sidebar__link--active' : ''}" title="${state.t('tool_coverage_simulation_title', 'Coverage Simulation')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">Coverage Simulation</span>
               </a>
             </li>
             <li>
-              <a href="#tool-okumura-hata" class="sidebar__link ${currentRoute === 'tool-okumura-hata' ? 'sidebar__link--active' : ''}" title="${state.t('tool_okumura_hata_title', 'Okumura-Hata Model')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-okumura-hata.svg" alt="Okumura-Hata">
-                </span>
+              <a href="#tool-okumura-hata" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-okumura-hata' ? 'sidebar__link--active' : ''}" title="${state.t('tool_okumura_hata_title', 'Okumura-Hata Model')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">Okumura-Hata Model</span>
               </a>
             </li>
             <li>
-              <a href="#tool-nettilt-3d" class="sidebar__link ${(currentRoute === 'tool-nettilt-3d' || currentRoute === 'tool-nettilt3d') ? 'sidebar__link--active' : ''}" title="${state.t('tool_nettilt_3d_title', 'NetTilt 3D')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-nettilt-3d.svg" alt="NetTilt 3D">
-                </span>
+              <a href="#tool-nettilt-3d" class="sidebar__link sidebar__sub-link ${(currentRoute === 'tool-nettilt-3d' || currentRoute === 'tool-nettilt3d') ? 'sidebar__link--active' : ''}" title="${state.t('tool_nettilt_3d_title', 'NetTilt 3D')}">
+                <span class="sidebar__sub-bullet">•</span>
                 <span class="sidebar__link-text">NetTilt 3D</span>
               </a>
             </li>
           </ul>
         </div>
 
-        <!-- Section: Geospatial & Geohash Utilities -->
+        <!-- Section: GIS & Coordinates -->
         <div class="sidebar__section" data-section="gis">
-          <button type="button" class="sidebar__section-header" data-section="gis" aria-expanded="${secGisOpen}">
-            <span class="sidebar__section-title">${state.t('nav_gis')}</span>
+          <button type="button" class="sidebar__section-header sidebar__accordion-btn ${secGisOpen ? 'sidebar__accordion-btn--open' : ''}" data-section="gis" aria-expanded="${secGisOpen}">
+            <span class="sidebar__section-left">
+              <span class="sidebar__link-icon">
+                <img src="/assets/icons/tool-geohash-converter.svg" alt="${state.t('nav_gis')}">
+              </span>
+              <span class="sidebar__section-title">${state.t('nav_gis')}</span>
+            </span>
             ${renderChevron(secGisOpen)}
           </button>
           <ul class="sidebar__menu sidebar__submenu ${secGisOpen ? '' : 'sidebar__submenu--collapsed'}" id="submenu-gis">
             <li>
-              <a href="#tool-geohash-converter" class="sidebar__link ${currentRoute === 'tool-geohash-converter' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_converter_title', 'Geohash Converter')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-geohash-converter.svg" alt="Geohash Converter">
-                </span>
-                <span class="sidebar__link-text">${state.t('tool_geohash_converter_title', 'Geohash Converter')}</span>
+              <a href="#tool-geohash-converter" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-geohash-converter' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_converter_title', 'Geohash Converter')}">
+                <span class="sidebar__sub-bullet">•</span>
+                <span class="sidebar__link-text">Geohash Converter</span>
               </a>
             </li>
             <li>
-              <a href="#tool-geohash-to-shp" class="sidebar__link ${currentRoute === 'tool-geohash-to-shp' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_shp_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-geohash-to-shp.svg" alt="Geohash to SHP">
-                </span>
-                <span class="sidebar__link-text">Geohash &rarr; Shapefile</span>
+              <a href="#tool-geohash-to-shp" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-geohash-to-shp' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_shp_title')}">
+                <span class="sidebar__sub-bullet">•</span>
+                <span class="sidebar__link-text">Geohash &rarr; SHP</span>
               </a>
             </li>
             <li>
-              <a href="#tool-geohash-to-latlon" class="sidebar__link ${currentRoute === 'tool-geohash-to-latlon' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_latlon_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-geohash-to-latlon.svg" alt="Decoder">
-                </span>
-                <span class="sidebar__link-text">Geohash &rarr; Lat / Long</span>
+              <a href="#tool-geohash-to-latlon" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-geohash-to-latlon' ? 'sidebar__link--active' : ''}" title="${state.t('tool_geohash_to_latlon_title')}">
+                <span class="sidebar__sub-bullet">•</span>
+                <span class="sidebar__link-text">Geohash &rarr; Lat/Lon</span>
               </a>
             </li>
             <li>
-              <a href="#tool-latlon-to-geohash" class="sidebar__link ${currentRoute === 'tool-latlon-to-geohash' ? 'sidebar__link--active' : ''}" title="${state.t('tool_latlon_to_geohash_title')}">
-                <span class="sidebar__link-icon">
-                  <img src="/assets/icons/tool-latlon-to-geohash.svg" alt="Encoder">
-                </span>
-                <span class="sidebar__link-text">Lat / Long &rarr; Geohash</span>
+              <a href="#tool-latlon-to-geohash" class="sidebar__link sidebar__sub-link ${currentRoute === 'tool-latlon-to-geohash' ? 'sidebar__link--active' : ''}" title="${state.t('tool_latlon_to_geohash_title')}">
+                <span class="sidebar__sub-bullet">•</span>
+                <span class="sidebar__link-text">Lat/Lon &rarr; Geohash</span>
               </a>
             </li>
           </ul>
         </div>
       </nav>
 
-      <!-- Sidebar Footer (Refined User-Friendly Toggle Button) -->
+      <!-- Sidebar Footer with Vector SVG Toggle -->
       <div class="sidebar__footer">
-        <button class="sidebar__toggle" id="sidebar-toggle-btn" title="${state.t('toggle_sidebar')}" aria-label="${state.t('toggle_sidebar')}">
-          <span class="sidebar__toggle-icon">
-            <svg class="sidebar__toggle-svg" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2.5" y="2.5" width="15" height="15" rx="3" stroke-width="1.5"/>
-              <path d="M7.5 2.5V17.5" stroke-width="1.5"/>
-              ${isCollapsed ? '<path d="M11 8L13.5 10.5L11 13"/>' : '<path d="M13.5 8L11 10.5L13.5 13"/>'}
-            </svg>
-          </span>
-          ${isCollapsed ? '' : `<span class="sidebar__toggle-label">${state.lang === 'id' ? 'Ciutkan Menu' : 'Collapse Sidebar'}</span>`}
+        <button class="sidebar__toggle" title="Collapse sidebar" aria-label="Toggle sidebar width">
+          <svg class="sidebar__toggle-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span class="sidebar__toggle-text">Collapse sidebar</span>
         </button>
       </div>
     `;
 
-    // Bind collapsible section toggles
-    const sectionHeaders = this.container.querySelectorAll('.sidebar__section-header');
-    sectionHeaders.forEach((header) => {
-      header.addEventListener('click', () => {
-        const secId = header.dataset.section;
+    // Bind section accordion toggles
+    this.container.querySelectorAll('.sidebar__section-header').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const secId = btn.getAttribute('data-section');
         if (secId) {
           this.toggleSection(secId);
         }
       });
     });
 
-    const toggleBtn = this.container.querySelector('#sidebar-toggle-btn');
+    // Bind collapse sidebar toggle button
+    const toggleBtn = this.container.querySelector('.sidebar__toggle');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        state.toggleSidebar();
+        state.setSidebarCollapsed(!state.sidebarCollapsed);
       });
     }
   }
