@@ -177,11 +177,14 @@
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   color: var(--color-text-muted);
-  padding: 0 10px;
+  padding: 2px 10px;
   margin-bottom: 6px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .sidebar--collapsed .sidebar__section-title {
@@ -200,43 +203,92 @@
 .sidebar__link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: var(--rounded-sm);
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--rounded-md, 6px);
   color: var(--color-text-secondary);
   text-decoration: none;
-  font-size: 0.84rem;
+  font-size: 0.825rem;
   font-weight: 500;
-  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
   position: relative;
 }
 
 .sidebar__link:hover {
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-bg-sunken);
   color: var(--color-text-primary);
+  border-left-color: rgba(2, 132, 199, 0.35);
 }
 
 .sidebar__link--active {
-  background-color: rgba(14, 165, 233, 0.12);
+  background-color: var(--sidebar-item-active-bg, rgba(2, 132, 199, 0.09));
   color: var(--color-primary);
   font-weight: 600;
   border-left: 3px solid var(--color-primary);
 }
 
 .sidebar__link-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--rounded-xs, 2px);
+  background: transparent;
   flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__link:hover .sidebar__link-icon {
+  background-color: rgba(2, 132, 199, 0.06);
+}
+
+.sidebar__link--active .sidebar__link-icon {
+  background-color: rgba(2, 132, 199, 0.12);
 }
 
 .sidebar__link-icon img,
 .sidebar__link-icon svg {
   width: 18px;
   height: 18px;
+}
+
+/* Sidebar Menu Badge Treatments */
+.sidebar__badge {
+  margin-left: auto;
+  font-size: 0.58rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: var(--rounded-full, 9999px);
+  text-transform: uppercase;
+  line-height: 1.25;
+  flex-shrink: 0;
+}
+
+.sidebar__badge--new {
+  background-color: var(--sidebar-badge-new-bg, #ecfdf5);
+  border: 1px solid var(--sidebar-badge-new-border, #a7f3d0);
+  color: var(--sidebar-badge-new-text, #059669);
+}
+
+.sidebar__badge--pro {
+  background-color: var(--sidebar-badge-pro-bg, #eef2ff);
+  border: 1px solid var(--sidebar-badge-pro-border, #c7d2fe);
+  color: var(--sidebar-badge-pro-text, #4f46e5);
+}
+
+.sidebar__badge--beta {
+  background-color: var(--sidebar-badge-beta-bg, #fffbeb);
+  border: 1px solid var(--sidebar-badge-beta-border, #fde68a);
+  color: var(--sidebar-badge-beta-text, #b45309);
+}
+
+.sidebar--collapsed .sidebar__badge {
+  display: none;
 }
 
 .sidebar--collapsed .sidebar__link-text {

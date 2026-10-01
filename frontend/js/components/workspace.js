@@ -3287,6 +3287,25 @@ export class WorkspaceComponent {
               <div class="rf-coverage-canvas-body" id="cov-diagram-body">
                 ${this.activeCovTab === 'elevation' ? this.renderCovElevationSvg(d) : this.renderCovFootprintSvg(d)}
               </div>
+              <div class="rf-diagram-hud">
+                <div class="rf-diagram-hud__legend">
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#10b981;"></span>
+                    <span>Boresight Axis</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#0284c7;"></span>
+                    <span>3dB Beam Cone</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#f59e0b;"></span>
+                    <span>Inner/Outer Bounds</span>
+                  </span>
+                </div>
+                <div class="rf-diagram-hud__readout" id="cov-hud-readout">
+                  Center: ${d.centerDist.toFixed(1)}m | Width: ${d.coverageWidth.toFixed(1)}m | Area: ${d.coverageAreaHa.toFixed(2)} ha
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -3299,7 +3318,7 @@ export class WorkspaceComponent {
   renderCovKpiCards(d) {
     const isId = state.lang === 'id';
     return `
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Total Downtilt' : 'Total Downtilt'}</span>
           <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
@@ -3308,7 +3327,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° Elec</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Jarak Boresight (Pusat)' : 'Boresight Center'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Target</span>
@@ -3317,7 +3336,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Ground impact @ ${d.totalTilt.toFixed(1)}°</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Batas Dekat (Near Edge)' : 'Near Beam Edge'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">Inner</span>
@@ -3326,7 +3345,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Upper 3dB boundary ray</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Batas Jauh (Far Edge)' : 'Far Beam Edge'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Outer</span>
@@ -3335,7 +3354,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Lower 3dB boundary ray</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Lebar Sektor di Far Edge' : 'Beam Width @ Far Edge'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Spread</span>
@@ -3344,7 +3363,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Azimuth 3dB span (${d.hbw}°)</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Estimasi Luas Cakupan' : 'Ground Coverage Area'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Footprint</span>
@@ -3589,6 +3608,11 @@ export class WorkspaceComponent {
         ? this.renderCovElevationSvg(d)
         : this.renderCovFootprintSvg(d);
     }
+
+    const hudReadout = this.container.querySelector('#cov-hud-readout');
+    if (hudReadout) {
+      hudReadout.textContent = `Center: ${d.centerDist.toFixed(1)}m | Width: ${d.coverageWidth.toFixed(1)}m | Area: ${d.coverageAreaHa.toFixed(2)} ha`;
+    }
   }
 
   // --- 2. OKUMURA-HATA PROPAGATION MODEL ---
@@ -3829,6 +3853,25 @@ export class WorkspaceComponent {
               <div class="rf-coverage-canvas-body" id="oh-diagram-body">
                 ${this.activeOhTab === 'curve' ? this.renderOhCurveSvg(d) : this.renderOhBudgetSvg(d)}
               </div>
+              <div class="rf-diagram-hud">
+                <div class="rf-diagram-hud__legend">
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#0284c7;"></span>
+                    <span>Propagation Curve</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#ef4444;"></span>
+                    <span>MAPL Ceiling</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#10b981;"></span>
+                    <span>Max Reach (R-Cov)</span>
+                  </span>
+                </div>
+                <div class="rf-diagram-hud__readout" id="oh-hud-readout">
+                  MAPL: ${d.maxPl.toFixed(1)} dB | R-Cov: ${(d.covRadiusKm * 1000).toFixed(0)}m | L1km: ${d.L_1km.toFixed(1)} dB
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -3841,7 +3884,7 @@ export class WorkspaceComponent {
   renderOhKpiCards(d) {
     const isId = state.lang === 'id';
     return `
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">EIRP Transmitter</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">RF Power</span>
@@ -3850,7 +3893,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">${d.txPower} dBm + ${d.gain} dBi - ${d.cableLoss} dB</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">Max Allowable Loss (MAPL)</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Budget</span>
@@ -3859,7 +3902,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">EIRP - (${d.rxSens} dBm sensitivity)</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">Path Loss @ 1 km (L1km)</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">${d.env}</span>
@@ -3868,7 +3911,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Correction a(hm)=${d.a_hm.toFixed(2)} dB</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Radius Jangkauan Maks' : 'Max Coverage Radius'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">R-Cov</span>
@@ -3877,7 +3920,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">${(d.covRadiusKm * 1000).toFixed(0)} meters reach</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Luas Area Sektor' : 'Sector Coverage Area'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Area</span>
@@ -3886,7 +3929,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">${d.sectorAreaHa.toFixed(1)} ha (${d.hbw}° sector)</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Keandalan Model' : 'Model Confidence'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">${Math.round(d.confidence * 100)}%</span>
@@ -4106,6 +4149,11 @@ export class WorkspaceComponent {
       diagramBody.innerHTML = this.activeOhTab === 'curve'
         ? this.renderOhCurveSvg(d)
         : this.renderOhBudgetSvg(d);
+    }
+
+    const hudReadout = this.container.querySelector('#oh-hud-readout');
+    if (hudReadout) {
+      hudReadout.textContent = `MAPL: ${d.maxPl.toFixed(1)} dB | R-Cov: ${(d.covRadiusKm * 1000).toFixed(0)}m | L1km: ${d.L_1km.toFixed(1)} dB`;
     }
   }
 
@@ -4334,6 +4382,25 @@ export class WorkspaceComponent {
               <div class="rf-coverage-canvas-body" id="tilt-diagram-body">
                 ${this.activeTiltTab === 'perspective' ? this.renderTiltPerspectiveSvg(d) : this.renderTiltGaugeSvg(d)}
               </div>
+              <div class="rf-diagram-hud">
+                <div class="rf-diagram-hud__legend">
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#6366f1;"></span>
+                    <span>Net Vector (${d.totalTilt.toFixed(1)}°)</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#10b981;"></span>
+                    <span>Target (${d.targetDist}m)</span>
+                  </span>
+                  <span class="rf-diagram-hud__item">
+                    <span class="rf-diagram-hud__dot" style="background:#0284c7;"></span>
+                    <span>Ground Hit (${d.boresightDist.toFixed(0)}m)</span>
+                  </span>
+                </div>
+                <div class="rf-diagram-hud__readout" id="tilt-hud-readout">
+                  Optimum: ${d.optTiltDeg.toFixed(2)}° | Deviation: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}° | Hit: ${d.boresightDist.toFixed(1)}m
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -4348,9 +4415,12 @@ export class WorkspaceComponent {
     const statusClass = d.alignStatus === 'optimal'
       ? 'rf-coverage-chip--excellent'
       : (d.alignStatus === 'over' ? 'rf-coverage-chip--bad' : 'rf-coverage-chip--fair');
+    const statusCardClass = d.alignStatus === 'optimal'
+      ? 'rf-metric-card--optimal'
+      : (d.alignStatus === 'over' ? 'rf-metric-card--critical' : 'rf-metric-card--warning');
 
     return `
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--accent">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Total Net Tilt' : 'Total Net Tilt'}</span>
           <span class="rf-tilt-badge rf-tilt-badge--net">${d.totalTilt}°</span>
@@ -4359,7 +4429,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">${d.mech.toFixed(1)}° Mech + ${d.elec.toFixed(1)}° RET</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Sudut Optimum Target' : 'Optimum Target Tilt'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Calculated</span>
@@ -4368,7 +4438,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">For ${d.targetDist}m @ H=${d.effHeight}m</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card ${statusCardClass}">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Status Keselarasan' : 'Alignment Status'}</span>
           <span class="rf-coverage-chip ${statusClass}">${d.alignStatus.toUpperCase()}</span>
@@ -4377,7 +4447,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Delta: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}°</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--nominal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Titik Jatuh Boresight' : 'Boresight Ground Hit'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--good">Center</span>
@@ -4386,7 +4456,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Target is @ ${d.targetDist}m</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--warning">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">Inner & Outer 3dB</span>
           <span class="rf-coverage-chip rf-coverage-chip--fair">Span</span>
@@ -4395,7 +4465,7 @@ export class WorkspaceComponent {
         <div class="rf-metric-card__meta">Near: ${d.innerDist.toFixed(0)}m, Far: ${d.outerDist.toFixed(0)}m</div>
       </div>
 
-      <div class="rf-metric-card">
+      <div class="rf-metric-card rf-metric-card--optimal">
         <div class="rf-metric-card__header">
           <span class="rf-metric-card__label">${isId ? 'Panjang Jejak Radiasi' : 'Ground Footprint Depth'}</span>
           <span class="rf-coverage-chip rf-coverage-chip--excellent">Coverage</span>
@@ -4632,6 +4702,11 @@ export class WorkspaceComponent {
       diagramBody.innerHTML = this.activeTiltTab === 'perspective'
         ? this.renderTiltPerspectiveSvg(d)
         : this.renderTiltGaugeSvg(d);
+    }
+
+    const hudReadout = this.container.querySelector('#tilt-hud-readout');
+    if (hudReadout) {
+      hudReadout.textContent = `Optimum: ${d.optTiltDeg.toFixed(2)}° | Deviation: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}° | Hit: ${d.boresightDist.toFixed(1)}m`;
     }
   }
 

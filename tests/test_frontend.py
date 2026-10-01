@@ -715,3 +715,44 @@ def test_coverage_workspace_components_and_visualizers():
 
 
 
+
+
+def test_sidebar_and_coverage_telemetry_visual_standards():
+    # 1. Sidebar badge styling and markup
+    res_side = client.get("/static/js/components/sidebar.js")
+    assert res_side.status_code == 200
+    assert "sidebar__badge" in res_side.text
+    assert "sidebar__badge--new" in res_side.text
+    assert "sidebar__badge--pro" in res_side.text
+
+    res_css = client.get("/static/css/app.css")
+    assert res_css.status_code == 200
+    assert ".sidebar__badge" in res_css.text
+    assert ".sidebar__badge--new" in res_css.text
+    assert "border-left: 3px solid transparent;" in res_css.text
+
+    # 2. Design tokens for telemetry and sidebar
+    res_tokens = client.get("/static/css/tokens.css")
+    assert res_tokens.status_code == 200
+    assert "--sidebar-item-active-bg" in res_tokens.text
+    assert "--telemetry-accent-optimal" in res_tokens.text
+    assert "--telemetry-accent-nominal" in res_tokens.text
+
+    # 3. Telemetry scorecards and diagram HUD
+    res_comp = client.get("/static/css/components.css")
+    assert res_comp.status_code == 200
+    assert ".rf-metric-card--optimal" in res_comp.text
+    assert ".rf-metric-card--nominal" in res_comp.text
+    assert ".rf-metric-card--accent" in res_comp.text
+    assert ".rf-diagram-hud" in res_comp.text
+    assert ".rf-diagram-hud__legend" in res_comp.text
+
+    # 4. Workspace components integration
+    res_ws = client.get("/static/js/components/workspace.js")
+    assert res_ws.status_code == 200
+    assert "rf-metric-card--optimal" in res_ws.text
+    assert "rf-metric-card--nominal" in res_ws.text
+    assert "rf-diagram-hud" in res_ws.text
+    assert "cov-hud-readout" in res_ws.text
+    assert "oh-hud-readout" in res_ws.text
+    assert "tilt-hud-readout" in res_ws.text

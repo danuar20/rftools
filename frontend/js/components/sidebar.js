@@ -101,6 +101,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-coverage-simulation.svg" alt="Coverage Simulation">
                 </span>
                 <span class="sidebar__link-text">Coverage Simulation</span>
+                <span class="sidebar__badge sidebar__badge--new">NEW</span>
               </a>
             </li>
             <li>
@@ -109,6 +110,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-okumura-hata.svg" alt="Okumura-Hata">
                 </span>
                 <span class="sidebar__link-text">Okumura-Hata Model</span>
+                <span class="sidebar__badge sidebar__badge--new">NEW</span>
               </a>
             </li>
             <li>
@@ -117,6 +119,7 @@ export class SidebarComponent {
                   <img src="/assets/icons/tool-nettilt-3d.svg" alt="NetTilt 3D">
                 </span>
                 <span class="sidebar__link-text">NetTilt 3D</span>
+                <span class="sidebar__badge sidebar__badge--pro">3D</span>
               </a>
             </li>
           </ul>

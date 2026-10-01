@@ -111,6 +111,29 @@ html[data-theme="light"] {
   --env-bg-suburban: #f0f9ff;
   --env-bg-rural: #ecfdf5;
 
+  /* Sidebar Design System Tokens (Light Mode) */
+  --sidebar-item-active-bg: rgba(2, 132, 199, 0.08);
+  --sidebar-item-active-border: var(--color-primary);
+  --sidebar-badge-new-bg: #ecfdf5;
+  --sidebar-badge-new-text: #059669;
+  --sidebar-badge-new-border: #a7f3d0;
+  --sidebar-badge-pro-bg: #eef2ff;
+  --sidebar-badge-pro-text: #4f46e5;
+  --sidebar-badge-pro-border: #c7d2fe;
+  --sidebar-badge-beta-bg: #fffbeb;
+  --sidebar-badge-beta-text: #b45309;
+  --sidebar-badge-beta-border: #fde68a;
+
+  /* Telemetry Scorecard & Engineering Grid Tokens */
+  --telemetry-accent-optimal: #10b981;
+  --telemetry-accent-nominal: #0284c7;
+  --telemetry-accent-warning: #f59e0b;
+  --telemetry-accent-critical: #ef4444;
+  --telemetry-accent-vector: #6366f1;
+  --telemetry-glow-optimal: rgba(16, 185, 129, 0.12);
+  --telemetry-glow-warning: rgba(245, 158, 11, 0.12);
+  --telemetry-glow-critical: rgba(239, 68, 68, 0.12);
+
   /* Spacing Scale (4px baseline) */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -245,6 +268,29 @@ html[data-theme="dark"] {
   --env-bg-urban: rgba(79, 70, 229, 0.15);
   --env-bg-suburban: rgba(2, 132, 199, 0.15);
   --env-bg-rural: rgba(5, 150, 105, 0.15);
+
+  /* Sidebar Design System Tokens (Dark Mode) */
+  --sidebar-item-active-bg: rgba(56, 189, 248, 0.12);
+  --sidebar-item-active-border: #38bdf8;
+  --sidebar-badge-new-bg: rgba(16, 185, 129, 0.16);
+  --sidebar-badge-new-text: #34d399;
+  --sidebar-badge-new-border: rgba(16, 185, 129, 0.35);
+  --sidebar-badge-pro-bg: rgba(99, 102, 241, 0.16);
+  --sidebar-badge-pro-text: #818cf8;
+  --sidebar-badge-pro-border: rgba(99, 102, 241, 0.35);
+  --sidebar-badge-beta-bg: rgba(245, 158, 11, 0.16);
+  --sidebar-badge-beta-text: #fbbf24;
+  --sidebar-badge-beta-border: rgba(245, 158, 11, 0.35);
+
+  /* Telemetry Scorecard Tokens (Dark Mode) */
+  --telemetry-accent-optimal: #34d399;
+  --telemetry-accent-nominal: #38bdf8;
+  --telemetry-accent-warning: #fbbf24;
+  --telemetry-accent-critical: #f87171;
+  --telemetry-accent-vector: #818cf8;
+  --telemetry-glow-optimal: rgba(16, 185, 129, 0.18);
+  --telemetry-glow-warning: rgba(245, 158, 11, 0.18);
+  --telemetry-glow-critical: rgba(239, 68, 68, 0.18);
 
   /* Refined Elevation Shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
