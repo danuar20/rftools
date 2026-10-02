@@ -2057,7 +2057,7 @@ html[data-theme="dark"] .sidebar--collapsed .sidebar__link--active {
 }
 
 .sidebar__toggle-kbd {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 2px 6px;
@@ -2070,6 +2070,11 @@ html[data-theme="dark"] .sidebar--collapsed .sidebar__link--active {
   border-radius: 4px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   line-height: 1.2;
+  margin-left: auto;
+}
+
+.sidebar__toggle:hover .sidebar__toggle-kbd {
+  display: inline-flex;
 }
 
 html[data-theme="dark"] .sidebar__toggle-kbd {
@@ -2409,7 +2414,7 @@ html[data-theme="dark"] .sidebar__sub-link.sidebar__link--active .sidebar__sub-b
   grid-template-columns: 310px minmax(0, 1fr);
   grid-template-columns: 320px minmax(0, 1fr) !important;
   gap: 16px !important;
-  align-items: start !important;
+  align-items: stretch !important;
   width: 100% !important;
   min-height: calc(100vh - 140px);
   padding: 12px 16px;
@@ -2422,6 +2427,7 @@ html[data-theme="dark"] .sidebar__sub-link.sidebar__link--active .sidebar__sub-b
   .cov-workspace,
   .main-grid {
     grid-template-columns: 1fr !important;
+    align-items: start !important;
   }
 }
 
@@ -2433,6 +2439,7 @@ html[data-theme="dark"] .sidebar__sub-link.sidebar__link--active .sidebar__sub-b
   width: 320px !important;
   min-width: 320px !important;
   max-width: 320px !important;
+  height: 100% !important;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
   border-radius: 12px;
@@ -2448,7 +2455,38 @@ html[data-theme="dark"] .sidebar__sub-link.sidebar__link--active .sidebar__sub-b
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
+    height: auto !important;
   }
+}
+
+/* Reset button in card header (attachments/feedback_improvements/cov_reset/image.png) */
+.rf-btn-reset-link {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--color-border-subtle, #cbd5e1);
+  color: var(--color-primary, #0284c7);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--rounded-xs, 4px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.3;
+}
+
+.rf-btn-reset-link:hover {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: var(--color-primary, #0284c7);
+}
+
+html[data-theme="dark"] .rf-btn-reset-link {
+  border-color: rgba(79, 172, 254, 0.2);
+  color: #38bdf8;
+}
+
+html[data-theme="dark"] .rf-btn-reset-link:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
 }
 
 /* Carrier Band & Model Presets */
@@ -2557,16 +2595,32 @@ html[data-theme="light"] .cov-input-panel {
 .cov-input-label {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  align-items: center;
+  font-size: 10px;
   font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.input-label > span:first-child,
+.cov-input-label > span:first-child {
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--color-text-secondary);
 }
 
-.input-label span,
-.cov-input-label span {
+.input-label > span:last-child:not(:first-child),
+.cov-input-label > span:last-child:not(:first-child) {
   font-weight: 700;
+  font-size: 10px;
   color: var(--color-primary);
   font-family: var(--font-mono, monospace);
+  margin-left: auto;
 }
 
 .f-range,
@@ -2682,12 +2736,117 @@ html[data-theme="dark"] .cov-range {
 /* Right Results Panel */
 .results-panel,
 .cov-results-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 800px) {
+  .results-panel,
+  .cov-results-panel {
+    height: auto !important;
+  }
+}
+
+/* NetTilt 3D Coverage Estimation Tab (attachments/feedback_improvements/nettilt_est/image.png) */
+.nettilt-est-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 0;
-  width: 100%;
-  box-sizing: border-box;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .nettilt-est-card {
+  background: rgba(30, 30, 58, 0.6);
+  border-color: rgba(79, 172, 254, 0.15);
+}
+
+.nettilt-est-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nettilt-est-metric {
+  background: var(--color-bg-elevated, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+html[data-theme="dark"] .nettilt-est-metric {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(79, 172, 254, 0.15);
+}
+
+.nettilt-est-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 4px;
+  font-family: var(--font-mono, monospace);
+}
+
+.nettilt-est-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.nettilt-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+html[data-theme="dark"] .nettilt-status-banner {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(79, 172, 254, 0.15);
+}
+
+.nettilt-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  display: inline-block;
+}
+
+.nettilt-radar-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  flex: 1;
+}
+
+html[data-theme="dark"] .nettilt-radar-card {
+  background: rgba(30, 30, 58, 0.6);
+  border-color: rgba(79, 172, 254, 0.15);
 }
 
 .results-card,
@@ -3055,15 +3214,19 @@ html[data-theme="dark"] .tab-btn--active {
 }
 
 .tab-content.active {
-  display: block;
-  width: 100%;
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .tab-section {
   position: relative;
   width: 100%;
-  height: 520px;
-  min-height: 520px;
+  flex: 1;
+  height: 100%;
+  min-height: 580px;
   border-radius: var(--rounded-md, 8px);
   overflow: hidden;
   background: var(--color-bg-sunken);
@@ -3081,13 +3244,32 @@ html[data-theme="dark"] .tab-btn--active {
   z-index: 1;
 }
 
+.results-panel #leafletMap {
+  height: 100%;
+  min-height: 580px;
+}
+
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  min-height: 520px !important;
+  min-height: 580px !important;
   background: #e2e8f0;
   border-radius: var(--rounded-md, 8px);
   font-family: inherit;
+}
+
+#visualTab .tab-section {
+  height: 100%;
+  min-height: 580px;
+  display: flex;
+  flex-direction: column;
+}
+
+#threeCanvas {
+  width: 100%;
+  height: 100%;
+  min-height: 580px;
+  display: block;
 }
 
 /* Layer Control on Map Canvas */
@@ -3095,52 +3277,69 @@ html[data-theme="dark"] .tab-btn--active {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 10;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .layer-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, #cbd5e1);
   border-radius: var(--rounded-sm, 6px);
-  color: var(--color-text-primary);
+  color: var(--color-primary, #0284c7);
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+
+.layer-icon:hover {
+  background: var(--color-bg-hover, #f8fafc);
+  border-color: var(--color-primary, #0284c7);
 }
 
 .layer-popup {
-  position: absolute;
-  top: 38px;
-  right: 0;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 4px;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, #cbd5e1);
   border-radius: var(--rounded-sm, 6px);
   padding: 6px;
-  box-shadow: var(--shadow-md);
-  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 110px;
+}
+
+.layer-control:hover .layer-popup,
+.layer-control.expanded .layer-popup {
+  display: flex !important;
 }
 
 .layer-popup button {
-  padding: 4px 8px;
+  padding: 5px 10px;
   font-size: 11px;
+  font-weight: 500;
   text-align: left;
-  border-radius: var(--rounded-xs, 4px);
+  border-radius: 4px;
   border: none;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary, #1e293b);
   cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.layer-popup button:hover {
+  background: var(--color-bg-hover, #f1f5f9);
 }
 
 .layer-popup button.active {
-  background: rgba(2, 132, 199, 0.1);
-  color: var(--color-primary);
+  background: #38bdf8 !important;
+  color: #0f172a !important;
   font-weight: 600;
 }
 
@@ -3149,20 +3348,22 @@ html[data-theme="dark"] .tab-btn--active {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  z-index: 10;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
+  z-index: 1000;
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, #cbd5e1);
   border-radius: var(--rounded-md, 8px);
   padding: 8px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 11px;
 }
 
 html[data-theme="dark"] .beam-control {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(6px);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .beam-title {
@@ -3186,15 +3387,27 @@ html[data-theme="dark"] .beam-control {
 }
 
 .beam-check .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
   display: inline-block;
+  flex-shrink: 0;
 }
 
-.beam-check .dot.near { background: #10b981; }
-.beam-check .dot.center { background: #0284c7; }
-.beam-check .dot.far { background: #ef4444; }
+.beam-check .dot.near {
+  background: rgba(0, 200, 83, 0.4);
+  border: 1.5px solid #00c853;
+}
+
+.beam-check .dot.center {
+  background: rgba(79, 172, 254, 0.45);
+  border: 1.5px solid #4facfe;
+}
+
+.beam-check .dot.far {
+  background: rgba(255, 85, 85, 0.35);
+  border: 1.5px solid #ff5555;
+}
 
 /* Status Indicator */
 .status-indicator {
@@ -3259,16 +3472,67 @@ html[data-theme="dark"] .beam-control {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
   border-radius: var(--rounded-sm, 6px);
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 html[data-theme="dark"] .three-legend {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(6px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.three-legend .legend-title {
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.three-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--color-text-secondary);
+}
+
+.three-legend .legend-color {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.three-legend .legend-color.tower {
+  background: #5a6a7a;
+  border: 1px solid #475569;
+}
+
+.three-legend .legend-color.main-beam {
+  background: #4facfe;
+  border: 1px solid #0284c7;
+}
+
+.three-legend .legend-color.center-beam {
+  background: #00f2fe;
+  border: 1px solid #00c4d4;
+}
+
+.three-legend .legend-color.coverage {
+  background: rgba(79, 172, 254, 0.45);
+  border: 1px solid #4facfe;
+}
+
+.three-legend .legend-color.distance {
+  background: #2563eb;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
 }
 
 

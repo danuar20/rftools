@@ -12,13 +12,7 @@ export class AppState {
     this.route = this.getHashRoute();
     this.tools = [];
     this.health = { ok: false, latency: 0, engines: {}, port: 5005 };
-    const urlParams = typeof window !== 'undefined' && window.location ? new URLSearchParams(window.location.search) : null;
-    const urlCollapsed = urlParams ? urlParams.get('collapsed') : null;
-    if (urlCollapsed !== null) {
-      this.sidebarCollapsed = urlCollapsed === 'true' || urlCollapsed === '1';
-    } else {
-      this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
-    }
+    this.sidebarCollapsed = localStorage.getItem('rf_sidebar_collapsed') === 'true';
 
     // Theme & Language
     this.theme = localStorage.getItem('rf_tools_theme') || 'light';
@@ -220,12 +214,22 @@ export class AppState {
     this.sidebarCollapsed = !this.sidebarCollapsed;
     localStorage.setItem('rf_sidebar_collapsed', String(this.sidebarCollapsed));
     this.emit('sidebar-toggle', this.sidebarCollapsed);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 220);
+    }
   }
 
   setSidebarCollapsed(collapsed) {
     this.sidebarCollapsed = Boolean(collapsed);
     localStorage.setItem('rf_sidebar_collapsed', String(this.sidebarCollapsed));
     this.emit('sidebar-toggle', this.sidebarCollapsed);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 220);
+    }
   }
 
   setTheme(theme) {
