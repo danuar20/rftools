@@ -1,0 +1,15 @@
+[Unit]
+Description=RF Tools FastAPI Application
+After=network.target
+
+[Service]
+User=dans
+Group=dans
+WorkingDirectory=/home/dans/multica_workspaces/8653e74a-3303-43a0-b141-ed8de4b2497d/bbc5536ee8b7/workdir
+EnvironmentFile=/home/dans/multica_workspaces/8653e74a-3303-43a0-b141-ed8de4b2497d/bbc5536ee8b7/workdir/.env
+ExecStart=/home/dans/multica_workspaces/8653e74a-3303-43a0-b141-ed8de4b2497d/bbc5536ee8b7/workdir/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 5005
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

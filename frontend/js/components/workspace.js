@@ -3256,43 +3256,48 @@ export class WorkspaceComponent {
               </div>
             </div>
 
-            <!-- Side-by-Side Dual Visualizers -->
+            <!-- Side-by-Side Dual Visualizers (coverage_simulation.html) -->
             <div class="viz-grid">
               <!-- Side View: Vertical Profile -->
               <div class="viz-card">
                 <div class="viz-title">
                   <span>Side View — Vertical Profile</span>
                   <div class="ctrl-btns" style="margin-left:auto; display:inline-flex;">
-                    <button type="button" class="ctrl-btn" id="cov-zoom-in-btn" title="Zoom In">+</button>
-                    <button type="button" class="ctrl-btn" id="cov-zoom-out-btn" title="Zoom Out">−</button>
-                    <button type="button" class="ctrl-btn" id="cov-reset-view-btn" title="Reset View">↺</button>
+                    <button type="button" class="ctrl-btn" id="zoomInBtn" title="Zoom In">+</button>
+                    <button type="button" class="ctrl-btn" id="zoomOutBtn" title="Zoom Out">−</button>
+                    <button type="button" class="ctrl-btn" id="resetBtn" title="Reset">↺</button>
+                    <button type="button" id="cov-zoom-in-btn" style="display:none;"></button>
+                    <button type="button" id="cov-zoom-out-btn" style="display:none;"></button>
+                    <button type="button" id="cov-reset-view-btn" style="display:none;"></button>
                   </div>
                 </div>
-                <div class="chart-area" id="cov-side-chart">
-                  ${this.renderCovElevationSvg(d)}
+                <div class="chart-area" id="sideWrap">
+                  <canvas id="sideChart" class="cov-side-chart"></canvas>
+                  <div id="cov-side-chart" style="display:none;">${this.renderCovElevationSvg(d)}</div>
                 </div>
                 <div class="chart-legend">
-                  <div class="legend-item"><div class="legend-line" style="background:#0284c7"></div><span>Center Beam</span></div>
-                  <div class="legend-item"><div class="legend-line" style="background:#10b981"></div><span>Near Edge</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#4facfe"></div><span>Center Beam</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#22c55e"></div><span>Near Edge</span></div>
                   <div class="legend-item"><div class="legend-line" style="background:#ef4444"></div><span>Far Edge</span></div>
-                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7; opacity:0.6"></div><span>Antenna</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#4facfe; opacity:0.5"></div><span>Antenna</span></div>
                 </div>
               </div>
 
-              <!-- Top View: Horizontal Coverage 3-Tier Fan -->
+              <!-- Top View: Horizontal Coverage -->
               <div class="viz-card">
                 <div class="viz-title">
                   <span>Top View — Horizontal Coverage</span>
                 </div>
-                <div class="chart-area" id="cov-top-chart">
-                  ${this.renderCovFootprintSvg(d)}
+                <div class="chart-area" id="topWrap">
+                  <canvas id="topChart" class="cov-top-chart"></canvas>
+                  <div id="cov-top-chart" style="display:none;">${this.renderCovFootprintSvg(d)}</div>
                 </div>
                 <div class="chart-legend">
-                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7"></div><span>Antenna Position</span></div>
-                  <div class="legend-item"><div class="legend-line" style="background:#f59e0b"></div><span>Main Beam Direction</span></div>
-                  <div class="legend-item"><div class="legend-circle" style="background:#10b981"></div><span>Near Zone</span></div>
-                  <div class="legend-item"><div class="legend-circle" style="background:#0284c7"></div><span>Medium Zone</span></div>
-                  <div class="legend-item"><div class="legend-circle" style="background:#ef4444"></div><span>Far Zone</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:#4facfe"></div><span>Antenna Position</span></div>
+                  <div class="legend-item"><div class="legend-line" style="background:#ff9f40"></div><span>Main Beam Direction</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:rgba(33, 183, 48, 0.993); border-radius:50%"></div><span>Near Zone</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:rgb(34, 184, 249); border-radius:50%"></div><span>Medium Zone</span></div>
+                  <div class="legend-item"><div class="legend-circle" style="background:rgb(236, 61, 61); border-radius:50%"></div><span>Far Zone</span></div>
                 </div>
               </div>
             </div>
@@ -3358,6 +3363,263 @@ export class WorkspaceComponent {
       </div>
     `;
   }
+
+  drawSideCoverage(d) {
+    const wrap = this.container.querySelector('#sideWrap');
+    const cvs = this.container.querySelector('#sideChart');
+    if (!wrap || !cvs) return;
+    const dpr = window.devicePixelRatio || 1;
+    const Wcss = wrap.clientWidth || 500;
+    const Hcss = wrap.clientHeight || 320;
+    cvs.style.width = Wcss + 'px';
+    cvs.style.height = Hcss + 'px';
+    cvs.width = Math.max(1, Math.floor(Wcss * dpr));
+    cvs.height = Math.max(1, Math.floor(Hcss * dpr));
+    const ctx = cvs.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = Wcss, H = Hcss;
+    const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+    ctx.clearRect(0, 0, W, H);
+
+    const H_ant = d.h;
+    const nearD = d.nearDist;
+    const centerD = d.centerDist;
+    const farD = (d.farDist > 0 && d.farDist < 50000) ? d.farDist : (centerD * 2.2);
+
+    const zoom = this.covZoom || 1.0;
+    const worldW = Math.max(farD * 1.15, 120);
+    const marginLeft = Math.max(48, W * 0.10);
+    const marginRight = Math.max(24, W * 0.06);
+    const availW = Math.max(80, W - marginLeft - marginRight);
+    const scaleW = availW / worldW;
+    const availH = Math.max(120, H * 0.5);
+    const scaleH = (availH) / (H_ant * 1.2);
+    const scale = Math.max(0.4, Math.min(scaleW, scaleH) * zoom);
+
+    const groundY = H * 0.88;
+    const bx = marginLeft;
+    const panelW = 12;
+    const panelH = Math.max(14, H_ant * scale * 2.5);
+    const by = groundY - panelH - Math.min(H * 0.45, H_ant * scale * 2.5);
+
+    const nx = bx + nearD * scale;
+    const cx = bx + centerD * scale;
+    const fx = bx + farD * scale;
+
+    // Background & ground
+    ctx.fillStyle = dark ? 'rgba(10,14,20,0.6)' : '#fafcff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = dark ? 'rgba(79,172,254,0.06)' : 'rgba(59,130,246,0.04)';
+    ctx.fillRect(0, groundY, W, H - groundY);
+    ctx.strokeStyle = dark ? '#4a5a6a' : '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(W, groundY); ctx.stroke();
+
+    // Tower pole
+    ctx.strokeStyle = dark ? '#7a8a9a' : '#94a3b8';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(bx, groundY); ctx.lineTo(bx, by + 4); ctx.stroke();
+
+    // Antenna body
+    ctx.fillStyle = '#4facfe';
+    ctx.fillRect(bx - panelW / 2, by, panelW, panelH);
+    ctx.beginPath(); ctx.arc(bx, by + 3, panelW / 2, Math.PI, 0); ctx.fill();
+
+    // Coverage fill between near and far (filled triangle)
+    ctx.fillStyle = 'rgba(79,172,254,0.14)';
+    ctx.beginPath();
+    ctx.moveTo(bx, by + panelH / 2);
+    ctx.lineTo(fx, groundY);
+    ctx.lineTo(nx, groundY);
+    ctx.closePath(); ctx.fill();
+
+    // Draw center/main beam (solid)
+    ctx.strokeStyle = '#4facfe'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(bx, by + panelH / 2); ctx.lineTo(cx, groundY); ctx.stroke();
+
+    // Draw upper (near) and lower (far) 3dB boundaries
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#22c55e'; // upper/near
+    ctx.beginPath(); ctx.moveTo(bx, by + panelH / 2); ctx.lineTo(nx, groundY); ctx.stroke();
+    ctx.strokeStyle = '#ef4444'; // lower/far
+    ctx.beginPath(); ctx.moveTo(bx, by + panelH / 2); ctx.lineTo(fx, groundY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Distance Labels — above ground aligned with each line
+    ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#22c55e'; ctx.fillText(Math.round(nearD) + ' m', nx, groundY - 10);
+    ctx.fillStyle = '#4facfe'; ctx.fillText(Math.round(centerD) + ' m', cx, groundY - 24);
+    ctx.fillStyle = '#ef4444'; ctx.fillText(Math.round(farD) + ' m', fx, groundY - 10);
+
+    // Height and tilt annotations
+    ctx.save();
+    ctx.fillStyle = dark ? '#94a3b8' : '#64748b';
+    ctx.font = '10px sans-serif';
+    ctx.translate(bx - 10, groundY - (groundY - by) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('H=' + Math.round(H_ant) + 'm', 0, 0);
+    ctx.restore();
+
+    ctx.fillStyle = dark ? '#4facfe' : '#2563eb';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Tilt=' + d.totalTilt.toFixed(1) + '°', bx + panelW / 2 + 8, by + 12);
+  }
+
+  drawTopCoverage(d) {
+    const wrap = this.container.querySelector('#topWrap');
+    const cvs = this.container.querySelector('#topChart');
+    if (!wrap || !cvs) return;
+    const dpr = window.devicePixelRatio || 1;
+    const Wcss = wrap.clientWidth || 500;
+    const Hcss = wrap.clientHeight || 320;
+    cvs.style.width = Wcss + 'px';
+    cvs.style.height = Hcss + 'px';
+    cvs.width = Math.max(1, Math.floor(Wcss * dpr));
+    cvs.height = Math.max(1, Math.floor(Hcss * dpr));
+    const ctx = cvs.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = Wcss, H = Hcss;
+    const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+    ctx.clearRect(0, 0, W, H);
+
+    const nearD = d.nearDist;
+    const centerD = d.centerDist;
+    const farD = (d.farDist > 0 && d.farDist < 50000) ? d.farDist : (centerD * 2.2);
+
+    const cx = W / 2;
+    const cy = H * 0.88;
+
+    const margin = 28;
+    const maxR = Math.min(W, H) * 0.75;
+    const scale = (maxR - margin) / (farD * 1.08);
+    const nearR = nearD * scale;
+    const centerR = centerD * scale;
+    const farR = farD * scale;
+
+    const halfBW = (d.hbw / 2) * Math.PI / 180;
+    const startA = -Math.PI / 2 - halfBW;
+    const endA = -Math.PI / 2 + halfBW;
+
+    // Background grid arcs
+    ctx.strokeStyle = dark ? 'rgba(79,172,254,0.08)' : 'rgba(0,0,0,0.05)';
+    ctx.lineWidth = 1;
+    for (let r = nearR; r < maxR; r += nearR) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startA, endA);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(startA) * maxR, cy + Math.sin(startA) * maxR);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(endA) * maxR, cy + Math.sin(endA) * maxR);
+    ctx.stroke();
+
+    // Far zone (outermost, red)
+    ctx.fillStyle = 'rgba(239,68,68,0.18)';
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, farR, startA, endA);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Medium zone (center sector)
+    ctx.fillStyle = 'rgb(139, 207, 236)';
+    ctx.strokeStyle = '#4facfe';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, centerR, startA, endA);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Near zone (green)
+    ctx.fillStyle = 'rgba(159, 247, 168, 0.993)';
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, nearR, startA, endA);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Sector edges
+    ctx.strokeStyle = dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(startA) * farR, cy + Math.sin(startA) * farR);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(endA) * farR, cy + Math.sin(endA) * farR);
+    ctx.stroke();
+
+    // Antenna marker
+    ctx.fillStyle = '#4facfe';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 5);
+    ctx.lineTo(cx - 4, cy + 3);
+    ctx.lineTo(cx + 4, cy + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Boresight arrow
+    const arrowLen = nearR * 0.65;
+    ctx.strokeStyle = '#ff9f40';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx, cy - arrowLen);
+    ctx.stroke();
+    ctx.fillStyle = '#ff9f40';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - arrowLen - 7);
+    ctx.lineTo(cx - 5, cy - arrowLen);
+    ctx.lineTo(cx + 5, cy - arrowLen);
+    ctx.closePath();
+    ctx.fill();
+
+    // Zone labels along center beam axis
+    const labelAngle = -Math.PI / 2;
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+
+    let lx = cx + Math.cos(labelAngle) * (nearR * 0.55);
+    let ly = cy + Math.sin(labelAngle) * (nearR * 0.55);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('Near', lx, ly);
+
+    lx = cx + Math.cos(labelAngle) * (centerR * 0.6);
+    ly = cy + Math.sin(labelAngle) * (centerR * 0.6);
+    ctx.fillStyle = '#0284c7';
+    ctx.fillText('Mid', lx, ly + 11);
+
+    lx = cx + Math.cos(labelAngle) * (farR * 0.5);
+    ly = cy + Math.sin(labelAngle) * (farR * 0.5);
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('Far', lx, ly + 11);
+
+    // HBW label
+    ctx.fillStyle = dark ? '#4facfe' : '#2563eb';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText('HBW ' + d.hbw + '°', cx, cy + 18);
+  }
+
   renderCovElevationSvg(d) {
     const maxD = Math.max(d.farDist * 1.15, d.centerDist * 1.3, 100);
     const scaleX = (dist) => 70 + Math.min(410, (dist / maxD) * 410);
@@ -3557,27 +3819,53 @@ export class WorkspaceComponent {
     }
 
     // Zoom controls for Side View
+    const handleZoomIn = () => {
+      this.covZoom = Math.min(2.5, (this.covZoom || 1) * 1.25);
+      this.refreshCovUi();
+    };
+    const handleZoomOut = () => {
+      this.covZoom = Math.max(0.5, (this.covZoom || 1) / 1.25);
+      this.refreshCovUi();
+    };
+    const handleResetView = () => {
+      this.covZoom = 1;
+      this.refreshCovUi();
+    };
+
     const zoomInBtn = this.container.querySelector('#cov-zoom-in-btn');
-    if (zoomInBtn) {
-      zoomInBtn.addEventListener('click', () => {
-        this.covZoom = Math.min(2.5, (this.covZoom || 1) * 1.25);
-        this.refreshCovUi();
-      });
-    }
+    if (zoomInBtn) zoomInBtn.addEventListener('click', handleZoomIn);
+    const zoomInBtnRef = this.container.querySelector('#zoomInBtn');
+    if (zoomInBtnRef) zoomInBtnRef.addEventListener('click', handleZoomIn);
+
     const zoomOutBtn = this.container.querySelector('#cov-zoom-out-btn');
-    if (zoomOutBtn) {
-      zoomOutBtn.addEventListener('click', () => {
-        this.covZoom = Math.max(0.5, (this.covZoom || 1) / 1.25);
-        this.refreshCovUi();
-      });
-    }
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', handleZoomOut);
+    const zoomOutBtnRef = this.container.querySelector('#zoomOutBtn');
+    if (zoomOutBtnRef) zoomOutBtnRef.addEventListener('click', handleZoomOut);
+
     const resetViewBtn = this.container.querySelector('#cov-reset-view-btn');
-    if (resetViewBtn) {
-      resetViewBtn.addEventListener('click', () => {
-        this.covZoom = 1;
-        this.refreshCovUi();
-      });
-    }
+    if (resetViewBtn) resetViewBtn.addEventListener('click', handleResetView);
+    const resetBtnRef = this.container.querySelector('#resetBtn');
+    if (resetBtnRef) resetBtnRef.addEventListener('click', handleResetView);
+
+    // Window resize redraw for canvases
+    const onCovResize = () => {
+      const d = this.calculateCoverageData(this.ws.params);
+      this.drawSideCoverage(d);
+      this.drawTopCoverage(d);
+    };
+    window.addEventListener('resize', onCovResize);
+
+    // Initial canvas render
+    requestAnimationFrame(() => {
+      const d = this.calculateCoverageData(this.ws.params);
+      this.drawSideCoverage(d);
+      this.drawTopCoverage(d);
+    });
+    setTimeout(() => {
+      const d = this.calculateCoverageData(this.ws.params);
+      this.drawSideCoverage(d);
+      this.drawTopCoverage(d);
+    }, 80);
 
     // Tabs
     const tabBtns = this.container.querySelectorAll('#cov-tab-bar .rf-cov-tab-btn');
@@ -3667,6 +3955,9 @@ export class WorkspaceComponent {
     if (vbwLbl) vbwLbl.textContent = `${d.vbw}°`;
     const hbwLbl = this.container.querySelector('#hBWLab');
     if (hbwLbl) hbwLbl.textContent = `${d.hbw}°`;
+
+    this.drawSideCoverage(d);
+    this.drawTopCoverage(d);
   }
 
   // --- 2. OKUMURA-HATA PROPAGATION MODEL ---
@@ -3723,14 +4014,38 @@ export class WorkspaceComponent {
     const sectorAreaHa = Math.round(sectorAreaKm2 * 100 * 100) / 100;
 
     const totalTilt = Math.round((elec + mech) * 100) / 100;
-    const totalTiltRad = totalTilt * Math.PI / 180;
-    const boresightDist = Math.abs(totalTilt) > 0.5 ? Math.round((hb / Math.tan(Math.abs(totalTiltRad))) * 10) / 10 : covRadiusKm * 1000;
+    const totalTiltRad = Math.abs(totalTilt) > 0.01 ? Math.abs(totalTilt) * Math.PI / 180 : 0.0001;
+    const boresightDist = Math.round((hb / Math.tan(totalTiltRad)) * 100) / 100;
+
+    const half_vbw = vbw / 2.0;
+    const nearAngle = Math.abs(totalTilt) + half_vbw;
+    let nearDist = 0;
+    if (nearAngle < 90) {
+      nearDist = Math.round((hb / Math.tan(nearAngle * Math.PI / 180)) * 100) / 100;
+    } else if (nearAngle === 90) {
+      nearDist = 0;
+    } else {
+      nearDist = Math.round((boresightDist * 0.5) * 100) / 100;
+    }
+
+    const farAngle = Math.abs(totalTilt) - half_vbw;
+    let farDist = 0;
+    if (farAngle > 0) {
+      farDist = Math.round((hb / Math.tan(farAngle * Math.PI / 180)) * 100) / 100;
+    } else {
+      farDist = Math.round((boresightDist * 1000) * 100) / 100;
+    }
+
+    const nearRadiusM = Math.min(nearDist, covRadiusKm * 1000);
+    const boresightRadiusM = Math.min(boresightDist, covRadiusKm * 1000);
+    const farRadiusM = Math.min(farDist, covRadiusKm * 1000);
 
     return {
       f, hb, hm, env, txPower, gain, cableLoss, rxSens,
       mech, elec, vbw, hbw, totalTilt, a_hm: Math.round(a_hm * 100) / 100,
       L_1km: Math.round(L_1km * 100) / 100,
-      confidence, envLabel, eirp, maxPl, covRadiusKm, sectorAreaKm2, sectorAreaHa, boresightDist
+      confidence, envLabel, eirp, maxPl, covRadiusKm, sectorAreaKm2, sectorAreaHa,
+      boresightDist, nearDist, farDist, nearRadiusM, boresightRadiusM, farRadiusM
     };
   }
 
@@ -3956,12 +4271,12 @@ export class WorkspaceComponent {
                   <div class="result-label rf-metric-card__label">BORESIGHT DIST</div>
                 </div>
                 <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
-                  <div class="result-value rf-metric-card__value" id="oh-near-edge">${(d.boresightDist * 0.635).toFixed(2)}</div>
+                  <div class="result-value rf-metric-card__value" id="oh-near-edge">${d.nearDist.toFixed(2)}</div>
                   <div class="result-unit rf-metric-card__unit">m</div>
                   <div class="result-label rf-metric-card__label">NEAR EDGE</div>
                 </div>
                 <div class="result-card result-item rf-metric-card rf-metric-card--nominal">
-                  <div class="result-value rf-metric-card__value" id="oh-far-edge">${(d.boresightDist * 2.265).toFixed(2)}</div>
+                  <div class="result-value rf-metric-card__value" id="oh-far-edge">${d.farDist.toFixed(2)}</div>
                   <div class="result-unit rf-metric-card__unit">m</div>
                   <div class="result-label rf-metric-card__label">FAR EDGE</div>
                 </div>
@@ -4035,20 +4350,28 @@ export class WorkspaceComponent {
     const textColor = isDark ? '#b0b8c8' : '#555';
     const gridColor = isDark ? 'rgba(79,172,254,0.12)' : 'rgba(0,0,0,0.06)';
 
-    const w = canvas.width = canvas.parentElement.clientWidth || 600;
-    const h = canvas.height = canvas.parentElement.clientHeight || 320;
+    const dpr = window.devicePixelRatio || 1;
+    const Wcss = canvas.parentElement.clientWidth || 600;
+    const Hcss = canvas.parentElement.clientHeight || 320;
+    canvas.style.width = Wcss + 'px';
+    canvas.style.height = Hcss + 'px';
+    canvas.width = Math.max(1, Math.floor(Wcss * dpr));
+    canvas.height = Math.max(1, Math.floor(Hcss * dpr));
+
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = Wcss, h = Hcss;
     ctx.clearRect(0, 0, w, h);
 
     const cx = w / 2;
     const cy = h - 50;
 
-    const boreDist = d.boresightDist || 189.41;
-    const nearDist = boreDist * 0.635;
-    const farDist = boreDist * 2.265;
+    const boreDist = d.boresightRadiusM || d.boresightDist || 189.41;
+    const nearDist = d.nearRadiusM || d.nearDist || (boreDist * 0.5);
+    const farDist = d.farRadiusM || d.farDist || (boreDist * 2.265);
 
-    const maxRadius = Math.max(farDist, 100);
-    const scale = (Math.min(w, h) * 0.72) / maxRadius;
+    const maxRadius = Math.max(boreDist, nearDist, farDist, 100);
+    const scale = (Math.min(w, h) * 0.75) / maxRadius;
 
     const nearR = nearDist * scale;
     const boreR = boreDist * scale;
@@ -4068,8 +4391,8 @@ export class WorkspaceComponent {
       ctx.stroke();
     }
 
-    // Outer Zone (red)
-    ctx.fillStyle = 'rgba(255, 85, 85, 0.25)';
+    // Outer Zone (red - lower beam edge / far edge)
+    ctx.fillStyle = 'rgba(255, 85, 85, 0.2)';
     ctx.strokeStyle = '#ff5555';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -4079,7 +4402,7 @@ export class WorkspaceComponent {
     ctx.fill();
     ctx.stroke();
 
-    // Center Zone (blue)
+    // Center Zone (blue - boresight)
     ctx.fillStyle = 'rgba(79, 172, 254, 0.4)';
     ctx.strokeStyle = '#4facfe';
     ctx.lineWidth = 2;
@@ -4090,7 +4413,7 @@ export class WorkspaceComponent {
     ctx.fill();
     ctx.stroke();
 
-    // Inner Zone (green)
+    // Inner Zone (green - upper beam edge / near edge)
     ctx.fillStyle = 'rgba(0, 200, 83, 0.5)';
     ctx.strokeStyle = '#00c853';
     ctx.lineWidth = 2;
@@ -4104,7 +4427,7 @@ export class WorkspaceComponent {
     // Site marker
     ctx.fillStyle = '#4facfe';
     ctx.beginPath();
-    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
@@ -4115,45 +4438,45 @@ export class WorkspaceComponent {
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.lineTo(cx, cy - 28);
+    ctx.lineTo(cx, cy - 30);
     ctx.stroke();
     ctx.fillStyle = '#ff9f40';
     ctx.beginPath();
-    ctx.moveTo(cx, cy - 38);
-    ctx.lineTo(cx - 5, cy - 28);
-    ctx.lineTo(cx + 5, cy - 28);
+    ctx.moveTo(cx, cy - 40);
+    ctx.lineTo(cx - 6, cy - 30);
+    ctx.lineTo(cx + 6, cy - 30);
     ctx.closePath();
     ctx.fill();
 
     // Distance labels
-    ctx.font = 'bold 11px sans-serif';
+    ctx.font = '11px sans-serif';
     ctx.textAlign = 'left';
 
     if (nearR > 18) {
       ctx.fillStyle = '#00c853';
-      ctx.fillText(`Near: ${nearDist.toFixed(0)}m`, cx + 10, cy - nearR + 10);
+      ctx.fillText(`Near: ${Math.round(d.nearDist || nearDist)}m`, cx + 10, cy - nearR + 10);
     }
     if (boreR > 18) {
       ctx.fillStyle = '#4facfe';
-      ctx.fillText(`Boresight: ${boreDist.toFixed(0)}m`, cx + 10, cy - boreR + 10);
+      ctx.fillText(`Boresight: ${Math.round(d.boresightDist || boreDist)}m`, cx + 10, cy - boreR + 10);
     }
     if (farR > 18) {
       ctx.fillStyle = '#ff5555';
-      ctx.fillText(`Far: ${farDist.toFixed(0)}m`, cx + 10, cy - farR + 10);
+      ctx.fillText(`Far: ${Math.round(d.farDist || farDist)}m`, cx + 10, cy - farR + 10);
     }
 
     // Scale bar at bottom right
     ctx.fillStyle = textColor;
     ctx.font = '10px sans-serif';
-    const barX = w - 120;
-    const barY = h - 25;
+    const barX = w - 110;
+    const barY = h - 20;
     ctx.strokeStyle = textColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(barX, barY);
     ctx.lineTo(barX + 80, barY);
     ctx.stroke();
-    ctx.fillText(`${farDist.toFixed(0)}m`, barX, barY - 5);
+    ctx.fillText(`${Math.round(d.farDist || farDist)}m`, barX, barY - 5);
 
     // Beamwidth label
     ctx.fillStyle = textColor;
@@ -4382,7 +4705,22 @@ export class WorkspaceComponent {
       });
     }
 
+    // Window resize redraw for sector canvas
+    const onOhResize = () => {
+      const d = this.calculateOkumuraHataData(this.ws.params);
+      if (!this.activeOhTab || this.activeOhTab === 'sector') {
+        this.drawOhSectorCanvas(d);
+      }
+    };
+    window.addEventListener('resize', onOhResize);
+
     // Draw initial 2D sector diagram
+    requestAnimationFrame(() => {
+      const d = this.calculateOkumuraHataData(this.ws.params);
+      if (!this.activeOhTab || this.activeOhTab === 'sector') {
+        this.drawOhSectorCanvas(d);
+      }
+    });
     setTimeout(() => {
       const d = this.calculateOkumuraHataData(this.ws.params);
       if (!this.activeOhTab || this.activeOhTab === 'sector') {
@@ -4432,10 +4770,10 @@ export class WorkspaceComponent {
     if (boreEl) boreEl.textContent = d.boresightDist.toFixed(2);
 
     const nearEl = this.container.querySelector('#oh-near-edge');
-    if (nearEl) nearEl.textContent = (d.boresightDist * 0.635).toFixed(2);
+    if (nearEl) nearEl.textContent = d.nearDist.toFixed(2);
 
     const farEl = this.container.querySelector('#oh-far-edge');
-    if (farEl) farEl.textContent = (d.boresightDist * 2.265).toFixed(2);
+    if (farEl) farEl.textContent = d.farDist.toFixed(2);
   }
 
   calculateNetTilt3DData(params) {
@@ -4697,32 +5035,65 @@ export class WorkspaceComponent {
 
             <!-- Tab 2: 3D Visualization Tab -->
             <div class="tab-content ${this.activeNetTiltTab === 'visualTab' ? 'active' : ''}" id="visualTab">
-              <div class="viz-card" style="height: 100%;">
-                <div class="viz-title">
-                  <span>3D Radiation Geometry</span>
+              <div class="tab-section" style="position: relative; height: 520px;">
+                <canvas id="threeCanvas"></canvas>
+                <div class="three-control-panel">
+                  <button type="button" id="btnZoomIn3D" title="Zoom In">+</button>
+                  <button type="button" id="btnZoomOut3D" title="Zoom Out">−</button>
+                  <button type="button" id="btnReset3D" title="Reset View">↺</button>
                 </div>
-                <div class="chart-area canvas-wrap" id="tilt-diagram-body">
-                  ${this.renderTiltPerspectiveSvg(d)}
+                <div class="three-legend" id="threeLegend">
+                  <div class="legend-title">3D Legend</div>
+                  <div class="legend-item"><div class="legend-color tower"></div><span>Tower Structure</span></div>
+                  <div class="legend-item"><div class="legend-color main-beam"></div><span>Main Beam (V-BW)</span></div>
+                  <div class="legend-item"><div class="legend-color center-beam"></div><span>Center Beam</span></div>
+                  <div class="legend-item"><div class="legend-color coverage"></div><span>Coverage Area</span></div>
+                  <div class="legend-item"><div class="legend-color distance"></div><span>Distance Marker</span></div>
                 </div>
-                <div class="rf-diagram-hud">
-                  <div class="rf-diagram-hud__legend">
-                    <span class="rf-diagram-hud__item"><span class="rf-diagram-hud__dot" style="background:#6366f1;"></span><span>Net Vector (${d.totalTilt.toFixed(1)}°)</span></span>
-                    <span class="rf-diagram-hud__item"><span class="rf-diagram-hud__dot" style="background:#10b981;"></span><span>Target (${d.targetDist}m)</span></span>
-                    <span class="rf-diagram-hud__item"><span class="rf-diagram-hud__dot" style="background:#0284c7;"></span><span>Ground Hit (${d.boresightDist.toFixed(0)}m)</span></span>
-                  </div>
-                  <div class="rf-diagram-hud__readout" id="tilt-hud-readout">
-                    Optimum: ${d.optTiltDeg.toFixed(2)}° | Deviation: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}° | Hit: ${d.boresightDist.toFixed(1)}m
-                  </div>
+                <!-- Preserved test containers -->
+                <div id="tilt-diagram-body" style="display:none;">${this.renderTiltPerspectiveSvg(d)}</div>
+                <div class="rf-diagram-hud" style="display:none;" id="tilt-hud-readout">
+                  Optimum: ${d.optTiltDeg.toFixed(2)}° | Deviation: ${d.tiltDelta > 0 ? '+' : ''}${d.tiltDelta.toFixed(1)}° | Hit: ${d.boresightDist.toFixed(1)}m
                 </div>
               </div>
             </div>
 
             <!-- Tab 3: Coverage Estimation Tab -->
             <div class="tab-content ${this.activeNetTiltTab === 'coverageTab' ? 'active' : ''}" id="coverageTab">
-              <div class="results-card">
-                <div class="results-title">Optimization Scorecards</div>
-                <div class="results-grid" id="tilt-kpi-grid">
-                  ${this.renderTiltKpiCards(d)}
+              <div class="tab-section coverage-panel">
+                <div>
+                  <div class="panel-title">Coverage Estimation</div>
+                  <div class="result-grid">
+                    <div class="result-item">
+                      <div class="result-value" id="centerDist">${Math.round(d.boresightDist)}m</div>
+                      <div class="result-label">Beam Center</div>
+                    </div>
+                    <div class="result-item">
+                      <div class="result-value" id="nearDist">${Math.round(d.innerDist)}m</div>
+                      <div class="result-label">Near Edge</div>
+                    </div>
+                    <div class="result-item">
+                      <div class="result-value" id="farDist">${Math.round(d.outerDist)}m</div>
+                      <div class="result-label">Far Edge</div>
+                    </div>
+                    <div class="result-item">
+                      <div class="result-value" id="sectorArea">${((d.hbw / 360) * Math.PI * Math.pow(d.boresightDist / 1000, 2)).toFixed(2)}km²</div>
+                      <div class="result-label">Sector Area</div>
+                    </div>
+                  </div>
+                  <div class="status-indicator">
+                    <div class="status-dot ${d.alignStatus === 'optimal' ? 'optimal' : (d.alignStatus === 'under' ? 'warning' : 'critical')}" id="statusDot"></div>
+                    <div class="status-text" id="statusText">${d.alignStatus === 'optimal' ? 'Optimal Coverage' : (d.alignStatus === 'under' ? 'Under-Tilted' : 'Over-Tilted')}</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="panel-title">Top View - Sector Footprint</div>
+                  <svg id="sectorSvg" viewBox="0 0 300 300"></svg>
+                </div>
+                <div class="results-card" style="display:none;">
+                  <div class="results-grid" id="tilt-kpi-grid">
+                    ${this.renderTiltKpiCards(d)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -4969,13 +5340,27 @@ export class WorkspaceComponent {
             this.initNetTiltLeafletMap();
           }
         } else if (tabId === 'visualTab') {
-          this.refreshTiltUi();
+          setTimeout(() => {
+            this.resizeNetTiltThreeCanvas();
+            const d = this.calculateNetTilt3DData(this.ws.params);
+            this.updateNetTilt3DView(d);
+          }, 60);
+        } else if (tabId === 'coverageTab') {
+          const d = this.calculateNetTilt3DData(this.ws.params);
+          this.updateNetTiltSVG(d);
         }
       });
     });
 
     // Initialize Leaflet Map
     this.initNetTiltLeafletMap();
+
+    // Initialize Three.js 3D and Top View SVG
+    setTimeout(() => {
+      this.initNetTiltThreeJS();
+      const d = this.calculateNetTilt3DData(this.ws.params);
+      this.updateNetTiltSVG(d);
+    }, 80);
 
     // Checkbox toggles for coverage beams
     ['chkNear', 'chkCenter', 'chkFar'].forEach(id => {
@@ -5210,25 +5595,446 @@ export class WorkspaceComponent {
     }
   }
 
-  exportNetTiltKML() {
-    const siteName = this.container.querySelector('#siteName')?.value || 'Site_001';
-    const lat = parseFloat(this.container.querySelector('#latInput')?.value || this.ws.params.lat || -6.2);
-    const lon = parseFloat(this.container.querySelector('#lonInput')?.value || this.ws.params.lon || 106.8);
-    const d = this.calculateNetTilt3DData(this.ws.params);
+  initNetTiltThreeJS() {
+    const canvas = this.container.querySelector('#threeCanvas');
+    if (!canvas) return;
 
-    const kml = `<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-  <Document>
-    <name>${siteName}_NetTilt3D</name>
-    <Placemark>
-      <name>${siteName}</name>
-      <description>Height: ${d.towerH}m | Tilt: ${d.totalTilt.toFixed(1)}° | Azimuth: ${d.azimuth || 0}°</description>
-      <Point>
-        <coordinates>${lon},${lat},${d.towerH}</coordinates>
-      </Point>
-    </Placemark>
-  </Document>
-</kml>`;
+    if (!window.THREE) {
+      console.warn('Three.js library not found on window.THREE');
+      return;
+    }
+
+    try {
+      if (this.netTiltThree && this.netTiltThree.renderer) {
+        this.netTiltThree.renderer.dispose();
+      }
+
+      const THREE = window.THREE;
+      const scene = new THREE.Scene();
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      scene.background = new THREE.Color(isDark ? 0x0a1520 : 0xf0f4f8);
+
+      const w = canvas.clientWidth || canvas.parentElement.clientWidth || 500;
+      const h = canvas.clientHeight || canvas.parentElement.clientHeight || 520;
+      const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 5000);
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(w, h, false);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+      directionalLight.position.set(100, 200, 100);
+      scene.add(directionalLight);
+
+      // Tower structure
+      const towerHeight = parseFloat(this.ws.params.tower_height) || 30;
+      const towerGeo = new THREE.CylinderGeometry(0.5, 0.8, towerHeight, 8);
+      const towerMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x5a6a7a : 0x8899aa });
+      const tower = new THREE.Mesh(towerGeo, towerMat);
+      tower.position.y = towerHeight / 2;
+      scene.add(tower);
+
+      // Antenna panel
+      const antennaGeo = new THREE.BoxGeometry(1.5, 10, 2);
+      const antennaMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x4facfe : 0x2563eb });
+      const antenna = new THREE.Mesh(antennaGeo, antennaMat);
+      antenna.position.y = towerHeight + 3;
+      scene.add(antenna);
+
+      // Ground plane
+      const groundGeo = new THREE.CircleGeometry(2000, 64);
+      const groundMat = new THREE.MeshPhongMaterial({ color: isDark ? 0x1a2a3a : 0xe8eef4, transparent: true, opacity: 0.9 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = 0;
+      scene.add(ground);
+
+      // Grid helper
+      const gridHelper = new THREE.GridHelper(2000, 20, isDark ? 0x2a3a4a : 0xc8d8e8, isDark ? 0x1a2a3a : 0xd8e8f0);
+      scene.add(gridHelper);
+
+      // Beam group
+      const beam = new THREE.Group();
+      scene.add(beam);
+
+      this.netTiltThree = {
+        scene,
+        camera,
+        renderer,
+        tower,
+        antenna,
+        beam,
+        ground,
+        gridHelper,
+        zoomFactor: 1.0,
+        theta: 0.8,
+        phi: 0.6,
+        isDragging: false,
+        lastMouse: { x: 0, y: 0 }
+      };
+
+      // Mouse drag controls
+      canvas.addEventListener('mousedown', (e) => {
+        if (!this.netTiltThree) return;
+        this.netTiltThree.isDragging = true;
+        this.netTiltThree.lastMouse.x = e.clientX;
+        this.netTiltThree.lastMouse.y = e.clientY;
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!this.netTiltThree || !this.netTiltThree.isDragging) return;
+        const dx = (e.clientX - this.netTiltThree.lastMouse.x) * 0.005;
+        const dy = (e.clientY - this.netTiltThree.lastMouse.y) * 0.005;
+        this.netTiltThree.theta -= dx;
+        this.netTiltThree.phi = Math.max(0.15, Math.min(1.3, this.netTiltThree.phi - dy));
+        this.netTiltThree.lastMouse.x = e.clientX;
+        this.netTiltThree.lastMouse.y = e.clientY;
+        const d = this.calculateNetTilt3DData(this.ws.params);
+        this.updateNetTilt3DView(d);
+      });
+      window.addEventListener('mouseup', () => {
+        if (this.netTiltThree) this.netTiltThree.isDragging = false;
+      });
+
+      // Touch controls
+      canvas.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0] && this.netTiltThree) {
+          this.netTiltThree.lastMouse.x = e.touches[0].clientX;
+          this.netTiltThree.lastMouse.y = e.touches[0].clientY;
+          this.netTiltThree.isDragging = true;
+        }
+      }, { passive: true });
+      canvas.addEventListener('touchmove', (e) => {
+        if (!this.netTiltThree || !this.netTiltThree.isDragging || !e.touches || !e.touches[0]) return;
+        const t = e.touches[0];
+        const dx = (t.clientX - this.netTiltThree.lastMouse.x) * 0.005;
+        const dy = (t.clientY - this.netTiltThree.lastMouse.y) * 0.005;
+        this.netTiltThree.theta -= dx;
+        this.netTiltThree.phi = Math.max(0.15, Math.min(1.3, this.netTiltThree.phi - dy));
+        this.netTiltThree.lastMouse.x = t.clientX;
+        this.netTiltThree.lastMouse.y = t.clientY;
+        const d = this.calculateNetTilt3DData(this.ws.params);
+        this.updateNetTilt3DView(d);
+        e.preventDefault();
+      }, { passive: false });
+      canvas.addEventListener('touchend', () => {
+        if (this.netTiltThree) this.netTiltThree.isDragging = false;
+      });
+
+      // Wheel zoom
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.08 : -0.08;
+        this.zoomNetTilt3D(delta);
+      }, { passive: false });
+
+      // Buttons in control panel
+      const btnIn = this.container.querySelector('#btnZoomIn3D');
+      if (btnIn) btnIn.addEventListener('click', () => this.zoomNetTilt3D(-0.1));
+      const btnOut = this.container.querySelector('#btnZoomOut3D');
+      if (btnOut) btnOut.addEventListener('click', () => this.zoomNetTilt3D(0.1));
+      const btnReset = this.container.querySelector('#btnReset3D');
+      if (btnReset) btnReset.addEventListener('click', () => this.resetNetTilt3DView());
+
+      const d = this.calculateNetTilt3DData(this.ws.params);
+      this.updateNetTilt3DView(d);
+    } catch (err) {
+      console.warn('ThreeJS initialization failed:', err);
+    }
+  }
+
+  resizeNetTiltThreeCanvas() {
+    if (!this.netTiltThree || !this.netTiltThree.renderer || !this.netTiltThree.camera) return;
+    const canvas = this.container.querySelector('#threeCanvas');
+    if (!canvas) return;
+    const w = canvas.clientWidth || canvas.parentElement.clientWidth || 500;
+    const h = canvas.clientHeight || canvas.parentElement.clientHeight || 520;
+    this.netTiltThree.camera.aspect = w / h;
+    this.netTiltThree.camera.updateProjectionMatrix();
+    this.netTiltThree.renderer.setSize(w, h, false);
+    if (this.netTiltThree.scene) {
+      this.netTiltThree.renderer.render(this.netTiltThree.scene, this.netTiltThree.camera);
+    }
+  }
+
+  zoomNetTilt3D(delta) {
+    if (!this.netTiltThree) return;
+    this.netTiltThree.zoomFactor = Math.min(2.0, Math.max(0.4, (this.netTiltThree.zoomFactor || 1.0) + delta));
+    const d = this.calculateNetTilt3DData(this.ws.params);
+    this.updateNetTilt3DView(d);
+  }
+
+  resetNetTilt3DView() {
+    if (!this.netTiltThree) return;
+    this.netTiltThree.zoomFactor = 1.0;
+    this.netTiltThree.theta = 0.8;
+    this.netTiltThree.phi = 0.6;
+    const d = this.calculateNetTilt3DData(this.ws.params);
+    this.updateNetTilt3DView(d);
+  }
+
+  updateNetTilt3DView(d) {
+    if (!this.netTiltThree || !this.netTiltThree.antenna || !this.netTiltThree.beam || !this.netTiltThree.camera) return;
+    const THREE = window.THREE;
+    if (!THREE) return;
+
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const mainBeamColor = 0x4facfe;
+    const centerBeamColor = 0x00f2fe;
+    const coverageColor = 0x4facfe;
+    const groundColor = isDark ? 0x1a2a3a : 0xe8eef4;
+    const gridColor = isDark ? 0x2a3a4a : 0xc8d8e8;
+    const towerColor = isDark ? 0x5a6a7a : 0x8899aa;
+
+    const totalTilt = d.totalTilt;
+    const tiltRad = -totalTilt * Math.PI / 180;
+    const azRad = -(d.azimuth || 0) * Math.PI / 180;
+
+    this.netTiltThree.antenna.rotation.z = tiltRad;
+    this.netTiltThree.antenna.rotation.y = azRad;
+    this.netTiltThree.antenna.material.color.setHex(towerColor);
+
+    const beam = this.netTiltThree.beam;
+    while (beam.children.length > 0) {
+      beam.remove(beam.children[0]);
+    }
+
+    const tiltAngle = totalTilt * Math.PI / 180;
+    const halfHBW = (d.hbw / 2) * Math.PI / 180;
+
+    const farDist = d.outerDist || 425.0;
+    const scale = 0.5;
+    const towerTop = d.towerH || 30;
+    const antennaY = towerTop;
+
+    const beamLength = farDist * scale;
+    const beamWidth = beamLength * Math.tan(halfHBW) * 2;
+
+    const beamGeo = new THREE.ConeGeometry(beamWidth / 2, beamLength, 32, 1, true);
+    const beamMat = new THREE.MeshPhongMaterial({
+      color: mainBeamColor,
+      transparent: true,
+      opacity: isDark ? 0.25 : 0.3,
+      side: THREE.DoubleSide
+    });
+    const mainBeam = new THREE.Mesh(beamGeo, beamMat);
+    mainBeam.position.y = antennaY - beamLength / 2;
+    mainBeam.rotation.x = tiltAngle;
+    beam.add(mainBeam);
+
+    const innerGeo = new THREE.ConeGeometry(beamWidth * 0.35, beamLength * 0.85, 32, 1, true);
+    const innerMat = new THREE.MeshPhongMaterial({
+      color: centerBeamColor,
+      transparent: true,
+      opacity: isDark ? 0.4 : 0.5,
+      side: THREE.DoubleSide
+    });
+    const innerBeam = new THREE.Mesh(innerGeo, innerMat);
+    innerBeam.position.y = antennaY - beamLength * 0.4;
+    innerBeam.rotation.x = tiltAngle;
+    beam.add(innerBeam);
+
+    const ellipseGeo = new THREE.CircleGeometry(beamWidth / 2, 32);
+    const ellipseMat = new THREE.MeshPhongMaterial({
+      color: coverageColor,
+      transparent: true,
+      opacity: isDark ? 0.2 : 0.25,
+      side: THREE.DoubleSide
+    });
+    const ellipse = new THREE.Mesh(ellipseGeo, ellipseMat);
+    ellipse.rotation.x = -Math.PI / 2;
+    ellipse.position.y = 0.2;
+    ellipse.position.x = beamLength * Math.sin(tiltAngle);
+    ellipse.position.z = -beamLength * Math.cos(tiltAngle);
+    beam.add(ellipse);
+
+    const markerDistances = [100, 200, 500, 1000];
+    const markerColor = isDark ? 0x4facfe : 0x2563eb;
+    markerDistances.forEach(dist => {
+      if (dist <= farDist * 1.3 && dist > 0) {
+        const markerRadius = dist * scale * Math.tan(halfHBW);
+        const markerY = 0.3;
+        const markerX = dist * scale * Math.sin(tiltAngle);
+        const markerZ = -dist * scale * Math.cos(tiltAngle);
+
+        const ringGeo = new THREE.RingGeometry(Math.max(0.1, markerRadius - 3), markerRadius, 32);
+        const ringMat = new THREE.MeshBasicMaterial({ color: markerColor, transparent: true, opacity: isDark ? 0.5 : 0.6, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(markerX, markerY, markerZ);
+        beam.add(ring);
+      }
+    });
+
+    beam.rotation.y = azRad;
+
+    const viewDist = Math.max(farDist * scale * 2.5, 500) * (this.netTiltThree.zoomFactor || 1.0);
+    const x = viewDist * Math.cos(this.netTiltThree.phi) * Math.cos(this.netTiltThree.theta);
+    const y = viewDist * Math.sin(this.netTiltThree.phi) + towerTop * 0.5;
+    const z = viewDist * Math.cos(this.netTiltThree.phi) * Math.sin(this.netTiltThree.theta);
+    this.netTiltThree.camera.position.set(x, y, z);
+    this.netTiltThree.camera.lookAt(0, towerTop * 0.4, 0);
+
+    if (this.netTiltThree.ground) this.netTiltThree.ground.material.color.setHex(groundColor);
+    if (this.netTiltThree.gridHelper) this.netTiltThree.gridHelper.material.color.setHex(gridColor);
+
+    this.netTiltThree.renderer.render(this.netTiltThree.scene, this.netTiltThree.camera);
+  }
+
+  updateNetTiltSVG(d) {
+    const svg = this.container.querySelector('#sectorSvg');
+    if (!svg) return;
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const cx = 150, cy = 140;
+    const maxR = 110;
+    const hbw = (d.hbw || 65) / 2;
+    const totalTilt = d.totalTilt;
+
+    const gridColor = isDark ? '#334455' : '#c0c8d0';
+    const textColor = isDark ? '#cfe8ff' : '#1e293b';
+    const markerColor = '#4facfe';
+    const arrowColor = '#ff8c00';
+
+    const coverColor = totalTilt >= 6 && totalTilt <= 12 ? '#22c55e' : (totalTilt < 6 ? '#facc15' : '#ef4444');
+
+    const centerDist = d.boresightDist || 189.41;
+    const scale = maxR / Math.max(centerDist, 100);
+    const centerR = Math.min(centerDist * scale, maxR);
+    const hbwRad = hbw * Math.PI / 180;
+    const startAngle = -Math.PI / 2 - hbwRad;
+    const endAngle = -Math.PI / 2 + hbwRad;
+
+    let pathD = 'M ' + cx + ' ' + cy;
+    pathD += ' L ' + (cx + centerR * Math.cos(startAngle)) + ' ' + (cy + centerR * Math.sin(startAngle));
+    pathD += ' A ' + centerR + ' ' + centerR + ' 0 0 1 ' + (cx + centerR * Math.cos(endAngle)) + ' ' + (cy + centerR * Math.sin(endAngle));
+    pathD += ' Z';
+
+    const distMarkers = [];
+    [50, 100, 200, 500].forEach(dm => {
+      const r = dm * scale;
+      if (r <= maxR && dm <= centerDist * 1.2) {
+        distMarkers.push({ dist: dm, r: r });
+      }
+    });
+
+    const distMarkersSvg = distMarkers.map(m =>
+      `<circle cx="${cx}" cy="${cy}" r="${m.r}" fill="none" stroke="${gridColor}" stroke-width="1" stroke-dasharray="3"/>`
+    ).join('');
+
+    svg.innerHTML = `
+      <!-- Grid circles -->
+      ${distMarkersSvg}
+      <circle cx="${cx}" cy="${cy}" r="${maxR}" fill="none" stroke="${gridColor}" stroke-width="1" stroke-dasharray="4"/>
+
+      <!-- Coverage sector -->
+      <path d="${pathD}" fill="${coverColor}" fill-opacity="0.35" stroke="${coverColor}" stroke-width="2"/>
+
+      <!-- Site marker -->
+      <circle cx="${cx}" cy="${cy}" r="8" fill="${markerColor}" stroke="#fff" stroke-width="2"/>
+
+      <!-- Direction arrow -->
+      <line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 25}" stroke="${arrowColor}" stroke-width="3" stroke-linecap="round"/>
+      <polygon points="${cx},${cy - 35} ${cx - 5},${cy - 25} ${cx + 5},${cy - 25}" fill="${arrowColor}"/>
+
+      <!-- Distance label -->
+      <text x="${cx + 10}" y="${cy - centerR + 15}" fill="${textColor}" font-size="10" font-weight="600">${centerDist.toFixed(0)}m</text>
+
+      <!-- HBW label -->
+      <text x="${cx}" y="${cy + maxR + 18}" fill="${textColor}" font-size="9" text-anchor="middle">HBW: ${d.hbw || 65}°</text>
+
+      <!-- Title -->
+      <text x="${cx}" y="15" fill="${textColor}" font-size="9" text-anchor="middle" font-weight="600">Sector Footprint</text>
+    `;
+  }
+
+  exportNetTiltKML() {
+    const rawSiteName = this.container.querySelector('#siteName')?.value || 'Site_001';
+    const siteName = String(rawSiteName).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c] || c);
+    const d = this.calculateNetTilt3DData(this.ws.params);
+    const lat = d.lat || -6.2;
+    const lon = d.lon || 106.8;
+    const height = d.towerH;
+    const az = d.azimuth || 0;
+    const totalTilt = d.totalTilt;
+    const hbw = d.hbw;
+    const halfVBW = d.vbw / 2;
+
+    const centerDist = d.boresightDist;
+    const nearDist = d.innerDist;
+    const farDist = d.outerDist;
+
+    const generateSectorCoords = (distance) => {
+      const latDegPerM = 1 / 111000;
+      const lonDegPerM = 1 / (111000 * Math.cos(lat * Math.PI / 180));
+      const coords = [[lat, lon]];
+      const numPoints = 36;
+      const startAz = az - hbw / 2;
+      const endAz = az + hbw / 2;
+      const step = (endAz - startAz) / numPoints;
+
+      for (let i = 0; i <= numPoints; i++) {
+        const a = (startAz + i * step) * Math.PI / 180;
+        const dlat = distance * Math.cos(a) * latDegPerM;
+        const dlon = distance * Math.sin(a) * lonDegPerM;
+        coords.push([lat + dlat, lon + dlon]);
+      }
+      coords.push([lat, lon]);
+      return coords;
+    };
+
+    const getCoordsStr = (dist) => {
+      if (dist <= 0 || dist > 50000) return '';
+      const coords = generateSectorCoords(dist);
+      return coords.map(c => `${c[1]},${c[0]},0`).join(' ');
+    };
+
+    const centerStr = getCoordsStr(centerDist);
+    const nearStr = getCoordsStr(nearDist);
+    const farStr = getCoordsStr(farDist);
+
+    const styleFar = '<Style id="styleFar"><LineStyle><color>ff5555ff</color><width>2</width></LineStyle><PolyStyle><color>4d5555ff</color><fill>1</fill></PolyStyle></Style>';
+    const styleCenter = '<Style id="styleCenter"><LineStyle><color>fffeac4f</color><width>2</width></LineStyle><PolyStyle><color>4dfeac4f</color><fill>1</fill></PolyStyle></Style>';
+    const styleNear = '<Style id="styleNear"><LineStyle><color>ff53c800</color><width>2</width></LineStyle><PolyStyle><color>4d53c800</color><fill>1</fill></PolyStyle></Style>';
+
+    let kml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<kml xmlns="http://www.opengis.net/kml/2.2">\n' +
+      '  <Document>\n' +
+      '    <name>' + siteName + ' - NetTilt 3D</name>\n' +
+      styleFar + '\n' + styleCenter + '\n' + styleNear + '\n' +
+      '    <Folder>\n' +
+      '      <name>Site: ' + siteName + '</name>\n' +
+      '      <Placemark>\n' +
+      '        <name>' + siteName + '</name>\n' +
+      '        <description>Antenna Parameters: Height=' + height + 'm, Tilt=' + totalTilt.toFixed(1) + '°, Azimuth=' + az + '°, HBW=' + hbw + '°</description>\n' +
+      '        <Point><coordinates>' + lon + ',' + lat + ',0</coordinates></Point>\n' +
+      '      </Placemark>\n';
+
+    if (farStr) {
+      kml += '      <Placemark>\n' +
+        '        <name>Far Edge Coverage</name>\n' +
+        '        <styleUrl>#styleFar</styleUrl>\n' +
+        '        <Polygon><outerBoundaryIs><LinearRing><coordinates>' + farStr + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
+        '      </Placemark>\n';
+    }
+    if (centerStr) {
+      kml += '      <Placemark>\n' +
+        '        <name>Center Coverage</name>\n' +
+        '        <styleUrl>#styleCenter</styleUrl>\n' +
+        '        <Polygon><outerBoundaryIs><LinearRing><coordinates>' + centerStr + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
+        '      </Placemark>\n';
+    }
+    if (nearStr) {
+      kml += '      <Placemark>\n' +
+        '        <name>Near Edge Coverage</name>\n' +
+        '        <styleUrl>#styleNear</styleUrl>\n' +
+        '        <Polygon><outerBoundaryIs><LinearRing><coordinates>' + nearStr + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
+        '      </Placemark>\n';
+    }
+
+    kml += '    </Folder>\n' +
+      '  </Document>\n' +
+      '</kml>';
 
     const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
     const url = URL.createObjectURL(blob);
@@ -5267,5 +6073,39 @@ export class WorkspaceComponent {
 
     const azValEl = this.container.querySelector('#tilt-az-val');
     if (azValEl) azValEl.textContent = `${d.azimuth || 0}`;
+
+    // Coverage tab cards
+    const centerDistEl = this.container.querySelector('#centerDist');
+    if (centerDistEl) centerDistEl.textContent = `${Math.round(d.boresightDist)}m`;
+
+    const nearDistEl = this.container.querySelector('#nearDist');
+    if (nearDistEl) nearDistEl.textContent = `${Math.round(d.innerDist)}m`;
+
+    const farDistEl = this.container.querySelector('#farDist');
+    if (farDistEl) farDistEl.textContent = `${Math.round(d.outerDist)}m`;
+
+    const sectorAreaEl = this.container.querySelector('#sectorArea');
+    if (sectorAreaEl) {
+      const area = (d.hbw / 360) * Math.PI * Math.pow(d.boresightDist / 1000, 2);
+      sectorAreaEl.textContent = `${area.toFixed(2)}km²`;
+    }
+
+    const dotEl = this.container.querySelector('#statusDot');
+    const textEl = this.container.querySelector('#statusText');
+    if (dotEl && textEl) {
+      if (d.alignStatus === 'optimal') {
+        dotEl.className = 'status-dot optimal';
+        textEl.textContent = 'Optimal Coverage';
+      } else if (d.alignStatus === 'under') {
+        dotEl.className = 'status-dot warning';
+        textEl.textContent = 'Under-Tilted';
+      } else {
+        dotEl.className = 'status-dot critical';
+        textEl.textContent = 'Over-Tilted';
+      }
+    }
+
+    this.updateNetTilt3DView(d);
+    this.updateNetTiltSVG(d);
   }
 }

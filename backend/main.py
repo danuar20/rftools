@@ -72,7 +72,7 @@ async def add_process_time_and_security(request: Request, call_next):
                 or request.query_params.get("t")
             )
             if is_versioned:
-                response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+                response.headers["Cache-Control"] = "no-cache, must-revalidate"
                 if "pragma" in response.headers:
                     del response.headers["pragma"]
                 if "expires" in response.headers:

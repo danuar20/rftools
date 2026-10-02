@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block nav_coverage %}active{% endblock %}
+{% block subcoverage_open %}open{% endblock %}
+{% block nav_nettilt3d %}active{% endblock %}
+{% block page_title %}NetTilt 3D{% endblock %}
+{% block page_sub %}Antenna Tilt Calculator & Visualizer{% endblock %}
+
+{% block topbar_chips %}
+<div class="info-chip"><i class="fas fa-broadcast-tower" style="margin-right:4px"></i>RF Engineering Tool</div>
+{% endblock %}
+
+{% block sidebar_quickstats %}{% endblock %}
+
+{% block page_content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nettilt3d.css') }}?v=1.8">
+
+<div class="content-area">
+    <div class="input-panel">
+        <div class="panel-title">Antenna Parameters</div>
+
+        <div class="input-group">
+            <label class="input-label">Height (m) <span id="hVal">30</span></label>
+            <input type="range" class="f-range" id="heightRange" min="5" max="100" value="30" oninput="updateAll()">
+            <input type="number" class="f-input" id="heightNum" value="30" min="5" max="100" onchange="syncHeight()">
+        </div>
+
+        <div class="row-2">
+            <div class="input-group">
+                <label class="input-label">Mech Tilt</label>
+                <input type="number" class="f-input" id="mechTilt" value="3" min="0" max="15" step="0.5" onchange="updateAll()">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Elec Tilt</label>
+                <input type="number" class="f-input" id="elecTilt" value="6" min="0" max="15" step="0.5" onchange="updateAll()">
+            </div>
+        </div>
+
+        <div class="result-item" style="margin-bottom:5px;">
+            <div class="result-value" id="totalTilt">9.0°</div>
+            <div class="result-label">Total Tilt</div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Azimuth (°) <span id="azVal">0</span></label>
+            <input type="range" class="f-range" id="azimuthRange" min="0" max="360" value="0" oninput="updateAll()">
+            <input type="number" class="f-input" id="azimuthNum" value="0" min="0" max="360" onchange="syncAzimuth()">
+        </div>
+
+        <div class="row-2">
+            <div class="input-group">
+                <label class="input-label">H Beamwidth</label>
+                <input type="number" class="f-input" id="hBeam" value="65" min="20" max="120" onchange="updateAll()">
+            </div>
+            <div class="input-group">
+                <label class="input-label">V Beamwidth</label>
+                <input type="number" class="f-input" id="vBeam" value="10" min="3" max="30" onchange="updateAll()">
+            </div>
+        </div>
+
+        <div class="panel-title" style="margin-top:16px;">Site Location</div>
+
+        <div class="row-2">
+            <div class="input-group">
+                <label class="input-label">Latitude</label>
+                <input type="number" class="f-input" id="latInput" value="-6.2" step="any" onchange="updateAll()">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Longitude</label>
+                <input type="number" class="f-input" id="lonInput" value="106.8" step="any" onchange="updateAll()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Site Name</label>
+            <input type="text" class="f-input" id="siteName" value="Site_001">
+        </div>
+
+        <button class="btn-export" onclick="updateMap()">
+            <i class="fas fa-map-marker-alt" style="margin-right:4px"></i> Update Map
+        </button>
+        <button class="btn-export" onclick="exportKML()">
+            <i class="fas fa-download" style="margin-right:4px"></i> Download KML
+        </button>
+
+        <div class="formula-info">
+            <div class="formula-title"><i class="fas fa-info-circle"></i> Reference Formulas</div>
+            <div class="formula-text">
+                <strong>Total Tilt (θ)</strong> = Mech Tilt + Elec Tilt<br>
+                <strong>Center Dist</strong> = Height / tan(θ)<br>
+                <strong>Near Edge</strong> = Height / tan(θ + ½ V-Beam)<br>
+                <strong>Far Edge</strong> = Height / tan(θ - ½ V-Beam)
+            </div>
+        </div>
+    </div>
+
+    <div style="position: relative; height: 100%; min-height: 460px;">
+        <div class="right-panel panel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+            <div class="tab-bar">
+            <button class="tab-btn active" data-tab="mapTab" onclick="switchTab('mapTab')">Map View</button>
+            <button class="tab-btn" data-tab="visualTab" onclick="switchTab('visualTab')">3D Antenna Visualization</button>
+            <button class="tab-btn" data-tab="coverageTab" onclick="switchTab('coverageTab')">Coverage Estimation</button>
+        </div>
+
+        <!-- Map View Tab -->
+        <div class="tab-content active" id="mapTab">
+            <div class="tab-section">
+                <div id="leafletMap"></div>
+                <div class="layer-control">
+                    <div class="layer-icon"><i class="fas fa-layer-group"></i></div>
+                    <div class="layer-popup">
+                        <button type="button" class="active" id="btnStreetMap" onclick="setBaseLayer('street')">Street Map</button>
+                        <button type="button" id="btnSatellite" onclick="setBaseLayer('satellite')">Satellite</button>
+                    </div>
+                </div>
+                <div class="beam-control">
+                    <div class="beam-title"><i class="fas fa-signal"></i> Coverage Beams</div>
+                    <label class="beam-check"><input type="checkbox" id="chkNear" checked onchange="updateMapPolygon()"> <span class="dot near"></span> Near Edge</label>
+                    <label class="beam-check"><input type="checkbox" id="chkCenter" checked onchange="updateMapPolygon()"> <span class="dot center"></span> Center (Main)</label>
+                    <label class="beam-check"><input type="checkbox" id="chkFar" checked onchange="updateMapPolygon()"> <span class="dot far"></span> Far Edge</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Visualization Tab -->
+        <div class="tab-content" id="visualTab">
+            <div class="tab-section">
+                <canvas id="threeCanvas"></canvas>
+                <div class="three-control-panel">
+                    <button type="button" onclick="zoom3D(-0.1)" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                    <button type="button" onclick="zoom3D(0.1)" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                    <button type="button" onclick="reset3DView()" title="Reset View"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                <div class="three-legend" id="threeLegend">
+                    <div class="legend-title">3D Legend</div>
+                    <div class="legend-item"><div class="legend-color tower"></div><span>Tower Structure</span></div>
+                    <div class="legend-item"><div class="legend-color main-beam"></div><span>Main Beam (V-BW)</span></div>
+                    <div class="legend-item"><div class="legend-color center-beam"></div><span>Center Beam</span></div>
+                    <div class="legend-item"><div class="legend-color coverage"></div><span>Coverage Area</span></div>
+                    <div class="legend-item"><div class="legend-color distance"></div><span>Distance Marker</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coverage Estimation Tab -->
+        <div class="tab-content" id="coverageTab">
+            <div class="tab-section coverage-panel">
+                <div>
+                    <div class="panel-title">Coverage Estimation</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-value" id="centerDist">213.0m</div>
+                            <div class="result-label">Beam Center</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="nearDist">108.0m</div>
+                            <div class="result-label">Near Edge</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="farDist">425.0m</div>
+                            <div class="result-label">Far Edge</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="sectorArea">0.31km²</div>
+                            <div class="result-label">Sector Area</div>
+                        </div>
+                    </div>
+                    <div class="status-indicator">
+                        <div class="status-dot" id="statusDot"></div>
+                        <div class="status-text" id="statusText">Optimal Coverage</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="panel-title">Top View - Sector Footprint</div>
+                    <svg id="sectorSvg" viewBox="0 0 300 300"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<!-- Leaflet CSS/JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/nettilt3d.js') }}?v=1.8"></script>
+{% endblock %}

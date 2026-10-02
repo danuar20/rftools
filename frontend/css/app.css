@@ -2280,4 +2280,335 @@ html[data-theme="dark"] .diagram-divider {
   color: var(--color-text-primary);
 }
 
+/* ==========================================================================
+   Coverage Workspaces: 2-Column Dashboard Layout (Coverage Simulation, Hata, Tilt)
+   ========================================================================== */
+
+.content-area.main-grid,
+.content-area.cov-workspace,
+.cov-workspace,
+.cov-two-column-layout {
+  display: grid !important;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 16px !important;
+  align-items: start !important;
+  width: 100% !important;
+  min-height: calc(100vh - 140px);
+  padding: 12px 16px;
+  box-sizing: border-box !important;
+}
+
+@media (min-width: 1024px) {
+  .content-area.main-grid,
+  .content-area.cov-workspace,
+  .cov-workspace,
+  .cov-two-column-layout {
+    grid-template-columns: minmax(310px, 30%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .content-area.main-grid,
+  .content-area.cov-workspace,
+  .cov-workspace,
+  .cov-two-column-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Left Input Controls Panel (~30%) */
+.input-panel,
+.cov-input-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px !important;
+  padding: 16px !important;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0;
+}
+
+html[data-theme="dark"] .input-panel,
+html[data-theme="dark"] .cov-input-panel {
+  background: rgba(30, 30, 58, 0.6) !important;
+  border-color: rgba(79, 172, 254, 0.15) !important;
+}
+
+html[data-theme="light"] .input-panel,
+html[data-theme="light"] .cov-input-panel {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.panel-title,
+.cov-panel-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--color-primary) !important;
+  margin-bottom: 6px;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input-group,
+.cov-input-group {
+  margin-bottom: 8px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px;
+}
+
+.input-label,
+.cov-input-label {
+  display: flex !important;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.input-label span:last-child,
+.cov-input-label span:last-child,
+#hValLbl, #mechLbl, #elecLbl, #vBWLab, #hBWLab {
+  font-weight: 700 !important;
+  color: var(--color-primary) !important;
+  font-family: var(--font-mono, monospace) !important;
+}
+
+.f-range,
+.cov-range,
+.rf-cov-slider {
+  width: 100% !important;
+  height: 4px !important;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(2, 132, 199, 0.2) !important;
+  border-radius: 2px;
+  cursor: pointer;
+  margin: 6px 0 !important;
+}
+
+.f-input,
+.cov-input,
+.rf-cov-param-input {
+  width: 100% !important;
+  padding: 6px 10px !important;
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 6px !important;
+  color: var(--color-text-primary) !important;
+  font-size: 12px !important;
+  font-family: var(--font-mono, monospace) !important;
+  box-sizing: border-box !important;
+}
+
+.btn-calc,
+.cov-btn-calc {
+  width: 100% !important;
+  padding: 10px 16px !important;
+  background: linear-gradient(135deg, #00d2fe, #0072ff) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 12.5px !important;
+  cursor: pointer;
+  margin-top: 6px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 3px 12px rgba(0, 180, 255, 0.35) !important;
+}
+
+.btn-calc:hover,
+.cov-btn-calc:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.formula-box,
+.cov-formula-box {
+  background: rgba(2, 132, 199, 0.06) !important;
+  border: 1px solid rgba(2, 132, 199, 0.18) !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  margin-top: 8px !important;
+  font-size: 10.5px !important;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  font-family: var(--font-mono, monospace) !important;
+  box-sizing: border-box !important;
+}
+
+/* Right Results Panel (~70%) */
+.results-panel,
+.cov-results-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.results-card,
+.cov-results-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+html[data-theme="dark"] .results-card,
+html[data-theme="dark"] .cov-results-card {
+  background: rgba(30, 30, 58, 0.6) !important;
+  border-color: rgba(79, 172, 254, 0.15) !important;
+}
+
+html[data-theme="light"] .results-card,
+html[data-theme="light"] .cov-results-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.results-title,
+.cov-results-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--color-primary) !important;
+  margin-bottom: 10px;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.results-grid.results-grid--6,
+.cov-results-grid.results-grid--6 {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 1100px) {
+  .results-grid.results-grid--6,
+  .cov-results-grid.results-grid--6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .results-grid.results-grid--6,
+  .cov-results-grid.results-grid--6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Side-by-Side Dual Visualizers */
+.viz-grid,
+.cov-viz-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  flex: 1;
+  min-height: 380px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 800px) {
+  .viz-grid,
+  .cov-viz-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.viz-card,
+.diagram-card,
+.cov-viz-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1;
+  min-width: 0 !important;
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box !important;
+  overflow: hidden;
+}
+
+html[data-theme="dark"] .viz-card,
+html[data-theme="dark"] .cov-viz-card {
+  background: rgba(30, 30, 58, 0.6) !important;
+  border-color: rgba(79, 172, 254, 0.15) !important;
+}
+
+html[data-theme="light"] .viz-card,
+html[data-theme="light"] .cov-viz-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.viz-title,
+.cov-viz-title {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--color-primary) !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chart-area,
+.canvas-wrap,
+.cov-chart-area {
+  flex: 1;
+  min-height: 270px;
+  background: rgba(10, 10, 22, 0.4);
+  border-radius: 8px !important;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html[data-theme="light"] .chart-area,
+html[data-theme="light"] .canvas-wrap,
+html[data-theme="light"] .cov-chart-area {
+  background: #f0f4f8 !important;
+}
+
+.rf-coverage-svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 280px;
+  display: block;
+}
+
+
 
