@@ -44,7 +44,7 @@ export class DirectoryComponent {
         <!-- Section 1: KML & Site Visualization -->
         <section style="margin-bottom: 40px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-default); padding-bottom: 8px;">
-            <span style="font-size: 1.25rem;">📡</span>
+            <img src="/assets/icons/tool-prb-kml.svg" width="20" height="20" alt="" style="vertical-align:middle;">
             <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--color-text-primary); margin: 0;">
               ${state.t('nav_kml')}
             </h2>
@@ -113,7 +113,7 @@ export class DirectoryComponent {
         <!-- Section 2: Topology & Distance -->
         <section style="margin-bottom: 40px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-default); padding-bottom: 8px;">
-            <span style="font-size: 1.25rem;">📐</span>
+            <img src="/assets/icons/tool-isd-calculator.svg" width="20" height="20" alt="" style="vertical-align:middle;">
             <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--color-text-primary); margin: 0;">
               ${state.t('nav_topology')}
             </h2>
@@ -153,7 +153,7 @@ export class DirectoryComponent {
         <!-- Section 3: Geospatial & Geohash -->
         <section style="margin-bottom: 40px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-default); padding-bottom: 8px;">
-            <span style="font-size: 1.25rem;">🌐</span>
+            <img src="/assets/icons/tool-geohash-converter.svg" width="20" height="20" alt="" style="vertical-align:middle;">
             <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--color-text-primary); margin: 0;">
               ${state.t('nav_gis')}
             </h2>

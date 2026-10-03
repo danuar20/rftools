@@ -130,9 +130,14 @@ html[data-theme="light"] {
   --telemetry-accent-warning: #f59e0b;
   --telemetry-accent-critical: #ef4444;
   --telemetry-accent-vector: #6366f1;
-  --telemetry-glow-optimal: rgba(16, 185, 129, 0.12);
-  --telemetry-glow-warning: rgba(245, 158, 11, 0.12);
-  --telemetry-glow-critical: rgba(239, 68, 68, 0.12);
+  --telemetry-glow-optimal: rgba(16, 185, 129, 0.08);
+  --telemetry-glow-warning: rgba(245, 158, 11, 0.08);
+  --telemetry-glow-critical: rgba(239, 68, 68, 0.08);
+
+  /* Interactive & Disabled States */
+  --color-disabled-bg: #f1f5f9;
+  --color-disabled-text: #94a3b8;
+  --color-disabled-border: #cbd5e1;
 
   /* Spacing Scale (4px baseline) */
   --spacing-xs: 4px;
@@ -288,9 +293,14 @@ html[data-theme="dark"] {
   --telemetry-accent-warning: #fbbf24;
   --telemetry-accent-critical: #f87171;
   --telemetry-accent-vector: #818cf8;
-  --telemetry-glow-optimal: rgba(16, 185, 129, 0.18);
-  --telemetry-glow-warning: rgba(245, 158, 11, 0.18);
-  --telemetry-glow-critical: rgba(239, 68, 68, 0.18);
+  --telemetry-glow-optimal: rgba(16, 185, 129, 0.12);
+  --telemetry-glow-warning: rgba(245, 158, 11, 0.12);
+  --telemetry-glow-critical: rgba(239, 68, 68, 0.12);
+
+  /* Interactive & Disabled States */
+  --color-disabled-bg: #1e293b;
+  --color-disabled-text: #64748b;
+  --color-disabled-border: #334155;
 
   /* Refined Elevation Shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);

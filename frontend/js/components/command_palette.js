@@ -42,7 +42,7 @@ export class CommandPaletteComponent {
     this.overlay.innerHTML = `
       <div class="command-palette" role="dialog" aria-modal="true">
         <div class="command-palette__input-wrap">
-          <span style="color: var(--color-primary); font-size: 1.1rem;">🔍</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary); flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" class="command-palette__input" id="command-input" placeholder="${state.t('search_placeholder')}" autocomplete="off">
           <span class="kbd-shortcut">ESC</span>
         </div>

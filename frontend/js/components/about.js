@@ -56,7 +56,7 @@ export class AboutComponent {
         <div class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
           <div class="about-modal__header">
             <div class="about-modal__title-group">
-              <span class="about-modal__logo">📡</span>
+              <img src="/assets/icons/rf-logo.svg" alt="RF Tools" width="28" height="28" style="flex-shrink:0;">
               <div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <h2 class="about-modal__title" id="about-modal-title">RF Tools-Telco</h2>
@@ -130,12 +130,12 @@ export class AboutComponent {
         <!-- Tool Functions (6 Tools) -->
         <div class="about-section">
           <h3 class="about-section__title">
-            <span>⚙️</span> ${state.lang === 'id' ? 'Fungsi & Modul Perhitungan' : 'Engine Functions & Modules'}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg> ${state.lang === 'id' ? 'Fungsi & Modul Perhitungan' : 'Engine Functions & Modules'}
           </h3>
           <div class="about-tools-grid">
             <div class="about-tool-card" data-tool-id="excel-to-kml">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">📍</span>
+                <img src="/assets/icons/tool-excel-to-kml.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Excel &rarr; Point KML</span>
               </div>
               <p class="about-tool-card__desc">
@@ -147,7 +147,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="prb-kml">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">📡</span>
+                <img src="/assets/icons/tool-prb-kml.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Excel &rarr; PRB 3D Sector</span>
               </div>
               <p class="about-tool-card__desc">
@@ -159,7 +159,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="isd-calculator">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">📐</span>
+                <img src="/assets/icons/tool-isd-calculator.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">ISD Calculator</span>
               </div>
               <p class="about-tool-card__desc">
@@ -171,7 +171,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="geohash-converter">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">⇄</span>
+                <img src="/assets/icons/tool-geohash-converter.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Geohash Converter</span>
               </div>
               <p class="about-tool-card__desc">
@@ -183,7 +183,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="geohash-to-shp">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">🗺️</span>
+                <img src="/assets/icons/tool-geohash-to-shp.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Geohash &rarr; Shapefile</span>
               </div>
               <p class="about-tool-card__desc">
@@ -195,7 +195,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="geohash-to-latlon">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">🔍</span>
+                <img src="/assets/icons/tool-geohash-to-latlon.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Geohash &rarr; Lat / Long</span>
               </div>
               <p class="about-tool-card__desc">
@@ -207,7 +207,7 @@ export class AboutComponent {
 
             <div class="about-tool-card" data-tool-id="latlon-to-geohash">
               <div class="about-tool-card__header">
-                <span class="about-tool-card__icon">🌐</span>
+                <img src="/assets/icons/tool-latlon-to-geohash.svg" class="about-tool-card__icon" width="18" height="18" alt="">
                 <span class="about-tool-card__name">Lat / Long &rarr; Geohash</span>
               </div>
               <p class="about-tool-card__desc">
@@ -222,7 +222,7 @@ export class AboutComponent {
         <!-- Developer Contact Card -->
         <div class="about-section">
           <h3 class="about-section__title">
-            <span>👤</span> ${state.lang === 'id' ? 'Informasi Pengembang' : 'Developer & Engineering Contact'}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${state.lang === 'id' ? 'Informasi Pengembang' : 'Developer & Engineering Contact'}
           </h3>
           <div class="about-contact-card">
             <div class="about-contact-row">

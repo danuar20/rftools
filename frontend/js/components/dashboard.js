@@ -191,7 +191,7 @@ export class DashboardComponent {
               
               <!-- Inspector Header -->
               <rect x="0" y="0" width="180" height="30" rx="5" fill="#0284C7" class="diagram-header-primary"/>
-              <text x="12" y="20" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">📍 Placemark Inspector</text>
+              <text x="12" y="20" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">Placemark Inspector</text>
 
               <g transform="translate(12, 45)">
                 <text x="0" y="0" fill="#64748B" class="diagram-text-muted" font-size="7.5">TARGET SITENAME:</text>
@@ -287,7 +287,7 @@ export class DashboardComponent {
             <g transform="translate(262, 68)">
               <rect width="144" height="144" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               <rect x="0" y="0" width="144" height="24" rx="5" fill="#059669" class="diagram-header-success"/>
-              <text x="10" y="16" fill="#FFFFFF" font-size="9" font-weight="bold" font-family="sans-serif">📊 ISD_Results.xlsx</text>
+              <text x="10" y="16" fill="#FFFFFF" font-size="9" font-weight="bold" font-family="sans-serif">ISD_Results.xlsx</text>
 
               <g transform="translate(10, 38)">
                 <text x="0" y="0" fill="#64748B" class="diagram-text-muted" font-size="7.5">COMPUTED PAIRS:</text>
@@ -357,7 +357,7 @@ export class DashboardComponent {
               <rect width="150" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
               <rect x="0" y="0" width="150" height="28" rx="5" fill="#4F46E5" class="diagram-header-accent"/>
-              <text x="12" y="18" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">📦 ESRI Shapefile Bundle</text>
+              <text x="12" y="18" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">ESRI Shapefile Bundle</text>
 
               <g transform="translate(12, 40)">
                 <text x="0" y="10" fill="#0284C7" class="diagram-text-primary" font-size="9" font-weight="bold" font-family="monospace">• layer.shp</text>
@@ -473,7 +473,7 @@ export class DashboardComponent {
             <g transform="translate(204, 20)">
               <rect width="198" height="190" rx="6" fill="#FFFFFF" stroke="#E2E8F0" class="diagram-panel" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
               
-              <text x="14" y="24" fill="#0F172A" class="diagram-text-title" font-size="10.5" font-weight="bold" font-family="sans-serif">⚡ Geohash Pipeline</text>
+              <text x="14" y="24" fill="#0F172A" class="diagram-text-title" font-size="10.5" font-weight="bold" font-family="sans-serif">Geohash Pipeline</text>
               <line x1="14" y1="32" x2="184" y2="32" stroke="#E2E8F0" class="diagram-divider"/>
 
               <!-- Precision Bar -->
@@ -524,7 +524,7 @@ export class DashboardComponent {
               <div class="slideshow-slide" data-slide-index="${idx}">
                 <div class="slide-content">
                   <div class="slide-tag">
-                    <span>📡</span> ${s.tag}
+                    ${s.tag}
                   </div>
                   <h2 class="slide-title">${s.title}</h2>
                   <p class="slide-desc">${s.desc}</p>
@@ -535,7 +535,7 @@ export class DashboardComponent {
 
                   <div class="slide-actions">
                     <a href="${s.route}" class="rf-btn rf-btn-primary" style="padding: 8px 18px; text-decoration: none;">
-                      <span>⚡ ${state.lang === 'id' ? 'Buka Ruang Kerja' : 'Launch Workspace'} &rarr;</span>
+                      <span>${state.lang === 'id' ? 'Buka Ruang Kerja' : 'Launch Workspace'} &rarr;</span>
                     </a>
                   </div>
                 </div>
@@ -598,7 +598,7 @@ export class DashboardComponent {
             value="${this.searchQuery}"
             style="width: 100%; text-align: left; padding-left: 34px; border-radius: 9999px; box-sizing: border-box; font-size: 0.8125rem;"
           >
-          <span style="position: absolute; left: 12px; top: 7px; color: var(--color-text-muted); font-size: 0.875rem; pointer-events: none;">🔍</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 10px; color: var(--color-text-muted); pointer-events: none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
       </div>
 
@@ -859,8 +859,9 @@ export class DashboardComponent {
     if (tools.length === 0) {
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--color-text-muted);">
-          <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
-          <div>${state.t('no_tools_found', 'No tools match your filter or search.')}</div>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 12px; color: var(--color-text-muted); opacity: 0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <div style="font-weight: 500; font-size: 0.9375rem; color: var(--color-text-secondary); margin-bottom: 4px;">${state.t('no_tools_found', 'No tools match your filter or search.')}</div>
+          <div style="font-size: 0.8125rem;">Try adjusting your search terms or clearing the active category filter.</div>
         </div>
       `;
       return;
@@ -897,12 +898,12 @@ export class DashboardComponent {
             class="rf-template-link" 
             download 
             title="Download sample template file"
-            style="display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; color: var(--color-text-secondary); text-decoration: none; font-weight: 500;"
+            style="display: flex; align-items: center; gap: 5px; font-size: 0.8125rem; color: var(--color-text-secondary); text-decoration: none; font-weight: 500;"
           >
             <span>📥 Template</span>
           </a>` : `
           <span style="font-size: 0.8125rem; color: var(--color-brand, #38BDF8); font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
-            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10B981; box-shadow: 0 0 6px #10B981;"></span>
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10B981; border: 1px solid rgba(16, 185, 129, 0.4);"></span>
             <span>${state.lang === 'id' ? 'Interaktif ⇄' : 'Interactive ⇄'}</span>
           </span>`}
         </div>

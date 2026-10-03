@@ -232,13 +232,13 @@ export class WorkspaceComponent {
 
           <div class="workspace-header-actions">
             <button class="rf-btn rf-btn-secondary" id="ws-download-template-btn" title="Download official sample template">
-              <span>📥 ${state.t('btn_download_template')}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>${state.t('btn_download_template')}</span>
             </button>
             <button class="rf-btn rf-btn-ghost" id="ws-formula-guide-btn" title="View math formulae &amp; specifications">
-              <span>📖 Guide</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Guide</span>
             </button>
             <button class="rf-btn rf-btn-ghost" id="ws-reset-btn" title="Reset workspace form">
-              <span>🔄 ${state.t('btn_reset')}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>${state.t('btn_reset')}</span>
             </button>
           </div>
         </header>
@@ -338,8 +338,8 @@ export class WorkspaceComponent {
       <div class="modal-overlay" id="formula-modal-overlay">
         <div class="command-palette" style="width: 720px; max-height: 85vh; display: flex; flex-direction: column;">
           <div class="command-palette__input-wrap" style="justify-content: space-between;">
-            <div style="font-weight: 700; color: var(--color-text-primary); font-size: 1.1rem;">
-              📖 Calculation Formula &amp; Engineering Specification
+            <div style="font-weight: 700; color: var(--color-text-primary); font-size: 1.1rem; display: flex; align-items: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; color: var(--color-primary);"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Calculation Formula &amp; Engineering Specification
             </div>
             <button class="rf-btn rf-btn-ghost" id="formula-modal-close" style="padding: 4px 8px;">&times;</button>
           </div>
@@ -375,7 +375,7 @@ export class WorkspaceComponent {
         </div>
         <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px;">
           <button class="rf-btn rf-btn-secondary" id="load-sample-isd-btn" style="padding: 6px 14px; font-size: 0.8125rem;">
-            <span>📄 ${state.t('btn_load_sample')}</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>${state.t('btn_load_sample')}</span>
           </button>
         </div>
       `;
@@ -391,7 +391,7 @@ export class WorkspaceComponent {
       ${this.renderEmptyDropzone('single')}
       <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px;">
         <button class="rf-btn rf-btn-secondary" id="load-sample-data-btn" style="padding: 6px 14px; font-size: 0.8125rem;">
-          <span>📄 ${state.t('btn_load_sample')}</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>${state.t('btn_load_sample')}</span>
         </button>
       </div>
     `;
@@ -444,10 +444,10 @@ export class WorkspaceComponent {
         <div class="rf-dropzone-chip__actions">
           <input type="file" id="replace-input-${id}" accept=".xlsx,.xls,.csv" style="display: none;">
           <button class="rf-btn rf-btn-secondary replace-file-btn" data-target="${id}" style="padding: 5px 10px; font-size: 0.75rem;">
-            <span>🔄 Replace</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>Replace</span>
           </button>
           <button class="rf-btn rf-btn-destructive remove-file-btn" data-target="${id}" style="padding: 5px 10px; font-size: 0.75rem;">
-            <span>✕ Remove</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Remove</span>
           </button>
         </div>
       </div>
@@ -459,65 +459,65 @@ export class WorkspaceComponent {
       case 'excel-to-kml':
         return {
           mandatory: [
-            { key: 'lat_col', label: 'Latitude Coordinate', defaultRole: 'latitude', icon: '📍', required: true },
-            { key: 'lon_col', label: 'Longitude Coordinate', defaultRole: 'longitude', icon: '📍', required: true }
+            { key: 'lat_col', label: 'Latitude Coordinate', defaultRole: 'latitude', icon: '', required: true },
+            { key: 'lon_col', label: 'Longitude Coordinate', defaultRole: 'longitude', icon: '', required: true }
           ],
           optional: [
-            { key: 'name_col', label: 'Site Name / Label', defaultRole: 'site_name', icon: '🏷️', required: false }
+            { key: 'name_col', label: 'Site Name / Label', defaultRole: 'site_name', icon: '', required: false }
           ]
         };
       case 'prb-kml':
         return {
           mandatory: [
-            { key: 'lat', label: 'Latitude Coordinate (LAT)', defaultRole: 'latitude', icon: '📍', required: true },
-            { key: 'lon', label: 'Longitude Coordinate (LONG)', defaultRole: 'longitude', icon: '📍', required: true },
-            { key: 'azimuth', label: 'Azimuth Direction (0-360°)', defaultRole: 'azimuth', icon: '🧭', required: true },
-            { key: 'beam', label: 'Beam / Carrier Band (LTE1800...)', defaultRole: 'beam', icon: '📡', required: true }
+            { key: 'lat', label: 'Latitude Coordinate (LAT)', defaultRole: 'latitude', icon: '', required: true },
+            { key: 'lon', label: 'Longitude Coordinate (LONG)', defaultRole: 'longitude', icon: '', required: true },
+            { key: 'azimuth', label: 'Azimuth Direction (0-360°)', defaultRole: 'azimuth', icon: '', required: true },
+            { key: 'beam', label: 'Beam / Carrier Band (LTE1800...)', defaultRole: 'beam', icon: '', required: true }
           ],
           optional: [
-            { key: 'sitename', label: 'Site Name (SITENAME)', defaultRole: 'site_name', icon: '🏷️', required: false },
-            { key: 'cellname', label: 'Cell Name (CELLNAME)', defaultRole: 'cell_name', icon: '📶', required: false },
-            { key: 'dl_prb', label: 'DL PRB Utilization (%)', defaultRole: 'dl_prb', icon: '📊', required: false },
-            { key: 'ul_prb', label: 'UL PRB Utilization (%)', defaultRole: 'ul_prb', icon: '📊', required: false },
-            { key: 'rrc_user', label: 'RRC Connected Users', defaultRole: 'rrc_user', icon: '👥', required: false }
+            { key: 'sitename', label: 'Site Name (SITENAME)', defaultRole: 'site_name', icon: '', required: false },
+            { key: 'cellname', label: 'Cell Name (CELLNAME)', defaultRole: 'cell_name', icon: '', required: false },
+            { key: 'dl_prb', label: 'DL PRB Utilization (%)', defaultRole: 'dl_prb', icon: '', required: false },
+            { key: 'ul_prb', label: 'UL PRB Utilization (%)', defaultRole: 'ul_prb', icon: '', required: false },
+            { key: 'rrc_user', label: 'RRC Connected Users', defaultRole: 'rrc_user', icon: '', required: false }
           ]
         };
       case 'isd-calculator':
         return {
           mandatoryA: [
-            { key: 'lat_col_a', label: 'File A Latitude', defaultRole: 'latitude', icon: '📍', required: true },
-            { key: 'lon_col_a', label: 'File A Longitude', defaultRole: 'longitude', icon: '📍', required: true }
+            { key: 'lat_col_a', label: 'File A Latitude', defaultRole: 'latitude', icon: '', required: true },
+            { key: 'lon_col_a', label: 'File A Longitude', defaultRole: 'longitude', icon: '', required: true }
           ],
           optionalA: [
-            { key: 'name_col_a', label: 'File A Site ID / Name', defaultRole: 'site_name', icon: '🏷️', required: false }
+            { key: 'name_col_a', label: 'File A Site ID / Name', defaultRole: 'site_name', icon: '', required: false }
           ],
           mandatoryB: [
-            { key: 'lat_col_b', label: 'File B Latitude', defaultRole: 'latitude', icon: '📍', required: true },
-            { key: 'lon_col_b', label: 'File B Longitude', defaultRole: 'longitude', icon: '📍', required: true }
+            { key: 'lat_col_b', label: 'File B Latitude', defaultRole: 'latitude', icon: '', required: true },
+            { key: 'lon_col_b', label: 'File B Longitude', defaultRole: 'longitude', icon: '', required: true }
           ],
           optionalB: [
-            { key: 'name_col_b', label: 'File B Site ID / Name', defaultRole: 'site_name', icon: '🏷️', required: false }
+            { key: 'name_col_b', label: 'File B Site ID / Name', defaultRole: 'site_name', icon: '', required: false }
           ]
         };
       case 'geohash-to-shp':
         return {
           mandatory: [
-            { key: 'geohash_col', label: 'Geohash Token Column', defaultRole: 'geohash', icon: '🌐', required: true }
+            { key: 'geohash_col', label: 'Geohash Token Column', defaultRole: 'geohash', icon: '', required: true }
           ],
           optional: []
         };
       case 'geohash-to-latlon':
         return {
           mandatory: [
-            { key: 'geohash_col', label: 'Geohash Token Column', defaultRole: 'geohash', icon: '🌐', required: true }
+            { key: 'geohash_col', label: 'Geohash Token Column', defaultRole: 'geohash', icon: '', required: true }
           ],
           optional: []
         };
       case 'latlon-to-geohash':
         return {
           mandatory: [
-            { key: 'lat_col', label: 'Latitude Coordinate', defaultRole: 'latitude', icon: '📍', required: true },
-            { key: 'lon_col', label: 'Longitude Coordinate', defaultRole: 'longitude', icon: '📍', required: true }
+            { key: 'lat_col', label: 'Latitude Coordinate', defaultRole: 'latitude', icon: '', required: true },
+            { key: 'lon_col', label: 'Longitude Coordinate', defaultRole: 'longitude', icon: '', required: true }
           ],
           optional: []
         };
@@ -535,7 +535,7 @@ export class WorkspaceComponent {
     if (!inspection || !inspection.columns || inspection.columns.length === 0) {
       return `
         <div style="padding: 32px; text-align: center; color: var(--color-text-muted); font-size: 0.875rem;">
-          <div style="font-size: 1.5rem; margin-bottom: 8px;">🎛️</div>
+          <div style="margin-bottom: 8px; color: var(--color-text-muted);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
           <div>Upload a workbook in Zone 1 to auto-detect and map columns.</div>
         </div>
       `;
@@ -561,7 +561,7 @@ export class WorkspaceComponent {
     if (!inspA && !inspB) {
       return `
         <div style="padding: 32px; text-align: center; color: var(--color-text-muted); font-size: 0.875rem;">
-          <div style="font-size: 1.5rem; margin-bottom: 8px;">🎛️</div>
+          <div style="margin-bottom: 8px; color: var(--color-text-muted);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
           <div>Upload File A and File B in Zone 1 to configure coordinate mappings.</div>
         </div>
       `;
@@ -630,7 +630,7 @@ export class WorkspaceComponent {
     return `
       <div class="rf-mapping-row">
         <div class="rf-mapping-label">
-          <span>${field.icon} ${field.label}</span>
+          <span>${field.icon ? `${field.icon} ` : ''}${field.label}</span>
           ${field.required ? '<span class="rf-mapping-label__required">*</span>' : ''}
         </div>
         <div class="rf-mapping-control-wrap">
@@ -1191,7 +1191,7 @@ export class WorkspaceComponent {
         </div>
         <div>
           <button class="rf-btn rf-btn-primary" id="download-deliverable-cta" style="padding: 8px 18px; font-size: 0.875rem;">
-            <span>📥 Download Deliverable (.${meta.outputExt})</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Download Deliverable (.${meta.outputExt})</span>
           </button>
         </div>
       </div>
@@ -2151,6 +2151,7 @@ export class WorkspaceComponent {
         try {
           previewBtn.disabled = true;
           executeBtn.disabled = true;
+          previewBtn.classList.add('rf-btn--loading');
           toast.info('Requesting calculation preview from engine...');
           const fd = this.buildFormData();
           const res = await ApiService.processTool(this.toolId, fd, true);
@@ -2162,6 +2163,7 @@ export class WorkspaceComponent {
         } catch (err) {
           toast.error(`Preview failed: ${err.message}`);
         } finally {
+          previewBtn.classList.remove('rf-btn--loading');
           previewBtn.disabled = !this.canCalculate();
           executeBtn.disabled = !this.canCalculate();
         }
@@ -2175,8 +2177,9 @@ export class WorkspaceComponent {
         try {
           previewBtn.disabled = true;
           executeBtn.disabled = true;
+          executeBtn.classList.add('rf-btn--loading');
           if (spinner) spinner.style.display = 'inline-block';
-          if (execText) execText.textContent = 'Processing & Packaging...';
+          if (execText) execText.textContent = state.t('btn_processing', 'Processing & Packaging...');
           toast.info('Running pure calculation engine...');
 
           const fd = this.buildFormData();
@@ -2188,8 +2191,9 @@ export class WorkspaceComponent {
         } catch (err) {
           toast.error(`Processing failed: ${err.message}`);
         } finally {
+          executeBtn.classList.remove('rf-btn--loading');
           if (spinner) spinner.style.display = 'none';
-          if (execText) execText.textContent = '⚡ Process & Generate Deliverable';
+          if (execText) execText.textContent = state.t('btn_execute', 'Execute & Deliver');
           previewBtn.disabled = !this.canCalculate();
           executeBtn.disabled = !this.canCalculate();
         }
@@ -2332,7 +2336,7 @@ export class WorkspaceComponent {
 
           <div class="workspace-header-actions">
             <button class="rf-btn rf-btn-ghost" id="gh-reset-btn" title="Reset to default coordinates">
-              <span>🔄 ${state.t('btn_reset', 'Reset')}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>${state.t('btn_reset', 'Reset')}</span>
             </button>
           </div>
         </header>
@@ -2347,11 +2351,11 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>#️⃣</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
                     <span>${state.lang === 'id' ? 'Kode String GeoHash' : 'GeoHash String'}</span>
                   </h2>
                   <span class="gh-card__badge" id="gh-status-badge">
-                    ${isValid ? `● Valid Base-32 (${curHash.length} chars)` : `⚠️ ${state.lang === 'id' ? 'Tidak Valid' : 'Invalid Base-32'}`}
+                    ${isValid ? `● Valid Base-32 (${curHash.length} chars)` : `● ${state.lang === 'id' ? 'Tidak Valid' : 'Invalid Base-32'}`}
                   </span>
                 </div>
 
@@ -2371,7 +2375,7 @@ export class WorkspaceComponent {
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </button>
                     <button class="rf-btn rf-btn-ghost" id="gh-clear-hash-btn" title="Clear input" style="padding: 6px 10px; font-size: 0.75rem;">
-                      <span>✕</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                   </div>
                 </div>
@@ -2403,7 +2407,7 @@ export class WorkspaceComponent {
                       <span>${state.lang === 'id' ? 'Salin Koordinat' : 'Copy Coords'}</span>
                     </button>
                     <button class="rf-btn rf-btn-ghost" id="gh-swap-coords-btn" title="Swap Lat and Long" style="padding: 3px 8px; font-size: 0.75rem;">
-                      <span>⇄</span>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
                     </button>
                   </div>
                 </div>
@@ -2462,7 +2466,7 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>🎯</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                     <span>${state.lang === 'id' ? 'Pengaturan Presisi (1 – 12)' : 'Precision Tuning (1 – 12)'}</span>
                   </h2>
                   <span class="gh-card__badge" id="gh-prec-badge" style="background: rgba(56, 189, 248, 0.15); color: var(--color-primary); border-color: rgba(56, 189, 248, 0.3);">
@@ -2474,14 +2478,14 @@ export class WorkspaceComponent {
                   <div class="gh-slider-row">
                     <button class="rf-btn rf-btn-secondary" id="gh-prec-dec-btn" style="padding: 4px 12px; font-size: 0.8125rem; font-weight: 700;">-</button>
                     <input 
-                      type="range" 
-                      id="gh-slider-precision" 
-                      class="gh-slider" 
-                      min="1" 
-                      max="12" 
-                      step="1" 
-                      value="${curPrec}"
-                    >
+                    type="range" 
+                    id="gh-slider-precision" 
+                    class="gh-slider" 
+                    min="1" 
+                    max="12" 
+                    step="1" 
+                    value="${curPrec}"
+                  >
                     <button class="rf-btn rf-btn-secondary" id="gh-prec-inc-btn" style="padding: 4px 12px; font-size: 0.8125rem; font-weight: 700;">+</button>
                     <span style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; min-width: 28px; text-align: center;" id="gh-prec-val-display">
                       ${curPrec}
@@ -2541,7 +2545,7 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>🧭</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                     <span>${state.lang === 'id' ? 'Eksplorasi 8-Tetangga Terdekat' : '8-Neighbor Adjacent Explorer'}</span>
                   </h2>
                   <span class="gh-card__badge">${state.lang === 'id' ? '3x3 Matriks' : '3x3 Matrix'}</span>
@@ -2559,7 +2563,7 @@ export class WorkspaceComponent {
               <div class="gh-card">
                 <div class="gh-card__header">
                   <h2 class="gh-card__title">
-                    <span>📍</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span>${state.lang === 'id' ? 'Pilihan Landmark Populer' : 'Quick Landmark Presets'}</span>
                   </h2>
                   <span class="gh-card__badge" id="gh-backend-sync" style="background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: rgba(16, 185, 129, 0.3);">
@@ -2569,22 +2573,22 @@ export class WorkspaceComponent {
 
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.175392" data-lon="106.827153" data-name="Monas Jakarta" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🇮🇩 Monas Jakarta
+                    Monas Jakarta
                   </button>
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.218335" data-lon="106.802216" data-name="GBK Senayan" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🇮🇩 GBK Stadium
+                    GBK Stadium
                   </button>
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="-6.230556" data-lon="106.819444" data-name="Telkom Landmark" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🏢 Telkom Landmark
+                    Telkom Landmark
                   </button>
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="48.858370" data-lon="2.294480" data-name="Eiffel Tower" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🇫🇷 Eiffel Tower
+                    Eiffel Tower
                   </button>
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="35.658580" data-lon="139.745430" data-name="Tokyo Tower" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🇯🇵 Tokyo Tower
+                    Tokyo Tower
                   </button>
                   <button class="rf-btn rf-btn-ghost gh-preset-btn" data-lat="40.758896" data-lon="-73.985130" data-name="Times Square" style="padding: 5px 10px; font-size: 0.75rem;">
-                    🇺🇸 Times Square
+                    Times Square
                   </button>
                 </div>
               </div>
@@ -2829,7 +2833,7 @@ export class WorkspaceComponent {
 
       if (!valid) {
         if (statusBadge) {
-          statusBadge.innerHTML = `⚠️ ${state.lang === 'id' ? 'Karakter Base-32 tidak valid' : 'Invalid Base-32 chars'}`;
+          statusBadge.innerHTML = `● ${state.lang === 'id' ? 'Karakter Base-32 tidak valid' : 'Invalid Base-32 chars'}`;
           statusBadge.style.color = '#EF4444';
         }
         return;
@@ -3004,7 +3008,7 @@ export class WorkspaceComponent {
         inputHash.value = '';
         inputHash.focus();
         if (statusBadge) {
-          statusBadge.innerHTML = '⚠️ Awaiting geohash input';
+          statusBadge.innerHTML = '● Awaiting geohash input';
           statusBadge.style.color = '#94A3B8';
         }
       });
